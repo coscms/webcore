@@ -1,0 +1,48 @@
+id: Forms
+theme: bootstrap3
+template: ""
+method: POST
+action: ""
+attributes:
+    - - class
+      - form-horizontal
+    - - role
+      - form
+withbuttons: true
+buttons: []
+btnstemplate: ""
+elements:
+    - id: ""
+      type: text
+      name: Name
+      label: Name
+      labelcols: 0
+      fieldcols: 0
+      value: ""
+      helptext: ""
+      template: ""
+      valid: ""
+      attributes: []
+      choices: []
+      elements: []
+      format: ""
+      languages: []
+      data: {}
+    - id: ""
+      type: text
+      name: Age
+      label: Age
+      labelcols: 0
+      fieldcols: 0
+      value: "0"
+      helptext: ""
+      template: ""
+      valid: ""
+      attributes: []
+      choices: []
+      elements: []
+      format: ""
+      languages: []
+      data: {}
+languages: []
+data: {}
