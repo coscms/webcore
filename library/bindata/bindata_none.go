@@ -36,7 +36,6 @@ import (
 	"github.com/coscms/webcore/cmd/bootconfig"
 	"github.com/coscms/webcore/initialize/backend"
 	"github.com/coscms/webcore/library/modal"
-	"github.com/coscms/webcore/library/ntemplate"
 	uploadLibrary "github.com/coscms/webcore/library/upload"
 	"github.com/coscms/webcore/registry/route"
 )
@@ -48,11 +47,6 @@ var StaticOptions = &middleware.StaticOptions{
 	Fallback: []string{},
 	MaxAge:   bootconfig.HTTPCacheMaxAge,
 }
-
-// PathAliases 后台模板文件路径别名分组
-//
-//	一般用于登记模块中的路径别名分组
-var PathAliases = ntemplate.NewPathAliases()
 
 // Initialize 后台模板等素材初始化配置
 func Initialize() {
