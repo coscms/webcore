@@ -17,12 +17,12 @@ func QrCode(ctx echo.Context) error {
 	siz := strings.SplitN(size, `x`, 2)
 	switch len(siz) {
 	case 2:
-		if i := ctx.Atop(siz[1]).Int(); i > 0 {
+		if i := ctx.Atop(siz[1]).Int(); i > 0 && i < 1000 {
 			height = i
 		}
 		fallthrough
 	case 1:
-		if i := ctx.Atop(siz[0]).Int(); i > 0 {
+		if i := ctx.Atop(siz[0]).Int(); i > 0 && i < 1000 {
 			width = i
 		}
 	}
