@@ -41,7 +41,7 @@ import (
 	"github.com/coscms/webcore/registry/route"
 )
 
-// StaticOptions static中间件选项
+// StaticOptions 后台static中间件选项
 var StaticOptions = &middleware.StaticOptions{
 	Root:     "",
 	Path:     "",
@@ -49,9 +49,12 @@ var StaticOptions = &middleware.StaticOptions{
 	MaxAge:   bootconfig.HTTPCacheMaxAge,
 }
 
+// PathAliases 后台模板文件路径别名分组
+//
+//	一般用于登记模块中的路径别名分组
 var PathAliases = ntemplate.NewPathAliases()
 
-// Initialize 初始化
+// Initialize 后台模板等素材初始化配置
 func Initialize() {
 	bootconfig.Bindata = false
 	if len(StaticOptions.Root) == 0 {
