@@ -191,7 +191,7 @@ func SetAssets(backendSo *middleware.StaticOptions, frontendSo *middleware.Stati
 		}
 	case `backend`:
 		backendSo.AddFallback(assetsPath)
-	case `template`:
+	case `assets`:
 		if frontendSo != nil && com.IsDir(assetsPath+`/frontend`) {
 			frontendSo.AddFallback(assetsPath + `/frontend`)
 		}
