@@ -55,7 +55,7 @@ func Initialize() {
 		StaticOptions.Root = backend.AssetsDir
 	}
 	if len(StaticOptions.Path) == 0 {
-		StaticOptions.Path = route.Prefix() + "/public/assets/"
+		StaticOptions.Path = route.Prefix() + "/public/assets/backend"
 	}
 	StaticOptions.TrimPrefix = route.Prefix()
 	bootconfig.StaticMW = middleware.Static(StaticOptions)

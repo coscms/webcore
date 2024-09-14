@@ -48,7 +48,7 @@ import (
 
 const (
 	DefaultTemplateDir   = `./template/backend`
-	DefaultAssetsDir     = `./public/assets`
+	DefaultAssetsDir     = `./public/assets/backend`
 	DefaultAssetsURLPath = `/public/assets/backend`
 )
 
