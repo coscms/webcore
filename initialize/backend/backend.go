@@ -58,6 +58,7 @@ var (
 	AssetsURLPath         = DefaultAssetsURLPath
 	DefaultAvatarURL      = AssetsURLPath + `/images/user_128.png`
 	RendererDo            = func(driver.Driver) {}
+	TmplCustomParser      func(tmpl string, content []byte) []byte
 	ParseStrings          = map[string]string{}
 	ParseStringFuncs      = map[string]func() string{}
 	DefaultLocalHostNames = []string{
@@ -171,6 +172,7 @@ func start() {
 		ErrorPages:           config.FromFile().Sys.ErrorPages,
 		ErrorProcessors:      common.ErrorProcessors,
 		FuncMapGlobal:        backend.GlobalFuncMap(),
+		CustomParser:         TmplCustomParser,
 	}
 	for key, val := range ParseStrings {
 		renderOptions.ParseStrings[key] = val
