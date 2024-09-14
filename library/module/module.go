@@ -1,6 +1,7 @@
 package module
 
 import (
+	"path"
 	"strings"
 
 	"github.com/coscms/webcore/library/common"
@@ -13,6 +14,7 @@ import (
 	"github.com/coscms/webcore/registry/dashboard"
 	"github.com/coscms/webcore/registry/navigate"
 	"github.com/coscms/webcore/registry/settings"
+	"github.com/webx-top/com"
 	"github.com/webx-top/echo/middleware"
 )
 
@@ -64,18 +66,18 @@ func (m *Module) setCmder(*config.CLIConfig) {
 	}
 }
 
-func (m *Module) setTemplate(pa *ntemplate.PathAliases) {
+func (m *Module) setTemplate(backendPa *ntemplate.PathAliases, frontendPa *ntemplate.PathAliases) {
 	if m.TemplatePath == nil {
 		return
 	}
 	for k, v := range m.TemplatePath {
-		SetTemplate(pa, k, v)
+		SetTemplate(backendPa, frontendPa, k, v)
 	}
 }
 
-func (m *Module) setAssets(so *middleware.StaticOptions) {
+func (m *Module) setAssets(backendSo *middleware.StaticOptions, frontendSo *middleware.StaticOptions) {
 	for _, v := range m.AssetsPath {
-		SetAssets(so, v)
+		SetAssets(backendSo, frontendSo, v)
 	}
 }
 
@@ -149,22 +151,52 @@ func (m *Module) Apply() {
 	m.setCronJob()
 }
 
-func SetTemplate(pa *ntemplate.PathAliases, key string, templatePath string) {
+func SetTemplate(backendPa *ntemplate.PathAliases, frontendPa *ntemplate.PathAliases, key string, templatePath string) {
 	if len(templatePath) == 0 {
 		return
 	}
 	if templatePath[0] != '.' && templatePath[0] != '/' && !strings.HasPrefix(templatePath, `vendor/`) {
 		templatePath = NgingPluginDir + `/` + templatePath
 	}
-	pa.Add(key, templatePath)
+	dir := path.Base(templatePath)
+	switch dir {
+	case `frontend`:
+		if frontendPa != nil {
+			frontendPa.Add(key, templatePath)
+		}
+	case `backend`:
+		backendPa.Add(key, templatePath)
+	case `template`:
+		if frontendPa != nil && com.IsDir(templatePath+`/frontend`) {
+			frontendPa.Add(key, templatePath+`/frontend`)
+		}
+		if com.IsDir(templatePath + `/backend`) {
+			backendPa.Add(key, templatePath+`/backend`)
+		}
+	}
 }
 
-func SetAssets(so *middleware.StaticOptions, assetsPath string) {
+func SetAssets(backendSo *middleware.StaticOptions, frontendSo *middleware.StaticOptions, assetsPath string) {
 	if len(assetsPath) == 0 {
 		return
 	}
 	if assetsPath[0] != '.' && assetsPath[0] != '/' && !strings.HasPrefix(assetsPath, `vendor/`) {
 		assetsPath = NgingPluginDir + `/` + assetsPath
 	}
-	so.AddFallback(assetsPath)
+	dir := path.Base(assetsPath)
+	switch dir {
+	case `frontend`:
+		if frontendSo != nil {
+			frontendSo.AddFallback(assetsPath)
+		}
+	case `backend`:
+		backendSo.AddFallback(assetsPath)
+	case `template`:
+		if frontendSo != nil && com.IsDir(assetsPath+`/frontend`) {
+			frontendSo.AddFallback(assetsPath + `/frontend`)
+		}
+		if com.IsDir(assetsPath + `/backend`) {
+			backendSo.AddFallback(assetsPath + `/backend`)
+		}
+	}
 }
