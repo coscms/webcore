@@ -2,6 +2,7 @@ package dashboard
 
 import (
 	"html/template"
+	"strings"
 
 	"github.com/webx-top/echo"
 )
@@ -67,13 +68,13 @@ func (c *Tmplxs) Ready(ctx echo.Context) error {
 }
 
 func (c Tmplxs) Render(ctx echo.Context) template.HTML {
-	var r template.HTML
+	var r strings.Builder
 	for _, blk := range c {
 		if blk != nil {
-			r += blk.Render(ctx)
+			r.WriteString(string(blk.Render(ctx)))
 		}
 	}
-	return r
+	return template.HTML(r.String())
 }
 
 // Remove 删除元素
