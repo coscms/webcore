@@ -1,10 +1,12 @@
 package dashboard
 
 import (
+	"html/template"
 	"strings"
 
 	"github.com/coscms/webcore/library/common"
 	"github.com/webx-top/echo"
+	"github.com/webx-top/echo/engine"
 )
 
 func NewPage(key string, atmpls ...map[string][]string) *Page {
@@ -63,4 +65,12 @@ func (s *Page) Fire(ctx echo.Context) error {
 		}
 	}
 	return errs.ToError()
+}
+
+func Render(ctx echo.Context, tmpl string, data interface{}) template.HTML {
+	b, err := ctx.Fetch(tmpl, data)
+	if err != nil {
+		return template.HTML(err.Error())
+	}
+	return template.HTML(engine.Bytes2str(b))
 }

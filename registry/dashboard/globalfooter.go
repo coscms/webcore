@@ -43,12 +43,12 @@ func GlobalFooterAdd(index int, footer ...*GlobalFooter) {
 	globalFooters.Add(index, footer...)
 }
 
-//GlobalFooterRemove 删除元素
+// GlobalFooterRemove 删除元素
 func GlobalFooterRemove(index int) {
 	globalFooters.Remove(index)
 }
 
-//GlobalFooterSet 设置元素
+// GlobalFooterSet 设置元素
 func GlobalFooterSet(index int, list ...*GlobalFooter) {
 	globalFooters.Set(index, list...)
 }

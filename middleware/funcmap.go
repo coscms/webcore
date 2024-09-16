@@ -29,7 +29,6 @@ import (
 	"github.com/coscms/webcore/library/common"
 	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webcore/library/modal"
-	"github.com/coscms/webcore/library/perm"
 	"github.com/coscms/webcore/library/role"
 	"github.com/coscms/webcore/library/role/roleutils"
 	"github.com/coscms/webcore/library/sessionguard"
@@ -128,15 +127,6 @@ func BackendFuncMap() echo.MiddlewareFunc {
 					return nil
 				}
 				return d.Get(c, dtype)
-			})
-			c.SetFunc(`IsHiddenCard`, func(card *dashboard.Card) bool {
-				return card.IsHidden(c)
-			})
-			c.SetFunc(`IsHiddenBlock`, func(block *dashboard.Block) bool {
-				return block.IsHidden(c)
-			})
-			c.SetFunc(`IsValidPermHandler`, func(h perm.Handler) interface{} {
-				return h.IsValid(c)
 			})
 			c.SetFunc(`SettingFormRender`, func(s *settings.SettingForm) interface{} {
 				return s.Render(c)

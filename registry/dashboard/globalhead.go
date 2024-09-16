@@ -43,12 +43,12 @@ func GlobalHeadAdd(index int, footer ...*GlobalHead) {
 	globalHeads.Add(index, footer...)
 }
 
-//GlobalHeadRemove 删除元素
+// GlobalHeadRemove 删除元素
 func GlobalHeadRemove(index int) {
 	globalHeads.Remove(index)
 }
 
-//GlobalHeadSet 设置元素
+// GlobalHeadSet 设置元素
 func GlobalHeadSet(index int, list ...*GlobalHead) {
 	globalHeads.Set(index, list...)
 }

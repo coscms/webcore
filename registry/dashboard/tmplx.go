@@ -1,6 +1,10 @@
 package dashboard
 
-import "github.com/webx-top/echo"
+import (
+	"html/template"
+
+	"github.com/webx-top/echo"
+)
 
 func NewTmplx(tmpl string, handle ...func(echo.Context) error) *Tmplx {
 	var content func(echo.Context) error
@@ -11,8 +15,9 @@ func NewTmplx(tmpl string, handle ...func(echo.Context) error) *Tmplx {
 }
 
 type Tmplx struct {
-	Tmpl    string //模板文件
-	content func(echo.Context) error
+	Tmpl      string //模板文件
+	content   func(echo.Context) error
+	tmplNamer func(echo.Context) string
 }
 
 func (c *Tmplx) Ready(ctx echo.Context) error {
@@ -27,9 +32,25 @@ func (c *Tmplx) SetContentGenerator(content func(echo.Context) error) *Tmplx {
 	return c
 }
 
+func (c *Tmplx) SetTmplNamer(tmplNamer func(echo.Context) string) *Tmplx {
+	c.tmplNamer = tmplNamer
+	return c
+}
+
 func (c *Tmplx) SetTmpl(tmpl string) *Tmplx {
 	c.Tmpl = tmpl
 	return c
+}
+
+func (c Tmplx) Render(ctx echo.Context) template.HTML {
+	tmpl := c.Tmpl
+	if c.tmplNamer != nil {
+		tmpl = c.tmplNamer(ctx)
+	}
+	if len(tmpl) == 0 {
+		return template.HTML(``)
+	}
+	return Render(ctx, tmpl, nil)
 }
 
 type Tmplxs []*Tmplx
@@ -43,6 +64,16 @@ func (c *Tmplxs) Ready(ctx echo.Context) error {
 		}
 	}
 	return nil
+}
+
+func (c Tmplxs) Render(ctx echo.Context) template.HTML {
+	var r template.HTML
+	for _, blk := range c {
+		if blk != nil {
+			r += blk.Render(ctx)
+		}
+	}
+	return r
 }
 
 // Remove 删除元素
