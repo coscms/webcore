@@ -168,7 +168,8 @@ func SetTemplate(backendPa *ntemplate.PathAliases, frontendPa *ntemplate.PathAli
 		backendPa.Add(key, templatePath)
 	case `template`:
 		if frontendPa != nil && com.IsDir(templatePath+`/frontend`) {
-			frontendPa.Add(key, templatePath+`/frontend`)
+			frontendPa.AddAllSubdir(templatePath + `/frontend`) // 支持多主题
+			//frontendPa.Add(key, templatePath+`/frontend`)
 		}
 		if com.IsDir(templatePath + `/backend`) {
 			backendPa.Add(key, templatePath+`/backend`)

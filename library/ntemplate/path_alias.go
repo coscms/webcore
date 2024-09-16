@@ -56,7 +56,7 @@ func (p *PathAliases) Range(fn func(string, string) error) (err error) {
 	return
 }
 
-// AddAllSubdir 添加某个路径下以子文件夹为别名的路径
+// AddAllSubdir 添加某个路径下以子文件夹为别名的路径(用于添加各个子文件夹为不同主题模板的情况)
 func (p *PathAliases) AddAllSubdir(absPath string) error {
 	fp, err := os.Open(absPath)
 	if err != nil {
