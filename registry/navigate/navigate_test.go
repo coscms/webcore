@@ -23,6 +23,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/webx-top/com"
 )
 
 func TestConfigDefaultsAsStore(t *testing.T) {
@@ -129,5 +130,70 @@ func TestConfigDefaultsAsStore(t *testing.T) {
 			Name: `1`,
 		},
 	}, v)
-
+	v3 := List{
+		{
+			Name:   `11`,
+			Action: `11`,
+		},
+		{
+			Name:   `12`,
+			Action: `12`,
+		},
+		{
+			Name:   `0`,
+			Action: `0`,
+			Children: &List{
+				{
+					Name:   `1`,
+					Action: `1`,
+					Children: &List{
+						{
+							Name:   `2`,
+							Action: `2`,
+						},
+					},
+				},
+			},
+		},
+	}
+	assert.Equal(t, &Item{
+		Name:   `2`,
+		Action: `2`,
+	}, v3.ChildItem(`0`, `1`, `2`))
+	assert.Equal(t, &List{
+		{
+			Name:   `2`,
+			Action: `2`,
+		},
+	}, v3.ChildList(`0`, `1`))
+	v3.ChildList(`0`).ReplaceChild(`1`, `2`, &Item{
+		Name:   `3`,
+		Action: `3`,
+	})
+	assert.Equal(t, `[
+  {
+    "Name": "11",
+    "Action": "11"
+  },
+  {
+    "Name": "12",
+    "Action": "12"
+  },
+  {
+    "Name": "0",
+    "Action": "0",
+    "Children": [
+      {
+        "Name": "1",
+        "Action": "1",
+        "Children": [
+          {
+            "Name": "3",
+            "Action": "3"
+          }
+        ]
+      }
+    ]
+  }
+]`, com.Dump(v3, true))
 }

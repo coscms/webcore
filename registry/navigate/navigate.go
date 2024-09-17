@@ -24,7 +24,7 @@ import (
 	"github.com/webx-top/echo"
 )
 
-//Item 操作
+// Item 操作
 type Item struct {
 	Display    bool        `json:",omitempty" xml:",omitempty"` //是否在菜单上显示
 	Name       string      `json:",omitempty" xml:",omitempty"` //名称
@@ -44,7 +44,7 @@ func (a *Item) FullPath(parentPath string) string {
 	return path.Join(parentPath, a.Action)
 }
 
-//List 操作列表
+// List 操作列表
 type List []*Item
 
 func (a *List) FullPath(parentPath string) []string {
@@ -64,7 +64,7 @@ func (a *List) FullPath(parentPath string) []string {
 	return r
 }
 
-//Remove 删除元素
+// Remove 删除元素
 func (a *List) Remove(index int) *List {
 	if index < 0 {
 		*a = (*a)[0:0]
@@ -81,7 +81,7 @@ func (a *List) Remove(index int) *List {
 	return a
 }
 
-//Set 设置元素
+// Set 设置元素
 func (a *List) Set(index int, list ...*Item) *List {
 	if len(list) == 0 {
 		return a
@@ -105,7 +105,7 @@ func (a *List) Set(index int, list ...*Item) *List {
 	return a
 }
 
-//Add 添加列表项
+// Add 添加列表项
 func (a *List) Add(index int, list ...*Item) *List {
 	if len(list) == 0 {
 		return a
@@ -130,7 +130,7 @@ func (a *List) Add(index int, list ...*Item) *List {
 	return a
 }
 
-//Get 添加列表项
+// Get 添加列表项
 func (a *List) Get(index int) *Item {
 	if len(*a) > index {
 		return (*a)[index]
@@ -138,12 +138,12 @@ func (a *List) Get(index int) *Item {
 	return nil
 }
 
-//Size 子项数量
+// Size 子项数量
 func (a *List) Size() int {
 	return len(*a)
 }
 
-//ChildrenBy 添加列表项
+// ChildrenBy 添加列表项
 func (a *List) ChildrenBy(index int) *List {
 	ls := a.Get(index)
 	if ls == nil {
@@ -152,11 +152,92 @@ func (a *List) ChildrenBy(index int) *List {
 	return ls.Children
 }
 
-func (a *List) AddChild(action string, index int, list ...*Item) {
+func (a *List) AddChild(action string, index int, list ...*Item) *List {
 	for _, item := range *a {
 		if item.Action == action {
 			item.Children.Add(index, list...)
 			break
 		}
 	}
+	return a
+}
+
+func (a *List) ReplaceOrAddChild(action string, childAction string, newItem *Item) *List {
+	for _, item := range *a {
+		if item.Action == action {
+			if item.Children != nil {
+				for _, sub := range *item.Children {
+					if sub.Action == childAction {
+						*sub = *newItem
+						return a
+					}
+				}
+				item.Children = &List{newItem}
+			} else {
+				item.Children.Add(-1, newItem)
+			}
+			break
+		}
+	}
+	return a
+}
+
+func (a *List) ReplaceChild(action string, childAction string, newItem *Item) bool {
+	for _, item := range *a {
+		if item.Action == action {
+			if item.Children != nil {
+				for _, sub := range *item.Children {
+					if sub.Action == childAction {
+						*sub = *newItem
+						return true
+					}
+				}
+			}
+			return false
+		}
+	}
+	return false
+}
+
+func (a *List) ChildItem(actions ...string) *Item {
+	b := a
+	end := len(actions) - 1
+	for index, action := range actions {
+		var found bool
+		for _, item := range *b {
+			if item.Action == action {
+				if index == end {
+					return item
+				}
+				if item.Children == nil {
+					return nil
+				}
+				b = item.Children
+				found = true
+				break
+			}
+		}
+		if !found {
+			return nil
+		}
+	}
+	return nil
+}
+
+func (a *List) ChildList(actions ...string) *List {
+	b := a
+	for _, action := range actions {
+		var found bool
+		for _, item := range *b {
+			if item.Action == action {
+				b = item.Children
+				found = true
+				break
+			}
+		}
+		if !found {
+			return nil
+		}
+	}
+	return b
 }
