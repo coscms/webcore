@@ -201,9 +201,10 @@ func (c *Config) DetectType(extension string) string {
 	}
 	mimeType := mime.TypeByExtension(`.` + extension)
 	mimeType = strings.SplitN(mimeType, ";", 2)[0]
+	mimeParts := strings.SplitN(mimeType, `/`, 2)
 	for typeK, ft := range c.FileTypes {
 		for _, words := range ft.MIMEKeywords {
-			if strings.Contains(mimeType, words) {
+			if com.InSlice(words, mimeParts) {
 				return typeK
 			}
 		}
