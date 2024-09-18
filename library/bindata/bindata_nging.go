@@ -34,6 +34,7 @@ import (
 
 	"github.com/coscms/webcore/cmd/bootconfig"
 	"github.com/coscms/webcore/initialize/backend"
+	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webcore/library/modal"
 	uploadLibrary "github.com/coscms/webcore/library/upload"
 	"github.com/coscms/webcore/registry/route"
@@ -114,4 +115,11 @@ func Initialize() {
 			return tmpl
 		})
 	}
+	config.AddConfigInitor(func(c *config.Config) {
+		c.AddReloader(func(newConfig *config.Config) {
+			newConfig.Language.SetFSFunc(func(root string) http.FileSystem {
+				return NewStaticAssetFSToSubdir(root, StaticAssetFS)
+			})
+		})
+	})
 }

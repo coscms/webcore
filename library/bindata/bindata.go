@@ -22,6 +22,7 @@ import (
 	"errors"
 	"net/http"
 	"os"
+	"path"
 	"strings"
 
 	assetfs "github.com/admpub/go-bindata-assetfs"
@@ -66,5 +67,25 @@ func NewStaticAssetFS(prefix string, afs *assetfs.AssetFS) http.FileSystem {
 	return &staticAsset{
 		prefix:  prefix,
 		AssetFS: afs,
+	}
+}
+
+type staticAssetToSubdir struct {
+	root string
+	http.FileSystem
+}
+
+func (s *staticAssetToSubdir) Open(name string) (http.File, error) {
+	name = path.Join(s.root, name)
+	return s.FileSystem.Open(name)
+}
+
+func NewStaticAssetFSToSubdir(root string, afs http.FileSystem) http.FileSystem {
+	if len(root) == 0 {
+		return afs
+	}
+	return &staticAssetToSubdir{
+		root:       root,
+		FileSystem: afs,
 	}
 }
