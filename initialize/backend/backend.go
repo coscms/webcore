@@ -47,24 +47,24 @@ import (
 )
 
 const (
-	DefaultTemplateDir   = `./template/backend`
-	DefaultAssetsDir     = `./public/assets/backend`
-	DefaultAssetsURLPath = `/public/assets/backend`
+	DefaultTemplateDir   = `./template/backend`      // 后台模板路径默认值
+	DefaultAssetsDir     = `./public/assets/backend` // 后台素材路径默认值
+	DefaultAssetsURLPath = `/public/assets/backend`  // 后台素材网址路径默认值
 )
 
 var (
-	TemplateDir           = DefaultTemplateDir //模板文件夹
-	AssetsDir             = DefaultAssetsDir   //素材文件夹
-	AssetsURLPath         = DefaultAssetsURLPath
-	DefaultAvatarURL      = AssetsURLPath + `/images/user_128.png`
-	RendererDo            = func(driver.Driver) {}
-	TmplCustomParser      func(tmpl string, content []byte) []byte
-	ParseStrings          = map[string]string{}
-	ParseStringFuncs      = map[string]func() string{}
+	TemplateDir           = DefaultTemplateDir                     //后台模板文件夹
+	AssetsDir             = DefaultAssetsDir                       //后台素材文件夹
+	AssetsURLPath         = DefaultAssetsURLPath                   //后台素材网址路径
+	DefaultAvatarURL      = AssetsURLPath + `/images/user_128.png` //默认头像网址
+	RendererDo            = func(driver.Driver) {}                 //后台模板引擎配置函数
+	TmplCustomParser      func(tmpl string, content []byte) []byte //后台模板自定义解析函数
+	ParseStrings          = map[string]string{}                    //后台模板内容替换
+	ParseStringFuncs      = map[string]func() string{}             //后台模板内容替换函数
 	DefaultLocalHostNames = []string{
 		`127.0.0.1`, `localhost`,
 	}
-	DefaultMiddlewares = []interface{}{}
+	DefaultMiddlewares = []interface{}{} //后台默认中间件
 )
 
 func MakeSubdomains(domain string, appends []string) []string {
