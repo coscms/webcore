@@ -131,6 +131,17 @@ func SendErr(ctx echo.Context, err error) {
 	SendFail(ctx, err.Error())
 }
 
+func AddLinks(ctx echo.Context, title string, url string, icon string, color ...string) *echo.KVList {
+	links := echo.KVList{}
+	options := []echo.KVOption{echo.KVOptHKV(`icon`, icon)}
+	if len(color) > 0 {
+		options = append(options, echo.KVOptHKV(`color`, color))
+	}
+	links.Add(title, url, options...)
+	ctx.Set(`links`, links)
+	return &links
+}
+
 type ConfigFromDB interface {
 	ConfigFromDB() echo.H
 }
