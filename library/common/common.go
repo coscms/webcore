@@ -132,7 +132,10 @@ func SendErr(ctx echo.Context, err error) {
 }
 
 func AddLinks(ctx echo.Context, title string, url string, icon string, color ...string) *echo.KVList {
-	links := echo.KVList{}
+	links, ok := ctx.Get(`links`).(echo.KVList)
+	if !ok {
+		links = echo.KVList{}
+	}
 	options := []echo.KVOption{echo.KVOptHKV(`icon`, icon)}
 	if len(color) > 0 {
 		options = append(options, echo.KVOptHKV(`color`, color))
