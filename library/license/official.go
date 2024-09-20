@@ -158,6 +158,19 @@ func LatestVersion(ctx echo.Context, version string, download bool) (*ProductVer
 		np := notice.NewP(ctx, `ngingDownloadNewVersion`, username, context.Background()).AutoComplete(true)
 		defer result.Data.SetProgressor(np)
 		result.Data.isNew = config.Version.IsNew(result.Data.Version, result.Data.Type)
+		/*
+			if !result.Data.isNew && result.Data.ReleasedAt > 0 {
+				releaseT := time.Unix(int64(result.Data.ReleasedAt), 0)
+				buildT, err := time.Parse(`20060102150405`, config.Version.BuildTime)
+				if err != nil {
+					np.Send(err.Error(), notice.StateFailure)
+				} else {
+					if releaseT.After(buildT) {
+						result.Data.isNew = true
+					}
+				}
+			}
+		*/
 		if !result.Data.isNew {
 			np.Send(`no new version`, notice.StateSuccess)
 			return result.Data, nil
