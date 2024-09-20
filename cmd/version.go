@@ -35,7 +35,8 @@ var versionCmd = &cobra.Command{
 
 func versionRunE(cmd *cobra.Command, args []string) error {
 	fmt.Println(config.Version.String())
-	fmt.Printf("dbschema: v%v\n", config.Version.DBSchema)
+	fmt.Printf("Schema: v%v\n", config.Version.DBSchema)
+	fmt.Printf("Build: %v\n", config.Version.BuildTime)
 	return nil
 }
 
