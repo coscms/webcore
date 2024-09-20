@@ -29,6 +29,7 @@ import (
 	"time"
 
 	"github.com/admpub/license_gen/lib"
+	"github.com/admpub/log"
 	"github.com/admpub/once"
 	"github.com/shirou/gopsutil/v3/cpu"
 	"github.com/webx-top/com"
@@ -232,13 +233,19 @@ func URLValues(ctx echo.Context, newVersion ...string) url.Values {
 			var err error
 			machineID, err = MachineID()
 			if err != nil {
-				panic(fmt.Errorf(`failed to get machineID: %v`, err))
+				if !SkipLicenseCheck {
+					panic(fmt.Errorf(`failed to get machineID: %v`, err))
+				} else {
+					log.Warnf(`failed to get machineID: %v`, err)
+				}
 			}
 		}
 		v.Set(`machineID`, machineID)
 	case ModeDomain:
 		if len(Domain()) == 0 {
-			panic(`license domain is required`)
+			if !SkipLicenseCheck {
+				panic(`license domain is required`)
+			}
 		}
 		v.Set(`domain`, Domain())
 	default:
