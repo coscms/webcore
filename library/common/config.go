@@ -22,12 +22,23 @@ type ExtendConfigGetter interface {
 	GetExtend() echo.H
 }
 
+type Cryptor interface {
+	Encode(raw string, keys ...string) string
+	Decode(encrypted string, keys ...string) string
+	Encode256(raw string, keys ...string) string
+	Decode256(encrypted string, keys ...string) string
+}
+
 type CookieConfigGetter interface {
 	CookieConfig() scookie.Config
 }
 
 func CookieConfig() scookie.Config {
 	return echo.Get(ConfigName).(CookieConfigGetter).CookieConfig()
+}
+
+func CryptorConfig() Cryptor {
+	return echo.Get(ConfigName).(Cryptor)
 }
 
 func Setting(group ...string) echo.H {

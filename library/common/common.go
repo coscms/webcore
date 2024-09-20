@@ -50,23 +50,76 @@ func Err(ctx echo.Context, err error) (ret interface{}) {
 		} else {
 			ret = flash
 		}
+	} else {
+		ret = GetEncMsg(ctx)
+	}
+	return
+}
+
+func WithEncErrMsg(msg string) string {
+	return `encMsg=` + EncErrMsg(msg)
+}
+
+func WithEncOkMsg(msg string) string {
+	return `encMsg=` + EncOkMsg(msg)
+}
+
+func EncErrMsg(msg string) string {
+	return CryptorConfig().Encode(`err:` + msg)
+}
+
+func EncOkMsg(msg string) string {
+	return CryptorConfig().Encode(`ok:` + msg)
+}
+
+func GetEncMsg(ctx echo.Context) (ret interface{}) {
+	encMsg := ctx.Query(`encMsg`)
+	if len(encMsg) == 0 {
+		encMsg = ctx.GetCookie(`EncMsg`)
+		if len(encMsg) > 0 {
+			ctx.Cookie().Set(`EncMsg`, ``, -1)
+		}
+	}
+	if len(encMsg) == 0 {
+		return
+	}
+	msg := CryptorConfig().Decode(encMsg)
+	if len(msg) == 0 {
+		return
+	}
+	parts := strings.SplitN(msg, `:`, 2)
+	if len(parts) == 2 {
+		switch parts[0] {
+		case `ok`:
+			ret = Ok(parts[1])
+		default:
+			ret = errors.New(parts[1])
+		}
 	}
 	return
 }
 
 // SendOk 记录成功信息
-func SendOk(ctx echo.Context, msg string) {
+func SendOk(ctx echo.Context, msg string, storeInCookie ...bool) {
 	if ctx.IsAjax() || ctx.Format() != echo.ContentTypeHTML {
 		ctx.Data().SetInfo(msg, 1)
+		return
+	}
+	if len(storeInCookie) > 0 && storeInCookie[0] {
+		ctx.Cookie().Set(`EncMsg`, CryptorConfig().Encode(`ok:`+msg))
 		return
 	}
 	ctx.Session().AddFlash(Ok(msg))
 }
 
 // SendFail 记录失败信息
-func SendFail(ctx echo.Context, msg string) {
+func SendFail(ctx echo.Context, msg string, storeInCookie ...bool) {
 	if ctx.IsAjax() || ctx.Format() != echo.ContentTypeHTML {
 		ctx.Data().SetInfo(msg, 0)
+		return
+	}
+	if len(storeInCookie) > 0 && storeInCookie[0] {
+		ctx.Cookie().Set(`EncMsg`, CryptorConfig().Encode(`err:`+msg))
 		return
 	}
 	ctx.Session().AddFlash(msg)
