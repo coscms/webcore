@@ -117,6 +117,10 @@ func SetPrefix(prefix string) {
 	backend.DefaultAvatarURL = prefix + DefaultAvatarURL
 }
 
+func Prefix() string {
+	return route.Prefix()
+}
+
 func start() {
 	e := route.IRegister().Echo() // 不需要内部重启，所以直接操作*Echo
 	config.FromFile().Sys.SetRealIPParams(e.RealIPConfig())
