@@ -85,7 +85,7 @@ func (r *Register) Logger() logger.Logger {
 }
 
 func (r *Register) Prefix() string {
-	return r.echo.Prefix()
+	return r.prefix
 }
 
 func (r *Register) SetPrefix(prefix string) IRegister {
