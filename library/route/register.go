@@ -90,6 +90,7 @@ func (r *Register) Prefix() string {
 
 func (r *Register) SetPrefix(prefix string) IRegister {
 	r.prefix = prefix
+	r.echo.SetPrefix(prefix)
 	return r
 }
 
@@ -133,9 +134,6 @@ func (r *Register) Apply() IRegister {
 		return r
 	}
 	e := r.echo
-	if len(r.prefix) > 0 {
-		e.SetPrefix(r.prefix)
-	}
 	e.Pre(r.preMiddlewares...)
 	e.Use(r.middlewares...)
 	r.handlers.Apply(e)
