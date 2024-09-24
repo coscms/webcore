@@ -106,6 +106,9 @@ func (h *HTTPServer) SetNavigate(nav *navigate.ProjectNavigates) *HTTPServer {
 }
 
 func (h *HTTPServer) Renderer() driver.Driver {
+	if h.renderOptions == nil {
+		return nil
+	}
 	return h.renderOptions.Renderer()
 }
 
