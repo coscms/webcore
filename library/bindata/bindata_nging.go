@@ -33,7 +33,6 @@ import (
 	"github.com/webx-top/image"
 
 	"github.com/coscms/webcore/cmd/bootconfig"
-	"github.com/coscms/webcore/initialize/backend"
 	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webcore/library/httpserver"
 	"github.com/coscms/webcore/library/modal"
@@ -92,7 +91,7 @@ func Initialize() {
 		httpserver.Frontend.TmplMgr = bindata.NewTmplManager(FrontendTmplAssetFS)
 	}
 	modal.ReadConfigFile = func(file string) ([]byte, error) {
-		file = strings.TrimPrefix(file, backend.TemplateDir)
+		file = strings.TrimPrefix(file, httpserver.Backend.TemplateDir)
 		return httpserver.Backend.TmplMgr.GetTemplate(file)
 	}
 	image.WatermarkOpen = func(file string) (image.FileReader, error) {
@@ -111,7 +110,7 @@ func Initialize() {
 		return f, err
 	}
 	bootconfig.LangFSFunc = LanguageAssetFSFunc
-	backend.RendererDo = func(renderer driver.Driver) {
+	httpserver.Backend.RendererDo = func(renderer driver.Driver) {
 		renderer.SetTmplPathFixer(func(c echo.Context, tmpl string) string {
 			return tmpl
 		})
