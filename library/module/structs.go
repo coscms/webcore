@@ -7,38 +7,77 @@ import (
 	"github.com/coscms/webcore/library/route"
 )
 
-func NewNavigate() *Navigate {
-	return &Navigate{
-		Backend:  httpserver.Backend.Navigate,
-		Frontend: httpserver.Frontend.Navigate,
+func NewNavigate() Navigate {
+	return &paramNavigate{
+		backend:  httpserver.Backend.Navigate,
+		frontend: httpserver.Frontend.Navigate,
 	}
 }
 
-type Navigate struct {
-	Backend  *navigate.ProjectNavigates
-	Frontend *navigate.ProjectNavigates
+type Navigate interface {
+	Backend() *navigate.ProjectNavigates
+	Frontend() *navigate.ProjectNavigates
 }
 
-func NewDashboard() *Dashboard {
-	return &Dashboard{
-		Backend:  httpserver.Backend.Dashboard,
-		Frontend: httpserver.Frontend.Dashboard,
+type paramNavigate struct {
+	backend  *navigate.ProjectNavigates
+	frontend *navigate.ProjectNavigates
+}
+
+func (a *paramNavigate) Backend() *navigate.ProjectNavigates {
+	return a.backend
+}
+
+func (a *paramNavigate) Frontend() *navigate.ProjectNavigates {
+	return a.frontend
+}
+
+func NewDashboard() Dashboard {
+	return &paramDashboard{
+		backend:  httpserver.Backend.Dashboard,
+		frontend: httpserver.Frontend.Dashboard,
 	}
 }
 
-type Dashboard struct {
-	Backend  *dashboard.Dashboard
-	Frontend *dashboard.Dashboard
+type Dashboard interface {
+	Backend() *dashboard.Dashboard
+	Frontend() *dashboard.Dashboard
 }
 
-func NewRouter() *Router {
-	return &Router{
-		Backend:  httpserver.Backend.Router,
-		Frontend: httpserver.Frontend.Router,
+type paramDashboard struct {
+	backend  *dashboard.Dashboard
+	frontend *dashboard.Dashboard
+}
+
+func (a *paramDashboard) Backend() *dashboard.Dashboard {
+	return a.backend
+}
+
+func (a *paramDashboard) Frontend() *dashboard.Dashboard {
+	return a.frontend
+}
+
+func NewRouter() Router {
+	return &paramRouter{
+		backend:  httpserver.Backend.Router,
+		frontend: httpserver.Frontend.Router,
 	}
 }
 
-type Router struct {
-	Backend  route.IRegister
-	Frontend route.IRegister
+type Router interface {
+	Backend() route.IRegister
+	Frontend() route.IRegister
+}
+
+type paramRouter struct {
+	backend  route.IRegister
+	frontend route.IRegister
+}
+
+func (a *paramRouter) Backend() route.IRegister {
+	return a.backend
+}
+
+func (a *paramRouter) Frontend() route.IRegister {
+	return a.frontend
 }

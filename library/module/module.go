@@ -24,21 +24,21 @@ var _ IModule = &Module{}
 
 type Module struct {
 	Startup       string                      // 默认启动项(多个用半角逗号“,”隔开)
-	Navigate      func(*Navigate)             // 注册导航菜单
+	Navigate      func(Navigate)              // 注册导航菜单
 	Extend        map[string]extend.Initer    // 注册扩展配置项
 	Cmder         map[string]cmder.Cmder      // 注册命令
 	TemplatePath  map[string]string           // 注册模板路径
 	AssetsPath    []string                    // 注册素材路径
 	SQLCollection func(*config.SQLCollection) // 注册SQL语句
-	Dashboard     func(*Dashboard)            // 注册控制面板首页区块
-	Route         func(*Router)               // 注册网址路由
+	Dashboard     func(Dashboard)             // 注册控制面板首页区块
+	Route         func(Router)                // 注册网址路由
 	LogParser     map[string]nlog.LogParser   // 注册日志解析器
 	Settings      []*settings.SettingForm     // 注册配置选项
 	CronJobs      []*cron.Jobx                // 注册定时任务
 	DBSchemaVer   float64                     // 设置数据库结构版本号
 }
 
-func (m *Module) setNavigate(nc *Navigate) {
+func (m *Module) setNavigate(nc Navigate) {
 	if m.Navigate == nil {
 		return
 	}
@@ -85,14 +85,14 @@ func (m *Module) setSQL(sc *config.SQLCollection) {
 	m.SQLCollection(sc)
 }
 
-func (m *Module) setDashboard(dd *Dashboard) {
+func (m *Module) setDashboard(dd Dashboard) {
 	if m.Dashboard == nil {
 		return
 	}
 	m.Dashboard(dd)
 }
 
-func (m *Module) setRoute(r *Router) {
+func (m *Module) setRoute(r Router) {
 	if m.Route == nil {
 		return
 	}
