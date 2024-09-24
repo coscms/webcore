@@ -47,7 +47,7 @@ var (
 	// PathAliases 后台模板文件路径别名分组
 	//
 	//	一般用于登记模块中的路径别名分组
-	PathAliases = httpserver.Backend.TmplPathFixers.PathAliases
+	PathAliases = httpserver.Backend.Template.PathAliases
 )
 
 type staticAsset struct {

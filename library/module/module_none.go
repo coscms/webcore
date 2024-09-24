@@ -9,12 +9,12 @@ import (
 )
 
 func (m *Module) applyTemplateAndAssets() {
-	m.setTemplate(bindata.PathAliases, httpserver.Frontend.TmplPathFixers.PathAliases)
+	m.setTemplate(bindata.PathAliases, httpserver.Frontend.Template.PathAliases)
 	m.setAssets(bindata.StaticOptions, httpserver.Frontend.StaticOptions)
 }
 
 func SetBackendTemplate(key string, templatePath string) {
-	SetTemplate(bindata.PathAliases, httpserver.Frontend.TmplPathFixers.PathAliases, key, templatePath)
+	SetTemplate(bindata.PathAliases, httpserver.Frontend.Template.PathAliases, key, templatePath)
 }
 
 func SetBackendAssets(assetsPath string) {

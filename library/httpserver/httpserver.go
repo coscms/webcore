@@ -31,7 +31,7 @@ func New(kind string) *HTTPServer {
 	s := &HTTPServer{
 		Name:                 kind,
 		Dashboard:            dashboard.New(),
-		TmplPathFixers:       ntemplate.New(kind, nil, true),
+		Template:             ntemplate.New(kind, nil, true),
 		DefaultStaticRootURL: `/public/`,
 		DefaultTemplateDir:   `./template/` + kind,
 		DefaultAssetsDir:     `./public/assets/` + kind,
@@ -46,12 +46,12 @@ func New(kind string) *HTTPServer {
 }
 
 type HTTPServer struct {
-	Name           string
-	Navigate       *navigate.ProjectNavigates
-	Router         route.IRegister
-	Dashboard      *dashboard.Dashboard
-	TmplPathFixers *ntemplate.Template
-	TmplMgr        driver.Manager
+	Name      string
+	Navigate  *navigate.ProjectNavigates
+	Router    route.IRegister
+	Dashboard *dashboard.Dashboard
+	Template  *ntemplate.Template
+	TmplMgr   driver.Manager
 
 	// for web framework
 	StaticOptions         *middleware.StaticOptions
