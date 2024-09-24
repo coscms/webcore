@@ -32,6 +32,7 @@ func New(kind string) *HTTPServer {
 		Name:                 kind,
 		Dashboard:            dashboard.New(),
 		TmplPathFixers:       ntemplate.New(kind, nil, true),
+		DefaultStaticRootURL: `/public/`,
 		DefaultTemplateDir:   `./template/` + kind,
 		DefaultAssetsDir:     `./public/assets/` + kind,
 		DefaultAssetsURLPath: `/public/assets/` + kind,
@@ -40,6 +41,7 @@ func New(kind string) *HTTPServer {
 	s.AssetsDir = s.DefaultAssetsDir
 	s.AssetsURLPath = s.DefaultAssetsURLPath
 	s.DefaultAvatarURL = s.AssetsURLPath + `/images/user_128.png`
+	s.StaticRootURLPath = s.DefaultStaticRootURL
 	return s
 }
 
@@ -52,25 +54,27 @@ type HTTPServer struct {
 	TmplMgr        driver.Manager
 
 	// for web framework
-	StaticOptions *middleware.StaticOptions
-	StaticMW      echo.MiddlewareFunc
-
-	DefaultTemplateDir   string // 模板路径默认值
-	DefaultAssetsDir     string // 素材路径默认值
-	DefaultAssetsURLPath string // 素材网址路径默认值
-
-	TemplateDir      string                                   //模板文件夹
-	AssetsDir        string                                   //素材文件夹
-	AssetsURLPath    string                                   //素材网址路径
-	DefaultAvatarURL string                                   //默认头像网址
-	RendererDo       func(driver.Driver)                      //模板引擎配置函数
-	TmplCustomParser func(tmpl string, content []byte) []byte //模板自定义解析函数
-	ParseStrings     map[string]string                        //模板内容替换
-	ParseStringFuncs map[string]func() string                 //模板内容替换函数
-	Middlewares      []interface{}
-	GlobalFuncMap    map[string]interface{}
-	renderOptions    *render.Config
-	language         *language.Language
+	StaticOptions         *middleware.StaticOptions
+	StaticMW              echo.MiddlewareFunc
+	KeepExtensionPrefixes []string
+	RouteDefaultExtension string
+	DefaultTemplateDir    string // 模板路径默认值
+	DefaultAssetsDir      string // 素材路径默认值
+	DefaultAssetsURLPath  string // 素材网址路径默认值
+	DefaultStaticRootURL  string
+	StaticRootURLPath     string
+	TemplateDir           string                                   //模板文件夹
+	AssetsDir             string                                   //素材文件夹
+	AssetsURLPath         string                                   //素材网址路径
+	DefaultAvatarURL      string                                   //默认头像网址
+	RendererDo            func(driver.Driver)                      //模板引擎配置函数
+	TmplCustomParser      func(tmpl string, content []byte) []byte //模板自定义解析函数
+	ParseStrings          map[string]string                        //模板内容替换
+	ParseStringFuncs      map[string]func() string                 //模板内容替换函数
+	Middlewares           []interface{}
+	GlobalFuncMap         map[string]interface{}
+	renderOptions         *render.Config
+	language              *language.Language
 }
 
 func (h *HTTPServer) Clear() {
@@ -81,8 +85,9 @@ func (h *HTTPServer) Clear() {
 
 func (h *HTTPServer) SetPrefix(prefix string) *HTTPServer {
 	h.Router.SetPrefix(prefix)
-	h.AssetsURLPath = prefix + h.AssetsURLPath
-	h.DefaultAvatarURL = prefix + h.DefaultAvatarURL
+	h.AssetsURLPath = prefix + h.DefaultAssetsURLPath
+	h.DefaultAvatarURL = h.AssetsURLPath + `/images/user_128.png`
+	h.StaticRootURLPath = prefix + h.DefaultStaticRootURL
 	return h
 }
 
@@ -110,7 +115,7 @@ func (h *HTTPServer) I18n() *language.Language {
 
 func (h *HTTPServer) Apply() {
 	e := h.Router.Echo()
-	e.SetRenderDataWrapper(echo.DefaultRenderDataWrapper)
+	//e.SetRenderDataWrapper(echo.DefaultRenderDataWrapper)
 
 	e.Use(middleware.Recover())
 	e.Use(MaxRequestBodySize)
@@ -173,4 +178,11 @@ func (h *HTTPServer) Apply() {
 	}
 	h.renderOptions.AddFuncSetter(ErrorPageFunc)
 	h.renderOptions.ApplyTo(e, h.TmplMgr)
+
+	if len(h.RouteDefaultExtension) > 0 {
+		e.SetDefaultExtension(h.RouteDefaultExtension)
+		if len(h.KeepExtensionPrefixes) > 0 {
+			e.Pre(TrimPathSuffix(h.KeepExtensionPrefixes...))
+		}
+	}
 }

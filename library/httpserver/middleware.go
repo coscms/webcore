@@ -3,6 +3,7 @@ package httpserver
 import (
 	"html/template"
 	"net/url"
+	"strings"
 
 	"github.com/coscms/webcore/library/captcha/captchabiz"
 	"github.com/coscms/webcore/library/config"
@@ -50,4 +51,20 @@ func ErrorPageFunc(c echo.Context) error {
 		return captchabiz.CaptchaFormWithType(c, typ, tmpl, args...)
 	})
 	return nil
+}
+
+func TrimPathSuffix(ignorePrefixes ...string) echo.MiddlewareFuncd {
+	return func(h echo.Handler) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			upath := c.Request().URL().Path()
+			for _, ignorePrefix := range ignorePrefixes {
+				if strings.HasPrefix(upath, ignorePrefix) {
+					return h.Handle(c)
+				}
+			}
+			cleanedPath := strings.TrimSuffix(upath, c.DefaultExtension())
+			c.Request().URL().SetPath(cleanedPath)
+			return h.Handle(c)
+		}
+	}
 }
