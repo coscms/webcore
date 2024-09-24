@@ -21,12 +21,13 @@ package manager
 import (
 	"github.com/webx-top/echo"
 
+	"github.com/coscms/webcore/library/dashboard"
+	"github.com/coscms/webcore/library/httpserver"
 	"github.com/coscms/webcore/model"
-	"github.com/coscms/webcore/registry/dashboard"
 )
 
 func init() {
-	dashboard.CardRegister(
+	httpserver.Backend.Dashboard.Cards.Register(
 		(&dashboard.Card{
 			IconName:  `fa-tasks`,
 			IconColor: `danger`,

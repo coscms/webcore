@@ -66,7 +66,7 @@ func PublicHandler(h interface{}, meta ...echo.H) echo.Handler {
 		m = echo.H{}
 	}
 	m.Set(PermPublicKV())
-	return routeRegister.MetaHandler(m, h)
+	return IRegister().MetaHandler(m, h)
 }
 
 func GuestHandler(h interface{}, meta ...echo.H) echo.Handler {
@@ -77,5 +77,5 @@ func GuestHandler(h interface{}, meta ...echo.H) echo.Handler {
 		m = echo.H{}
 	}
 	m.Set(PermGuestKV())
-	return routeRegister.MetaHandler(m, h)
+	return IRegister().MetaHandler(m, h)
 }

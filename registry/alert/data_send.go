@@ -5,9 +5,9 @@ import (
 	"strings"
 
 	"github.com/coscms/webcore/dbschema"
-	"github.com/coscms/webcore/library/common"
 	"github.com/coscms/webcore/library/cron/send"
 	"github.com/coscms/webcore/library/imbot"
+	"github.com/coscms/webcore/library/nerrors"
 	"github.com/webx-top/com"
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
@@ -34,7 +34,7 @@ func (alertData *AlertData) Send(a *dbschema.NgingAlertRecipient) (err error) {
 			custom := &WebhookCustom{}
 			extraBytes := com.Str2bytes(a.Extra)
 			if err := json.Unmarshal(extraBytes, custom); err != nil {
-				err = common.JSONBytesParseError(err, extraBytes)
+				err = nerrors.JSONBytesParseError(err, extraBytes)
 				return err
 			}
 			if len(custom.Url) == 0 {

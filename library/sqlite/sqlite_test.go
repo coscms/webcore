@@ -24,7 +24,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/coscms/webcore/library/common"
+	"github.com/coscms/webcore/library/nsql"
 )
 
 var sqlStr = `CREATE TABLE ` + "`" + `nging_login_log` + "`" + ` (
@@ -57,7 +57,7 @@ func parseTestSQL(sql string) error {
 
 func TestMySQLToSQLite(t *testing.T) {
 	fmt.Println(`============= multi-line:`)
-	err := common.ParseSQL(sqlStr, false, parseTestSQL)
+	err := nsql.ParseSQL(sqlStr, false, parseTestSQL)
 	if err != nil {
 		panic(err)
 	}

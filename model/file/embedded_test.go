@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/coscms/webcore/library/httpserver"
 	"github.com/stretchr/testify/assert"
 	"github.com/webx-top/db"
 	"github.com/webx-top/db/lib/factory"
@@ -16,7 +17,6 @@ import (
 	"github.com/coscms/webcore/dbschema"
 	"github.com/coscms/webcore/library/testutils"
 	_ "github.com/coscms/webcore/listener/upload/file"
-	mw "github.com/coscms/webcore/middleware"
 	modelFile "github.com/coscms/webcore/model/file"
 )
 
@@ -27,7 +27,7 @@ func TestUpdateEmbedded(t *testing.T) {
 	testutils.InitConfig()
 
 	e := echo.New()
-	e.Use(mw.Transaction())
+	e.Use(httpserver.Transaction())
 	req, resp := myTesting.NewRequestAndResponse(`GET`, `/`)
 	ctx := e.NewContext(req, resp)
 	ctx.SetTransaction(factory.NewParam())

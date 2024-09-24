@@ -20,48 +20,21 @@ package middleware
 
 import (
 	"html/template"
-	"net/url"
 	"strings"
 
 	"github.com/webx-top/echo"
 
 	"github.com/coscms/webcore/library/backend"
-	"github.com/coscms/webcore/library/common"
-	"github.com/coscms/webcore/library/config"
+	"github.com/coscms/webcore/library/dashboard"
+	"github.com/coscms/webcore/library/httpserver"
 	"github.com/coscms/webcore/library/modal"
+	navigateLib "github.com/coscms/webcore/library/navigate"
 	"github.com/coscms/webcore/library/role"
 	"github.com/coscms/webcore/library/role/roleutils"
 	"github.com/coscms/webcore/library/sessionguard"
-	"github.com/coscms/webcore/registry/dashboard"
 	"github.com/coscms/webcore/registry/navigate"
 	"github.com/coscms/webcore/registry/settings"
 )
-
-var (
-	EmptyURL = &url.URL{}
-)
-
-func ErrorPageFunc(c echo.Context) error {
-	var siteURI *url.URL
-	siteURL := config.Setting(`base`).String(`siteURL`)
-	if len(siteURL) > 0 {
-		siteURI, _ = url.Parse(siteURL)
-	}
-	c.Internal().Set(`siteURI`, siteURI)
-	c.SetFunc(`SiteURI`, func() *url.URL {
-		if siteURI == nil {
-			return EmptyURL
-		}
-		return siteURI
-	})
-	c.SetFunc(`CaptchaForm`, func(tmpl string, args ...interface{}) template.HTML {
-		return common.CaptchaForm(c, tmpl, args...)
-	})
-	c.SetFunc(`CaptchaFormWithType`, func(typ string, tmpl string, args ...interface{}) template.HTML {
-		return common.CaptchaFormWithType(c, typ, tmpl, args...)
-	})
-	return nil
-}
 
 func FuncMap() echo.MiddlewareFunc {
 	return func(h echo.Handler) echo.Handler {
@@ -69,7 +42,7 @@ func FuncMap() echo.MiddlewareFunc {
 			c.SetFunc(`Modal`, func(data interface{}) template.HTML {
 				return modal.Render(c, data)
 			})
-			ErrorPageFunc(c)
+			httpserver.ErrorPageFunc(c)
 			return h.Handle(c)
 		})
 	}
@@ -90,17 +63,17 @@ func BackendFuncMap() echo.MiddlewareFunc {
 				return GetProjectIdent(c)
 			})
 			c.SetFunc(`TopButtons`, func() dashboard.Buttons {
-				buttons := dashboard.TopButtonAll(c)
+				buttons := httpserver.Backend.Dashboard.TopButtons.All(c)
 				buttons.Ready(c)
 				return buttons
 			})
 			c.SetFunc(`GlobalHeads`, func() dashboard.GlobalHeads {
-				heads := dashboard.GlobalHeadAll(c)
+				heads := httpserver.Backend.Dashboard.GlobalHeads.All(c)
 				heads.Ready(c)
 				return heads
 			})
 			c.SetFunc(`GlobalFooters`, func() dashboard.GlobalFooters {
-				footers := dashboard.GlobalFooterAll(c)
+				footers := httpserver.Backend.Dashboard.GlobalFooters.All(c)
 				footers.Ready(c)
 				return footers
 			})
@@ -119,9 +92,9 @@ func BackendFuncMap() echo.MiddlewareFunc {
 				}
 				var d *dashboard.Dashboard
 				if len(extend) > 0 {
-					d = dashboard.Default.Backend.GetExtend(extend)
+					d = httpserver.Backend.Dashboard.GetExtend(extend)
 				} else {
-					d = dashboard.Default.Backend
+					d = httpserver.Backend.Dashboard
 				}
 				if d == nil {
 					return nil
@@ -134,10 +107,10 @@ func BackendFuncMap() echo.MiddlewareFunc {
 			c.SetFunc(`PermissionCheckByType`, func(permission role.ICheckByType, typ string, permPath string) interface{} {
 				return permission.CheckByType(c, typ, permPath)
 			})
-			c.SetFunc(`Navigate`, func(side string) navigate.List {
+			c.SetFunc(`Navigate`, func(side string) navigateLib.List {
 				return GetBackendNavigate(c, side)
 			})
-			c.SetFunc(`HasNavigate`, func(navList *navigate.List) bool {
+			c.SetFunc(`HasNavigate`, func(navList *navigateLib.List) bool {
 				if user != nil && role.IsFounder(user) {
 					return true
 				}
@@ -173,10 +146,10 @@ func GetProjectIdent(c echo.Context) string {
 	return projectIdent
 }
 
-func GetBackendNavigate(c echo.Context, side string) navigate.List {
+func GetBackendNavigate(c echo.Context, side string) navigateLib.List {
 	switch side {
 	case `top`:
-		navList, ok := c.Internal().Get(`navigate.top`).(navigate.List)
+		navList, ok := c.Internal().Get(`navigate.top`).(navigateLib.List)
 		if ok {
 			return navList
 		}
@@ -194,12 +167,12 @@ func GetBackendNavigate(c echo.Context, side string) navigate.List {
 	case `left`:
 		fallthrough
 	default:
-		navList, ok := c.Internal().Get(`navigate.left`).(navigate.List)
+		navList, ok := c.Internal().Get(`navigate.left`).(navigateLib.List)
 		if ok {
 			return navList
 		}
 		user := backend.User(c)
-		var leftNav *navigate.List
+		var leftNav *navigateLib.List
 		ident := GetProjectIdent(c)
 		if len(ident) > 0 {
 			if proj := navigate.ProjectGet(ident); proj != nil {

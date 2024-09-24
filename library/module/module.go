@@ -4,15 +4,12 @@ import (
 	"path"
 	"strings"
 
-	"github.com/coscms/webcore/library/common"
 	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webcore/library/config/cmder"
 	"github.com/coscms/webcore/library/config/extend"
 	"github.com/coscms/webcore/library/cron"
+	"github.com/coscms/webcore/library/nlog"
 	"github.com/coscms/webcore/library/ntemplate"
-	"github.com/coscms/webcore/library/route"
-	"github.com/coscms/webcore/registry/dashboard"
-	"github.com/coscms/webcore/registry/navigate"
 	"github.com/coscms/webcore/registry/settings"
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo/middleware"
@@ -26,22 +23,22 @@ type IModule interface {
 var _ IModule = &Module{}
 
 type Module struct {
-	Startup       string                         // 默认启动项(多个用半角逗号“,”隔开)
-	Navigate      func(nc *navigate.Collection)  // 注册导航菜单
-	Extend        map[string]extend.Initer       // 注册扩展配置项
-	Cmder         map[string]cmder.Cmder         // 注册命令
-	TemplatePath  map[string]string              // 注册模板路径
-	AssetsPath    []string                       // 注册素材路径
-	SQLCollection func(sc *config.SQLCollection) // 注册SQL语句
-	Dashboard     func(dd *dashboard.Dashboards) // 注册控制面板首页区块
-	Route         func(r *route.Collection)      // 注册网址路由
-	LogParser     map[string]common.LogParser    // 注册日志解析器
-	Settings      []*settings.SettingForm        // 注册配置选项
-	CronJobs      []*cron.Jobx                   // 注册定时任务
-	DBSchemaVer   float64                        // 设置数据库结构版本号
+	Startup       string                      // 默认启动项(多个用半角逗号“,”隔开)
+	Navigate      func(*Navigate)             // 注册导航菜单
+	Extend        map[string]extend.Initer    // 注册扩展配置项
+	Cmder         map[string]cmder.Cmder      // 注册命令
+	TemplatePath  map[string]string           // 注册模板路径
+	AssetsPath    []string                    // 注册素材路径
+	SQLCollection func(*config.SQLCollection) // 注册SQL语句
+	Dashboard     func(*Dashboard)            // 注册控制面板首页区块
+	Route         func(*Router)               // 注册网址路由
+	LogParser     map[string]nlog.LogParser   // 注册日志解析器
+	Settings      []*settings.SettingForm     // 注册配置选项
+	CronJobs      []*cron.Jobx                // 注册定时任务
+	DBSchemaVer   float64                     // 设置数据库结构版本号
 }
 
-func (m *Module) setNavigate(nc *navigate.Collection) {
+func (m *Module) setNavigate(nc *Navigate) {
 	if m.Navigate == nil {
 		return
 	}
@@ -88,21 +85,21 @@ func (m *Module) setSQL(sc *config.SQLCollection) {
 	m.SQLCollection(sc)
 }
 
-func (m *Module) setDashboard(dd *dashboard.Dashboards) {
+func (m *Module) setDashboard(dd *Dashboard) {
 	if m.Dashboard == nil {
 		return
 	}
 	m.Dashboard(dd)
 }
 
-func (m *Module) setRoute(r *route.Collection) {
+func (m *Module) setRoute(r *Router) {
 	if m.Route == nil {
 		return
 	}
 	m.Route(r)
 }
 
-func (m *Module) setLogParser(parsers map[string]common.LogParser) {
+func (m *Module) setLogParser(parsers map[string]nlog.LogParser) {
 	if m.LogParser == nil {
 		return
 	}
@@ -136,16 +133,16 @@ func (m *Module) Version() float64 {
 }
 
 func (m *Module) Apply() {
-	m.setNavigate(navigate.Default)
+	m.setNavigate(NewNavigate())
 	m.setConfig(config.FromFile())
 	m.setCmder(config.FromCLI())
 	m.applyTemplateAndAssets()
 	//m.setTemplate(bindata.PathAliases)
 	//m.setAssets(bindata.StaticOptions)
 	m.setSQL(config.GetSQLCollection())
-	m.setDashboard(dashboard.Default)
-	m.setRoute(route.Default)
-	m.setLogParser(common.LogParsers)
+	m.setDashboard(NewDashboard())
+	m.setRoute(NewRouter())
+	m.setLogParser(nlog.LogParsers)
 	m.setSettings()
 	m.setDefaultStartup()
 	m.setCronJob()

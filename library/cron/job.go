@@ -32,8 +32,8 @@ import (
 	"github.com/coscms/webcore/library/common"
 	"github.com/coscms/webcore/library/cron/send"
 	cronWriter "github.com/coscms/webcore/library/cron/writer"
+	"github.com/coscms/webcore/library/httpserver"
 	"github.com/coscms/webcore/registry/alert"
-	"github.com/coscms/webcore/registry/route"
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/code"
@@ -265,7 +265,7 @@ func (j *Job) send(elapsed int64, t time.Time, err error, cmdOut string, isTimeo
 	data["content"] = send.NewContent()
 	backendURL := common.Setting(`base`).String(`backendURL`)
 	backendURL = strings.TrimSuffix(backendURL, `/`)
-	data["detailURL"] = backendURL + route.Prefix() + `/task/log_view/` + fmt.Sprint(j.logID)
+	data["detailURL"] = backendURL + httpserver.Backend.Router.Prefix() + `/task/log_view/` + fmt.Sprint(j.logID)
 	return Send(&alert.AlertData{
 		Title:   title,
 		Content: send.NewContent(),

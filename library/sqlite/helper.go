@@ -27,8 +27,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/coscms/webcore/library/common"
 	"github.com/coscms/webcore/library/config"
+	"github.com/coscms/webcore/library/nsql"
 	"github.com/webx-top/com"
 )
 
@@ -445,7 +445,7 @@ func ConvertMySQLFile(sqlFile string, sqliteSQLFile string) error {
 		return err
 	}
 	defer fp.Close()
-	err = common.ParseSQL(sqlFile, true, func(s string) error {
+	err = nsql.ParseSQL(sqlFile, true, func(s string) error {
 		sqls, err := covertCreateTableSQL(s)
 		if err == nil {
 			fp.WriteString(strings.Join(sqls, "\n") + "\n")
@@ -460,7 +460,7 @@ func ConvertMySQLFile(sqlFile string, sqliteSQLFile string) error {
 // ConvertMySQL 转换MySQL为SQLite
 func ConvertMySQL(sqlContent string) (string, error) {
 	var sqlStr string
-	err := common.ParseSQL(sqlContent, false, func(s string) error {
+	err := nsql.ParseSQL(sqlContent, false, func(s string) error {
 		sqls, err := covertCreateTableSQL(s)
 		if err == nil {
 			sqlStr += strings.Join(sqls, "\n") + "\n"

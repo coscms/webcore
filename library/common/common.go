@@ -28,20 +28,26 @@ import (
 	"strings"
 
 	"github.com/admpub/decimal"
+	"github.com/coscms/webcore/library/nerrors"
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/middleware/tplfunc"
 )
 
 // Ok 操作成功
-func Ok(v string) Successor {
-	return NewOk(v)
+func Ok(v string) nerrors.Successor {
+	return nerrors.NewOk(v)
 }
+func SetProcessError(f func(ctx echo.Context, err error) error) {
+	processError = f
+}
+
+var processError = func(ctx echo.Context, err error) error { return err }
 
 // Err 获取错误信息
 func Err(ctx echo.Context, err error) (ret interface{}) {
 	if err != nil {
-		return ProcessError(ctx, err)
+		return processError(ctx, err)
 	}
 	flash := ctx.Flash()
 	if flash != nil {
@@ -127,7 +133,7 @@ func SendFail(ctx echo.Context, msg string, storeInCookie ...bool) {
 
 // SendErr 记录错误信息 (SendFail的别名)
 func SendErr(ctx echo.Context, err error) {
-	err = ProcessError(ctx, err)
+	err = processError(ctx, err)
 	SendFail(ctx, err.Error())
 }
 

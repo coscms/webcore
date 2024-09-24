@@ -5,19 +5,18 @@ package module
 
 import (
 	"github.com/coscms/webcore/library/bindata"
+	"github.com/coscms/webcore/library/httpserver"
 )
 
-var FrontendMisc = &Misc{}
-
 func (m *Module) applyTemplateAndAssets() {
-	m.setTemplate(bindata.PathAliases, FrontendMisc.Template)
-	m.setAssets(bindata.StaticOptions, FrontendMisc.Assets)
+	m.setTemplate(bindata.PathAliases, httpserver.Frontend.TmplPathFixers.PathAliases)
+	m.setAssets(bindata.StaticOptions, httpserver.Frontend.StaticOptions)
 }
 
 func SetBackendTemplate(key string, templatePath string) {
-	SetTemplate(bindata.PathAliases, FrontendMisc.Template, key, templatePath)
+	SetTemplate(bindata.PathAliases, httpserver.Frontend.TmplPathFixers.PathAliases, key, templatePath)
 }
 
 func SetBackendAssets(assetsPath string) {
-	SetAssets(bindata.StaticOptions, FrontendMisc.Assets, assetsPath)
+	SetAssets(bindata.StaticOptions, httpserver.Frontend.StaticOptions, assetsPath)
 }

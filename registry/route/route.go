@@ -19,82 +19,59 @@
 package route
 
 import (
-	"strings"
-
 	"github.com/webx-top/echo"
-	"github.com/webx-top/echo/defaults"
 	"github.com/webx-top/echo/logger"
 
+	"github.com/coscms/webcore/library/httpserver"
 	"github.com/coscms/webcore/library/route"
 )
 
-var (
-	routeRegister = route.NewRegister(defaults.Default).AddGroupNamer(groupNamer)
-)
-
-func init() {
-	route.Default.Backend = routeRegister
-}
-
-func groupNamer(group string) string {
-	if len(group) == 0 {
-		return group
-	}
-	if group == `@` {
-		return ``
-	}
-	if strings.HasPrefix(group, `@`) {
-		return group[1:]
-	}
-	return group
-}
-
 func IRegister() route.IRegister {
-	return routeRegister
+	return httpserver.Backend.Router
 }
 
 func Prefix() string {
-	return routeRegister.Prefix()
+	return IRegister().Prefix()
 }
 
 func SetPrefix(prefix string) {
-	routeRegister.SetPrefix(prefix)
+	IRegister().SetPrefix(prefix)
 }
 
 func MakeHandler(handler interface{}, requests ...interface{}) echo.Handler {
-	return routeRegister.MakeHandler(handler, requests...)
+	return IRegister().MakeHandler(handler, requests...)
 }
 
 func MetaHandler(handler interface{}, m echo.H, requests ...interface{}) echo.Handler {
-	return routeRegister.MetaHandler(m, handler, requests...)
+	return IRegister().MetaHandler(m, handler, requests...)
 }
 
 func MetaHandlerWithRequest(handler interface{}, m echo.H, requests interface{}, methods ...string) echo.Handler {
-	return routeRegister.MetaHandlerWithRequest(m, handler, requests, methods...)
+	return IRegister().MetaHandlerWithRequest(m, handler, requests, methods...)
 }
 
 func HandlerWithRequest(handler interface{}, requests interface{}, methods ...string) echo.Handler {
-	return routeRegister.HandlerWithRequest(handler, requests, methods...)
+	return IRegister().HandlerWithRequest(handler, requests, methods...)
 }
 
 func Routes() []*echo.Route {
-	return routeRegister.Routes()
+	return IRegister().Routes()
 }
 
 func Logger() logger.Logger {
-	return routeRegister.Logger()
+	return IRegister().Logger()
 }
 
 func Pre(middlewares ...interface{}) {
-	routeRegister.Pre(middlewares...)
+	IRegister().Pre(middlewares...)
 }
 
 func PreToGroup(groupName string, middlewares ...interface{}) {
-	routeRegister.PreToGroup(groupName, middlewares...)
+	IRegister().PreToGroup(groupName, middlewares...)
 }
 
 func Use(middlewares ...interface{}) {
-	routeRegister.Use(middlewares...)
+	IRegister().Use(middlewares...)
 }
 
 // UseToGroup “@”符号代表后台网址前缀
@@ -102,11 +79,11 @@ func UseToGroup(groupName string, middlewares ...interface{}) {
 	if groupName != `*` {
 		groupName = `@` + groupName
 	}
-	routeRegister.UseToGroup(groupName, middlewares...)
+	IRegister().UseToGroup(groupName, middlewares...)
 }
 
 func AddGroupNamer(namers ...func(string) string) {
-	routeRegister.AddGroupNamer(namers...)
+	IRegister().AddGroupNamer(namers...)
 }
 
 func Register(fn func(echo.RouteRegister)) {
@@ -114,23 +91,23 @@ func Register(fn func(echo.RouteRegister)) {
 }
 
 func SetRootGroup(groupName string) {
-	routeRegister.SetRootGroup(groupName)
+	IRegister().SetRootGroup(groupName)
 }
 
 func Host(hostName string, middlewares ...interface{}) route.Hoster {
-	return routeRegister.Host(hostName, middlewares...)
+	return IRegister().Host(hostName, middlewares...)
 }
 
 func Clear() {
-	routeRegister.Clear()
+	IRegister().Clear()
 }
 
 func Apply() {
 	echo.PanicIf(echo.Fire(`nging.route.apply.before`))
-	routeRegister.Apply()
+	IRegister().Apply()
 	echo.PanicIf(echo.Fire(`nging.route.apply.after`))
 }
 
 func RegisterToGroup(groupName string, fn func(echo.RouteRegister), middlewares ...interface{}) route.MetaSetter {
-	return routeRegister.RegisterToGroup(`@`+groupName, fn, middlewares...)
+	return IRegister().RegisterToGroup(`@`+groupName, fn, middlewares...)
 }

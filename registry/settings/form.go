@@ -7,6 +7,7 @@ import (
 	formsconfig "github.com/coscms/forms/config"
 	"github.com/coscms/webcore/dbschema"
 	"github.com/coscms/webcore/library/common"
+	"github.com/coscms/webcore/library/errorslice"
 	"github.com/webx-top/echo"
 )
 
@@ -148,7 +149,7 @@ func (s *SettingForm) RunHookPost(ctx echo.Context) error {
 	if s.hookPost == nil {
 		return nil
 	}
-	errs := common.NewErrors()
+	errs := errorslice.New()
 	for _, hook := range s.hookPost {
 		err := hook(ctx)
 		if err != nil {
@@ -162,7 +163,7 @@ func (s *SettingForm) RunHookGet(ctx echo.Context) error {
 	if s.hookGet == nil {
 		return nil
 	}
-	errs := common.NewErrors()
+	errs := errorslice.New()
 	for _, hook := range s.hookGet {
 		err := hook(ctx)
 		if err != nil {

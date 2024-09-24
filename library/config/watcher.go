@@ -22,7 +22,7 @@ import (
 	"strings"
 
 	"github.com/admpub/log"
-	"github.com/coscms/webcore/library/common"
+	"github.com/coscms/webcore/library/nerrors"
 	"github.com/webx-top/com"
 )
 
@@ -38,7 +38,7 @@ func WatchConfig(fn func(string) error) {
 				log.Info(`Succcessfully reload the configuration file: ` + file)
 				return
 			}
-			if err == common.ErrIgnoreConfigChange {
+			if err == nerrors.ErrIgnoreConfigChange {
 				log.Info(`No need to reload the configuration file: ` + file)
 				return
 			}

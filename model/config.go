@@ -25,7 +25,7 @@ import (
 	"github.com/webx-top/echo"
 
 	"github.com/coscms/webcore/dbschema"
-	"github.com/coscms/webcore/library/common"
+	"github.com/coscms/webcore/library/errorslice"
 	"github.com/coscms/webcore/registry/settings"
 )
 
@@ -94,7 +94,7 @@ func (f *Config) ListByGroup(group string) (func() int64, error) {
 }
 
 func (f *Config) ListMapByGroup(group string) (echo.H, error) {
-	errs := common.NewErrors()
+	errs := errorslice.New()
 	_, err := f.ListByGroup(group)
 	if err != nil {
 		errs.Add(err)

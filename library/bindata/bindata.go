@@ -26,7 +26,7 @@ import (
 	"strings"
 
 	assetfs "github.com/admpub/go-bindata-assetfs"
-	"github.com/coscms/webcore/library/ntemplate"
+	"github.com/coscms/webcore/library/httpserver"
 )
 
 var ErrUnsupported = errors.New(`unsupported bindata`)
@@ -47,7 +47,7 @@ var (
 	// PathAliases 后台模板文件路径别名分组
 	//
 	//	一般用于登记模块中的路径别名分组
-	PathAliases = ntemplate.NewPathAliases()
+	PathAliases = httpserver.Backend.TmplPathFixers.PathAliases
 )
 
 type staticAsset struct {

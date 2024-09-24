@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/coscms/webcore/library/common"
+	"github.com/coscms/webcore/library/filecache"
 	"github.com/coscms/webcore/library/restclient"
 )
 
@@ -53,14 +53,14 @@ func GetWANIP(cachedSeconds float64, ipVers ...int) (wanIP WANIP, err error) {
 	cacheFile := `v` + strconv.Itoa(ipVer)
 	if cachedSeconds > 0 {
 		var valid bool
-		if m, e := common.ModTimeCache(`ip`, cacheFile); e == nil {
+		if m, e := filecache.ModTimeCache(`ip`, cacheFile); e == nil {
 			wanIP.QueryTime = m
 			if time.Since(m).Seconds() < cachedSeconds { // 缓存1小时(3600秒)
 				valid = true
 			}
 		}
 		if valid {
-			if b, e := common.ReadCache(`ip`, cacheFile); e == nil {
+			if b, e := filecache.ReadCache(`ip`, cacheFile); e == nil {
 				wanIP.IP = strings.TrimSpace(string(b))
 				return
 			}
@@ -144,7 +144,7 @@ func GetWANIP(cachedSeconds float64, ipVers ...int) (wanIP WANIP, err error) {
 		wanIP.IP = ipv6
 	}
 	if len(wanIP.IP) > 0 {
-		if err := common.WriteCache(`ip`, cacheFile, []byte(wanIP.IP)); err != nil {
+		if err := filecache.WriteCache(`ip`, cacheFile, []byte(wanIP.IP)); err != nil {
 			errs = append(errs, err.Error())
 		}
 	}

@@ -35,6 +35,7 @@ import (
 	"github.com/coscms/webcore/cmd/bootconfig"
 	"github.com/coscms/webcore/initialize/backend"
 	"github.com/coscms/webcore/library/config"
+	"github.com/coscms/webcore/library/httpserver"
 	"github.com/coscms/webcore/library/modal"
 	uploadLibrary "github.com/coscms/webcore/library/upload"
 	"github.com/coscms/webcore/registry/route"
@@ -76,7 +77,7 @@ func Initialize() {
 			FrontendTmplAssetFS = NewAssetFS(FrontendTmplAssetPrefix)
 		}
 	}
-	bootconfig.StaticMW = bindata.Static(
+	httpserver.Backend.StaticMW = bindata.Static(
 		route.Prefix()+"/public/assets/",
 		NewStaticAssetFS(route.Prefix(), StaticAssetFS),
 		bootconfig.HTTPCacheMaxAge,
@@ -84,15 +85,15 @@ func Initialize() {
 	bootconfig.FaviconHandler = func(c echo.Context) error {
 		return c.CacheableFile(bootconfig.FaviconPath, bootconfig.HTTPCacheMaxAge, StaticAssetFS)
 	}
-	bootconfig.BackendTmplMgr = bindata.NewTmplManager(BackendTmplAssetFS)
+	httpserver.Backend.TmplMgr = bindata.NewTmplManager(BackendTmplAssetFS)
 	if BackendTmplAssetFS == FrontendTmplAssetFS {
-		bootconfig.FrontendTmplMgr = bootconfig.BackendTmplMgr
+		httpserver.Frontend.TmplMgr = httpserver.Backend.TmplMgr
 	} else {
-		bootconfig.FrontendTmplMgr = bindata.NewTmplManager(FrontendTmplAssetFS)
+		httpserver.Frontend.TmplMgr = bindata.NewTmplManager(FrontendTmplAssetFS)
 	}
 	modal.ReadConfigFile = func(file string) ([]byte, error) {
 		file = strings.TrimPrefix(file, backend.TemplateDir)
-		return bootconfig.BackendTmplMgr.GetTemplate(file)
+		return httpserver.Backend.TmplMgr.GetTemplate(file)
 	}
 	image.WatermarkOpen = func(file string) (image.FileReader, error) {
 		f, err := image.DefaultHTTPSystemOpen(file)

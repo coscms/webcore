@@ -20,12 +20,14 @@ package manager
 
 import (
 	"github.com/coscms/webcore/cmd/bootconfig"
-	"github.com/coscms/webcore/registry/navigate"
+	"github.com/coscms/webcore/library/httpserver"
+	"github.com/coscms/webcore/library/navigate"
+	navRegistry "github.com/coscms/webcore/registry/navigate"
 )
 
-var Project = navigate.NewProject(`Nging`, `nging`, `/index`, navigate.LeftNavigate)
+var Project = navigate.NewProject(`Nging`, `nging`, `/index`, navRegistry.LeftNavigate)
 
 func init() {
 	bootconfig.SupportManager = true
-	navigate.ProjectAdd(2, Project)
+	httpserver.Backend.Navigate.AddProject(2, Project)
 }

@@ -33,11 +33,10 @@ import (
 	"github.com/admpub/log"
 	"github.com/admpub/mysql-schema-sync/sync"
 	"github.com/coscms/webcore/cmd/bootconfig"
-	"github.com/coscms/webcore/library/common"
 	"github.com/coscms/webcore/library/config/subconfig/sdb"
 	"github.com/coscms/webcore/library/config/subconfig/ssystem"
-	"github.com/coscms/webcore/library/cron"
-	cronSend "github.com/coscms/webcore/library/cron/send"
+	"github.com/coscms/webcore/library/nretry"
+	"github.com/coscms/webcore/library/nsql"
 	"github.com/webx-top/com"
 	"github.com/webx-top/db/lib/factory"
 	"github.com/webx-top/db/lib/sqlbuilder"
@@ -109,10 +108,6 @@ func ParseConfig() error {
 		return err
 	}
 	InitSessionOptions(conf)
-	if conf.Cron.PoolSize > 0 {
-		cron.PoolSize = conf.Cron.PoolSize
-	}
-	cronSend.DefaultEmailConfig.Template = conf.Cron.Template
 	if IsInstalled() {
 		if FromFile() != nil {
 			if !FromFile().connectedDB || !reflect.DeepEqual(conf.DB, FromFile().DB) {
@@ -191,7 +186,7 @@ func UpgradeMySQL(schema string, syncConfig *sync.Config, cfg sdb.DB) (DBOperato
 			charset = sdb.MySQLDefaultCharset
 		}
 		return func(sqlStr string) string {
-			return common.ReplaceCharset(sqlStr, charset)
+			return nsql.ReplaceCharset(sqlStr, charset)
 		}
 	}()
 	return DBOperators{Source: sync.NewMySchemaData(schema, `source`)}, nil
@@ -223,11 +218,11 @@ func ConnectDB(c sdb.DB, index int, name string) error {
 	if !ok {
 		return ErrUnknowDatabaseType
 	}
-	err := common.Retry(10, func() error {
+	err := nretry.Retry(10, func() error {
 		database, err := fn(c)
 		if err != nil {
 			if !errors.Is(err, driver.ErrBadConn) && !com.IsNetworkOrHostDown(err, false) {
-				return common.NoRetry(fmt.Errorf(`failed to connect %v: %w`, c.Type, err))
+				return nretry.NoRetry(fmt.Errorf(`failed to connect %v: %w`, c.Type, err))
 			}
 			return fmt.Errorf(`failed to connect %v: %w`, c.Type, err)
 		}

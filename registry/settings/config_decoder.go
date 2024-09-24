@@ -25,7 +25,6 @@ import (
 	"github.com/webx-top/echo"
 
 	"github.com/coscms/webcore/dbschema"
-	"github.com/coscms/webcore/library/common"
 )
 
 type Decoder func(v *dbschema.NgingConfig, dbschemaMap echo.H) error
@@ -56,7 +55,7 @@ func RegisterDecoder(group string, decoder Decoder) {
 
 func DecodeConfigValue(v *dbschema.NgingConfig, decoder Decoder) (echo.H, error) {
 	if v.Encrypted == `Y` {
-		v.Value = echo.Get(common.ConfigName).(Codec).Decode(v.Value)
+		v.Value = echo.Get(`ConfigFromFile`).(Codec).Decode(v.Value)
 	}
 	r := echo.H(v.AsMap())
 	var err error

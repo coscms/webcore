@@ -3,7 +3,7 @@ package perm
 import (
 	"testing"
 
-	"github.com/coscms/webcore/registry/navigate"
+	"github.com/coscms/webcore/library/navigate"
 	"github.com/webx-top/echo"
 
 	"github.com/stretchr/testify/assert"

@@ -32,12 +32,13 @@ import (
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 
-	"github.com/coscms/webcore/library/common"
 	"github.com/coscms/webcore/library/setup"
 )
 
 const (
 	LockFileName = `installed.lock`
+	ConfigName   = `ConfigFromFile`
+	SettingName  = `ConfigFromDB`
 )
 
 var _ = FixWd()
@@ -74,7 +75,7 @@ func FromFile() *Config {
 }
 
 func FromDB(group ...string) echo.H {
-	return echo.GetStoreByKeys(common.SettingName, group...)
+	return echo.GetStoreByKeys(SettingName, group...)
 }
 
 func GetSQLCollection() *SQLCollection {

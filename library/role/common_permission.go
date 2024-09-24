@@ -6,9 +6,9 @@ import (
 
 	"github.com/admpub/copier"
 	"github.com/admpub/log"
-	"github.com/coscms/webcore/library/common"
+	"github.com/coscms/webcore/library/navigate"
+	"github.com/coscms/webcore/library/nerrors"
 	"github.com/coscms/webcore/library/perm"
-	"github.com/coscms/webcore/registry/navigate"
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/defaults"
@@ -108,7 +108,7 @@ func (r *CommonPermission) combineJSON(ctx echo.Context, checkeds map[string]map
 	recv := echo.H{}
 	jsonBytes := com.Str2bytes(permRule)
 	if err := json.Unmarshal(jsonBytes, &recv); err != nil {
-		log.Error(common.JSONBytesParseError(err, jsonBytes).Error())
+		log.Error(nerrors.JSONBytesParseError(err, jsonBytes).Error())
 		return
 	}
 	for permKey, permVal := range recv {

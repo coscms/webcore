@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/coscms/webcore/dbschema"
-	"github.com/coscms/webcore/library/common"
+	"github.com/coscms/webcore/library/filecache"
 	"github.com/coscms/webcore/library/role"
 	"github.com/coscms/webcore/model"
 	"github.com/webx-top/echo"
@@ -34,7 +34,7 @@ func init() {
 		if err != nil {
 			return err
 		}
-		err = common.WriteCache(`upgrade`, `db.lt5.nging_user_role.json`, b)
+		err = filecache.WriteCache(`upgrade`, `db.lt5.nging_user_role.json`, b)
 		return err
 	})
 	echo.OnCallback(`nging.upgrade.db.after`, func(data echo.Event) error {
@@ -42,7 +42,7 @@ func init() {
 		if installedSchemaVer >= 5 {
 			return nil
 		}
-		b, err := common.ReadCache(`upgrade`, `db.lt5.nging_user_role.json`)
+		b, err := filecache.ReadCache(`upgrade`, `db.lt5.nging_user_role.json`)
 		if err != nil {
 			return err
 		}
@@ -81,7 +81,7 @@ func init() {
 			}
 		}
 		if err == nil {
-			common.RemoveCache(`upgrade`, `db.lt5.nging_user_role.json`)
+			filecache.RemoveCache(`upgrade`, `db.lt5.nging_user_role.json`)
 		}
 		return err
 	})

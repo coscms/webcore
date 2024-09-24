@@ -27,7 +27,7 @@ import (
 	"github.com/webx-top/echo/code"
 
 	"github.com/coscms/webcore/dbschema"
-	"github.com/coscms/webcore/library/common"
+	"github.com/coscms/webcore/library/nerrors"
 	"github.com/coscms/webcore/registry/alert"
 )
 
@@ -69,7 +69,7 @@ func (s *AlertRecipient) check() error {
 			custom := &alert.WebhookCustom{}
 			extraBytes := []byte(s.Extra)
 			if err := json.Unmarshal(extraBytes, custom); err != nil {
-				err = common.JSONBytesParseError(err, extraBytes)
+				err = nerrors.JSONBytesParseError(err, extraBytes)
 				return s.Context().NewError(code.InvalidParameter, err.Error()).SetZone(`extra`)
 			}
 			if len(s.Account) > 7 {

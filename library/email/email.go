@@ -28,6 +28,7 @@ import (
 	"github.com/admpub/email"
 	"github.com/admpub/log"
 	"github.com/admpub/mail"
+	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webcore/library/notice"
 )
 
@@ -136,7 +137,10 @@ func Initial(queueSizes ...int) {
 		close(sendCh)
 	}
 	if queueSize <= 0 {
-		queueSize = QueueSize
+		queueSize = config.FromFile().Settings().Email.QueueSize
+		if queueSize <= 0 {
+			queueSize = QueueSize
+		}
 	}
 	sendCh = make(chan *queueItem, queueSize)
 	go func() {

@@ -23,16 +23,18 @@ import (
 	"strings"
 
 	"github.com/webx-top/echo"
+	"github.com/webx-top/echo/defaults"
 	"github.com/webx-top/echo/subdomains"
 
 	"github.com/admpub/log"
-	"github.com/coscms/webcore/library/common"
 	"github.com/coscms/webcore/library/config/subconfig/ssystem"
 	"github.com/coscms/webcore/library/notice"
 	"github.com/coscms/webcore/registry/settings"
 )
 
-var Setting = common.Setting
+func Setting(group ...string) echo.H {
+	return echo.GetStoreByKeys(SettingName, group...)
+}
 
 func NewSettings(config *Config) *Settings {
 	c := &Settings{
@@ -164,7 +166,7 @@ func FireSetSettings(group string, diffs Diffs) error {
 
 func (c *Settings) Init(ctx echo.Context) error {
 	if ctx == nil {
-		ctx = common.NewMockContext()
+		ctx = defaults.NewMockContext()
 	}
 	defaults := settings.ConfigDefaultsAsStore()
 	var configs = defaults
@@ -173,7 +175,7 @@ func (c *Settings) Init(ctx echo.Context) error {
 			configs = settings.ConfigAsStore(ctx)
 		}
 	}
-	echo.Set(common.SettingName, configs)
+	echo.Set(SettingName, configs)
 	for _, group := range actGroups {
 		c.SetConfig(group, configs, defaults)
 	}
@@ -181,7 +183,7 @@ func (c *Settings) Init(ctx echo.Context) error {
 }
 
 func (c *Settings) GetConfig() echo.H {
-	r, _ := echo.Get(common.SettingName).(echo.H)
+	r, _ := echo.Get(SettingName).(echo.H)
 	return r
 }
 

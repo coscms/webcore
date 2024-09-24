@@ -34,10 +34,9 @@ import (
 	"github.com/webx-top/image"
 
 	"github.com/coscms/webcore/cmd/bootconfig"
-	"github.com/coscms/webcore/initialize/backend"
+	"github.com/coscms/webcore/library/httpserver"
 	"github.com/coscms/webcore/library/modal"
 	uploadLibrary "github.com/coscms/webcore/library/upload"
-	"github.com/coscms/webcore/registry/route"
 )
 
 // StaticOptions 后台static中间件选项
@@ -51,14 +50,7 @@ var StaticOptions = &middleware.StaticOptions{
 // Initialize 后台模板等素材初始化配置
 func Initialize() {
 	bootconfig.Bindata = false
-	if len(StaticOptions.Root) == 0 {
-		StaticOptions.Root = backend.AssetsDir
-	}
-	if len(StaticOptions.Path) == 0 {
-		StaticOptions.Path = route.Prefix() + "/public/assets/backend"
-	}
-	StaticOptions.TrimPrefix = route.Prefix()
-	bootconfig.StaticMW = middleware.Static(StaticOptions)
+	httpserver.Backend.StaticOptions = StaticOptions
 	if !com.FileExists(bootconfig.FaviconPath) {
 		log.Error(`not found favicon file: ` + bootconfig.FaviconPath)
 	}
@@ -77,14 +69,14 @@ func Initialize() {
 		return f, err
 	}
 	modal.PathFixer = func(c echo.Context, file string) string {
-		rpath := strings.TrimPrefix(file, backend.TemplateDir+`/`)
+		rpath := strings.TrimPrefix(file, httpserver.Backend.TemplateDir+`/`)
 		rpath, ok := PathAliases.ParsePrefixOk(rpath)
 		if ok {
 			file = rpath
 		}
 		return file
 	}
-	backend.RendererDo = func(renderer driver.Driver) {
+	httpserver.Backend.RendererDo = func(renderer driver.Driver) {
 		renderer.SetTmplPathFixer(func(c echo.Context, tmpl string) string {
 			rpath, ok := PathAliases.ParsePrefixOk(tmpl)
 			if ok {

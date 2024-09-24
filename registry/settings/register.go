@@ -22,7 +22,7 @@ import (
 	"fmt"
 
 	"github.com/admpub/log"
-	"github.com/coscms/webcore/library/common"
+	"github.com/coscms/webcore/library/errorslice"
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 )
@@ -80,12 +80,12 @@ func Get(group string) (int, *SettingForm) {
 func RunHookPost(ctx echo.Context, groups ...string) error {
 	n := len(groups)
 	var i int
-	errs := common.NewErrors()
+	errs := errorslice.New()
 	for _, setting := range settings {
 		if n < 1 || com.InSlice(setting.Group, groups) {
 			err := setting.RunHookPost(ctx)
 			if err != nil {
-				err = fmt.Errorf("[config][group:%s] %s", setting.Group, err.(common.Errors).ErrorTab())
+				err = fmt.Errorf("[config][group:%s] %s", setting.Group, err.(errorslice.Errors).ErrorTab())
 				log.Error(err)
 				errs.Add(err)
 			}
@@ -103,12 +103,12 @@ func RunHookPost(ctx echo.Context, groups ...string) error {
 func RunHookGet(ctx echo.Context, groups ...string) error {
 	n := len(groups)
 	var i int
-	errs := common.NewErrors()
+	errs := errorslice.New()
 	for _, setting := range settings {
 		if n < 1 || com.InSlice(setting.Group, groups) {
 			err := setting.RunHookGet(ctx)
 			if err != nil {
-				err = fmt.Errorf("[config][group:%s] %s", setting.Group, err.(common.Errors).ErrorTab())
+				err = fmt.Errorf("[config][group:%s] %s", setting.Group, err.(errorslice.Errors).ErrorTab())
 				log.Error(err)
 				errs.Add(err)
 			}

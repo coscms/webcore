@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/coscms/webcore/library/common"
+	"github.com/coscms/webcore/library/nerrors"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/param"
 )
@@ -45,7 +45,7 @@ func (b BehaviorPerms) CheckBehavior(perm string) *CheckedBehavior {
 }
 
 func JSONBytesParseError(err error, jsonBytes []byte) error {
-	return common.JSONBytesParseError(err, jsonBytes)
+	return nerrors.JSONBytesParseError(err, jsonBytes)
 }
 
 func ParseBehavior(permBehaviors string, behaviors *Behaviors) (BehaviorPerms, error) {

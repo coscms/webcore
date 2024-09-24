@@ -42,9 +42,9 @@ import (
 	"github.com/coscms/webcore/cmd/bootconfig"
 	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webcore/library/config/startup"
+	"github.com/coscms/webcore/library/httpserver"
 	"github.com/coscms/webcore/library/license"
 	"github.com/coscms/webcore/library/msgbox"
-	"github.com/coscms/webcore/library/route"
 	"github.com/coscms/webcore/library/selfupdate"
 )
 
@@ -139,7 +139,7 @@ If you have already purchased a license, please place the ` + license.FileName()
 	//独立模块
 	if config.FromCLI().OnlyRunServer() {
 		bootconfig.SetServerType(config.FromCLI().Type)
-		route.Default.Clear()
+		httpserver.Clear()
 		return nil
 	}
 

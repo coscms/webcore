@@ -3,7 +3,7 @@ package model
 import (
 	"github.com/admpub/log"
 	"github.com/coscms/webcore/dbschema"
-	"github.com/coscms/webcore/library/common"
+	"github.com/coscms/webcore/library/nerrors"
 	"github.com/coscms/webcore/library/sessionguard"
 	"github.com/webx-top/db"
 )
@@ -25,7 +25,7 @@ func (u *User) VerifySession(users ...*dbschema.NgingUser) error {
 		user, _ = u.Context().Session().Get(`user`).(*dbschema.NgingUser)
 	}
 	if user == nil {
-		return common.ErrUserNotLoggedIn
+		return nerrors.ErrUserNotLoggedIn
 	}
 	err := u.Get(nil, db.Cond{`id`: user.Id})
 	if err != nil {
@@ -33,12 +33,12 @@ func (u *User) VerifySession(users ...*dbschema.NgingUser) error {
 			return err
 		}
 		u.UnsetSession()
-		return common.ErrUserNotFound
+		return nerrors.ErrUserNotFound
 	}
 	if !sessionguard.Validate(u.Context(), user.LastIp, `user`, uint64(user.Id)) {
 		log.Warn(u.Context().T(`用户“%s”的会话环境发生改变，需要重新登录`, user.Username))
 		u.UnsetSession()
-		return common.ErrUserNotLoggedIn
+		return nerrors.ErrUserNotLoggedIn
 	}
 	if u.NgingUser.Updated != user.Updated {
 		u.SetSession()

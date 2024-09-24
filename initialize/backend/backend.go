@@ -19,29 +19,22 @@
 package backend
 
 import (
-	"net/http"
 	"strconv"
 	"strings"
 
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/handler/pprof"
-	"github.com/webx-top/echo/middleware"
-	"github.com/webx-top/echo/middleware/language"
-	"github.com/webx-top/echo/middleware/render"
-	"github.com/webx-top/echo/middleware/render/driver"
-	"github.com/webx-top/echo/middleware/session"
 	"github.com/webx-top/echo/param"
 	"github.com/webx-top/echo/subdomains"
-	"github.com/webx-top/validator"
 
 	"github.com/admpub/events"
 	"github.com/admpub/log"
 	"github.com/coscms/webcore/cmd/bootconfig"
 	"github.com/coscms/webcore/library/backend"
-	"github.com/coscms/webcore/library/common"
 	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webcore/library/formbuilder"
+	"github.com/coscms/webcore/library/httpserver"
 	ngingMW "github.com/coscms/webcore/middleware"
 	"github.com/coscms/webcore/registry/route"
 )
@@ -53,18 +46,9 @@ const (
 )
 
 var (
-	TemplateDir           = DefaultTemplateDir                     //后台模板文件夹
-	AssetsDir             = DefaultAssetsDir                       //后台素材文件夹
-	AssetsURLPath         = DefaultAssetsURLPath                   //后台素材网址路径
-	DefaultAvatarURL      = AssetsURLPath + `/images/user_128.png` //默认头像网址
-	RendererDo            = func(driver.Driver) {}                 //后台模板引擎配置函数
-	TmplCustomParser      func(tmpl string, content []byte) []byte //后台模板自定义解析函数
-	ParseStrings          = map[string]string{}                    //后台模板内容替换
-	ParseStringFuncs      = map[string]func() string{}             //后台模板内容替换函数
 	DefaultLocalHostNames = []string{
 		`127.0.0.1`, `localhost`,
 	}
-	DefaultMiddlewares = []interface{}{} //后台默认中间件
 )
 
 func MakeSubdomains(domain string, appends []string) []string {
@@ -112,21 +96,19 @@ func MakeSubdomains(domain string, appends []string) []string {
 }
 
 func SetPrefix(prefix string) {
-	route.SetPrefix(prefix)
-	backend.AssetsURLPath = prefix + AssetsURLPath
-	backend.DefaultAvatarURL = prefix + DefaultAvatarURL
+	httpserver.Backend.SetPrefix(prefix)
 }
 
 func Prefix() string {
-	return route.Prefix()
+	return httpserver.Backend.Prefix()
 }
 
 func start() {
-	e := route.IRegister().Echo() // 不需要内部重启，所以直接操作*Echo
+	e := httpserver.Backend.Router.Echo() // 不需要内部重启，所以直接操作*Echo
 	config.FromFile().Sys.SetRealIPParams(e.RealIPConfig())
 	e.SetRenderDataWrapper(echo.DefaultRenderDataWrapper)
-	subdomains.Default.Default = `backend`
-	subdomains.Default.Boot = `backend`
+	subdomains.Default.Default = httpserver.KindBackend
+	subdomains.Default.Boot = httpserver.KindBackend
 	domainName := subdomains.Default.Default
 	backendDomain := config.FromCLI().BackendDomain
 	if len(backendDomain) > 0 {
@@ -134,62 +116,10 @@ func start() {
 	}
 	subdomains.Default.Add(domainName, e)
 
-	e.Use(middleware.Recover())
-	e.Use(ngingMW.MaxRequestBodySize)
-	if len(DefaultMiddlewares) == 0 {
-		if !config.FromFile().Sys.DisableHTTPLog {
-			e.Use(middleware.Log())
-		}
-	} else {
-		e.Use(DefaultMiddlewares...)
-	}
-
-	// 注册静态资源文件(网站素材文件)
-	e.Use(bootconfig.StaticMW) //打包的静态资源
-	// 上传文件资源(改到manager中用File函数实现)
-	// e.Use(middleware.Static(&middleware.StaticOptions{
-	// 	Root: helper.UploadDir,
-	// 	Path: helper.UploadURLPath,
-	// }))
-
-	// 启用session
-	e.Use(session.Middleware(config.SessionOptions, config.AutoSecure))
-	// 启用多语言支持
 	config.FromFile().Language.SetFSFunc(bootconfig.LangFSFunc)
-	i18n := language.New(&config.FromFile().Language)
-	e.Use(i18n.Middleware())
-
-	// 启用Validation
-	e.Use(validator.Middleware())
-
-	// 事物支持
-	e.Use(ngingMW.Transaction())
-	// 注册模板引擎
-	renderOptions := &render.Config{
-		TmplDir: TemplateDir,
-		Engine:  `standard`,
-		ParseStrings: map[string]string{
-			`__TMPL__`: TemplateDir,
-		},
-		DefaultHTTPErrorCode: http.StatusOK,
-		Reload:               true,
-		ErrorPages:           config.FromFile().Sys.ErrorPages,
-		ErrorProcessors:      common.ErrorProcessors,
-		FuncMapGlobal:        backend.GlobalFuncMap(),
-		CustomParser:         TmplCustomParser,
-	}
-	for key, val := range ParseStrings {
-		renderOptions.ParseStrings[key] = val
-	}
-	for key, val := range ParseStringFuncs {
-		renderOptions.ParseStringFuncs[key] = val
-	}
-	if RendererDo != nil {
-		renderOptions.AddRendererDo(RendererDo)
-	}
-	renderOptions.AddFuncSetter(ngingMW.ErrorPageFunc)
-	renderOptions.ApplyTo(e, bootconfig.BackendTmplMgr)
-	renderOptions.Renderer().MonitorEvent(func(file string) {
+	httpserver.Backend.GlobalFuncMap = backend.GlobalFuncMap()
+	httpserver.Backend.Apply()
+	httpserver.Backend.Renderer().MonitorEvent(func(file string) {
 		if strings.HasSuffix(file, `.form.json`) {
 			if formbuilder.DelCachedConfig(file) {
 				log.Debug(`delete: cache form config: `, file)
@@ -199,12 +129,12 @@ func start() {
 	//RendererDo(renderOptions.Renderer())
 	echo.OnCallback(`nging.renderer.cache.clear`, func(_ events.Event) error {
 		log.Debug(`clear: Backend Template Object Cache`)
-		renderOptions.Renderer().ClearCache()
+		httpserver.Backend.Renderer().ClearCache()
 		formbuilder.ClearCache()
 		return nil
 	})
 	e.Get(`/favicon.ico`, bootconfig.FaviconHandler).SetMetaKV(route.PermGuestKV())
-	i18n.Handler(e, `App.i18n`)
+	httpserver.Backend.I18n().Handler(e, `App.i18n`)
 	debugG := e.Group(`/debug`, ngingMW.DebugPprof).SetMetaKV(route.PermGuestKV())
 	pprof.RegisterRoute(debugG)
 	Initialize()

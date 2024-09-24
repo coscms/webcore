@@ -14,7 +14,7 @@ func TestMime(t *testing.T) {
 	result = cfg.DetectType(`.dmg`)
 	assert.Equal(t, `file`, result)
 	mimeType := mime.TypeByExtension(`.iso`)
-	assert.Equal(t, `application/vnd.efi.iso`, mimeType) // application/x-cd-image
+	assert.True(t, mimeType == `application/vnd.efi.iso` || mimeType == `application/x-cd-image`) // application/x-cd-image
 	mimeType = mime.TypeByExtension(`.dmg`)
 	assert.Equal(t, `application/x-apple-diskimage`, mimeType)
 }

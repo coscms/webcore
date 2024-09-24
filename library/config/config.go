@@ -33,7 +33,6 @@ import (
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/middleware/language"
 
-	"github.com/coscms/webcore/library/common"
 	"github.com/coscms/webcore/library/config/extend"
 	"github.com/coscms/webcore/library/config/subconfig/scookie"
 	"github.com/coscms/webcore/library/config/subconfig/scron"
@@ -275,7 +274,7 @@ func AddConfigInitor(initors ...func(*Config)) {
 
 func (c *Config) AsDefault() *Config {
 	c.Validations.Register()
-	echo.Set(common.ConfigName, c)
+	echo.Set(ConfigName, c)
 	for _, initor := range configInitors {
 		initor(c)
 	}

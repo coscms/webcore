@@ -26,9 +26,9 @@ import (
 	"github.com/webx-top/echo/code"
 
 	"github.com/coscms/webcore/library/backend"
-	"github.com/coscms/webcore/library/common"
 	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webcore/library/license"
+	"github.com/coscms/webcore/library/nerrors"
 	"github.com/coscms/webcore/library/role"
 	"github.com/coscms/webcore/model"
 	"github.com/coscms/webcore/registry/route"
@@ -88,7 +88,7 @@ func AuthCheck(h echo.Handler) echo.HandlerFunc {
 				return nil
 			}
 			if !permission.Check(c, route) {
-				return common.ErrUserNoPerm
+				return nerrors.ErrUserNoPerm
 			}
 			return nil
 		})
@@ -136,7 +136,7 @@ func CheckAnyPerm(c echo.Context, ppaths ...string) (err error) {
 			return nil
 		}
 	}
-	return common.ErrUserNoPerm
+	return nerrors.ErrUserNoPerm
 }
 
 // CheckAllPerm 检查是否匹配所有给定路径权限

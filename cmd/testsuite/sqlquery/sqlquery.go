@@ -10,7 +10,7 @@ import (
 	"github.com/webx-top/echo/defaults"
 
 	"github.com/coscms/webcore/cmd"
-	"github.com/coscms/webcore/library/common"
+	"github.com/coscms/webcore/library/nsql"
 )
 
 func init() {
@@ -21,21 +21,21 @@ func init() {
 
 func GetRow(cmd *cobra.Command, args []string) error {
 	ctx := defaults.NewMockContext()
-	row, err := common.NewSQLQuery(ctx).GetRow("SELECT * FROM nging_user WHERE id > 0")
+	row, err := nsql.NewSQLQuery(ctx).GetRow("SELECT * FROM nging_user WHERE id > 0")
 	if err != nil {
 		panic(err)
 	}
 	fmt.Print(`nging_user.created =========> `)
 	echo.Dump(row.Timestamp(`created`).Format(`2006-01-02 15:04:05`))
 
-	m, err := common.NewSQLQuery(ctx).GetModel(`NgingUser`, `id >`, 0)
+	m, err := nsql.NewSQLQuery(ctx).GetModel(`NgingUser`, `id >`, 0)
 	if err != nil {
 		panic(err)
 	}
 	fmt.Print("\nNgingUser =========> ")
 	echo.Dump(m)
 
-	rows, err := common.NewSQLQuery(ctx).Limit(2).GetModels(`NgingUser`, `id >`, 0)
+	rows, err := nsql.NewSQLQuery(ctx).Limit(2).GetModels(`NgingUser`, `id >`, 0)
 	if err != nil {
 		panic(err)
 	}
@@ -43,7 +43,7 @@ func GetRow(cmd *cobra.Command, args []string) error {
 	echo.Dump(rows)
 
 	fmt.Print("\nnging_user GetRows =========> ")
-	list, err := common.NewSQLQuery(ctx).Limit(2).GetRows("SELECT * FROM nging_user WHERE id > 0")
+	list, err := nsql.NewSQLQuery(ctx).Limit(2).GetRows("SELECT * FROM nging_user WHERE id > 0")
 	if err != nil {
 		panic(err)
 	}

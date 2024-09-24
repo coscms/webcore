@@ -28,7 +28,7 @@ import (
 	"github.com/webx-top/echo"
 
 	"github.com/admpub/log"
-	"github.com/coscms/webcore/library/common"
+	"github.com/coscms/webcore/library/nlog"
 	"github.com/coscms/webcore/library/service"
 )
 
@@ -86,7 +86,7 @@ func (c *Log) Show(ctx echo.Context) error {
 	if err != nil {
 		return ctx.JSON(ctx.Data().SetError(err))
 	}
-	return common.LogShow(ctx, logFile)
+	return nlog.LogShow(ctx, logFile)
 }
 
 func (c *Log) SetBy(r echo.H, defaults echo.H) *Log {

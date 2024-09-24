@@ -24,16 +24,12 @@ import (
 
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
-	"github.com/webx-top/echo/middleware/render/driver"
 	"github.com/webx-top/echo/middleware/tplfunc"
 )
 
 var (
 	Bindata          bool
-	StaticMW         interface{}
 	HTTPCacheMaxAge  = com.GetenvDuration(`NGING_HTTPCACHE_MAXAGE`, time.Hour*24*7)
-	BackendTmplMgr   driver.Manager
-	FrontendTmplMgr  driver.Manager
 	LangFSFunc       func(dir string) http.FileSystem
 	Develop          bool
 	SupportManager   bool

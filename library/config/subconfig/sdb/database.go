@@ -21,7 +21,7 @@ package sdb
 import (
 	"time"
 
-	"github.com/coscms/webcore/library/common"
+	"github.com/coscms/webcore/library/nsql"
 	"github.com/webx-top/db/lib/factory"
 	"github.com/webx-top/db/lib/sqlbuilder"
 	"github.com/webx-top/db/mysql"
@@ -135,7 +135,7 @@ func (d *DB) ToMySQL() mysql.ConnectionURL {
 		Password: d.Password,
 		Options:  d.Options,
 	}
-	common.ParseMysqlConnectionURL(&settings)
+	nsql.ParseMysqlConnectionURL(&settings)
 	if settings.Options == nil {
 		settings.Options = map[string]string{}
 	}

@@ -24,7 +24,7 @@ import (
 
 	"github.com/admpub/events"
 	"github.com/coscms/webcore/dbschema"
-	"github.com/coscms/webcore/library/common"
+	"github.com/coscms/webcore/library/errorslice"
 	"github.com/coscms/webcore/registry/upload"
 	"github.com/coscms/webcore/registry/upload/convert"
 	"github.com/webx-top/db"
@@ -89,7 +89,7 @@ func init() {
 			return err
 		}
 		defer storer.Close()
-		var errs common.Errors
+		var errs errorslice.Errors
 		otherFormatExtensions := convert.Extensions()
 		for _, file := range files {
 			if err := storer.Delete(file); err != nil && !storer.ErrIsNotExist(err) {

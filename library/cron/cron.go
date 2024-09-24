@@ -23,6 +23,7 @@ import (
 
 	"github.com/admpub/cron"
 	"github.com/admpub/log"
+	"github.com/coscms/webcore/library/config"
 )
 
 var (
@@ -38,7 +39,10 @@ func Initial(sizes ...int) {
 		size = sizes[0]
 	}
 	if size <= 0 {
-		size = PoolSize
+		size = config.FromFile().Cron.PoolSize
+		if size <= 0 {
+			size = PoolSize
+		}
 	}
 	Close()
 	workPool = make(chan bool, size)

@@ -6,7 +6,7 @@ import (
 
 	"github.com/admpub/godotenv"
 	"github.com/admpub/log"
-	"github.com/coscms/webcore/library/common"
+	"github.com/coscms/webcore/library/nerrors"
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 )
@@ -88,7 +88,7 @@ func (c *CLIConfig) WatchEnvConfig() {
 				log.Info(`Succcessfully reload the env file: ` + file)
 				return
 			}
-			if err == common.ErrIgnoreConfigChange {
+			if err == nerrors.ErrIgnoreConfigChange {
 				log.Info(`No need to reload the env file: ` + file)
 				return
 			}

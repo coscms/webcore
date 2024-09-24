@@ -20,7 +20,7 @@ package role
 
 import (
 	"github.com/coscms/webcore/dbschema"
-	"github.com/coscms/webcore/library/common"
+	"github.com/coscms/webcore/library/nerrors"
 	"github.com/webx-top/echo"
 )
 
@@ -59,18 +59,18 @@ func AuthDependency(c echo.Context, user *dbschema.NgingUser, permission *RolePe
 		return nil
 	}
 	if permission == nil {
-		return common.ErrUserNoPerm
+		return nerrors.ErrUserNoPerm
 	}
 	routes, ok := authDependencyOf[route]
 	if !ok {
-		return common.ErrUserNoPerm
+		return nerrors.ErrUserNoPerm
 	}
 	for _, _route := range routes {
 		if permission.Check(c, _route) {
 			return nil
 		}
 	}
-	return common.ErrUserNoPerm
+	return nerrors.ErrUserNoPerm
 }
 
 func GetDependency(route string) []string {
@@ -90,15 +90,15 @@ func authServerCmdSend(
 			return nil
 		}
 		if permission == nil {
-			return common.ErrUserNoPerm
+			return nerrors.ErrUserNoPerm
 		}
 		if len(id) > 0 {
 			if !permission.CheckCmd(c, id) {
-				return common.ErrUserNoPerm
+				return nerrors.ErrUserNoPerm
 			}
 		} else {
 			if !permission.Check(c, `server/cmd`) {
-				return common.ErrUserNoPerm
+				return nerrors.ErrUserNoPerm
 			}
 		}
 		return nil
@@ -127,11 +127,11 @@ func authCmd(
 	if len(id) > 0 {
 		returning = true
 		if permission == nil {
-			err = common.ErrUserNoPerm
+			err = nerrors.ErrUserNoPerm
 			return
 		}
 		if !permission.CheckCmd(c, id) {
-			err = common.ErrUserNoPerm
+			err = nerrors.ErrUserNoPerm
 			return
 		}
 		err = h.Handle(c)

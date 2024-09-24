@@ -30,6 +30,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/coscms/webcore/library/common"
+	"github.com/coscms/webcore/library/nerrors"
 	"github.com/coscms/webcore/library/s3manager/fileinfo"
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
@@ -63,7 +64,7 @@ func (s *AWSClient) PutBucketCors(ctx echo.Context) error {
 	jsonBytes := com.Str2bytes(rulesJSON)
 	err := json.Unmarshal(jsonBytes, &rules)
 	if err != nil {
-		return common.JSONBytesParseError(err, jsonBytes)
+		return nerrors.JSONBytesParseError(err, jsonBytes)
 	}
 	input := &s3.PutBucketCorsInput{
 		Bucket: aws.String(s.bucketName),

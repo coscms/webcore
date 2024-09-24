@@ -26,8 +26,9 @@ import (
 	"github.com/webx-top/echo/handler/captcha"
 	"github.com/webx-top/echo/middleware/render"
 
-	"github.com/coscms/webcore/library/common"
 	"github.com/coscms/webcore/library/config"
+	"github.com/coscms/webcore/library/nerrors"
+	"github.com/coscms/webcore/library/nretry"
 	"github.com/coscms/webcore/middleware"
 	"github.com/coscms/webcore/registry/route"
 )
@@ -46,7 +47,7 @@ func OnConfigChange(fn func(file string) error) {
 }
 
 func FireConfigChange(file string) error {
-	err := common.ErrIgnoreConfigChange
+	err := nerrors.ErrIgnoreConfigChange
 	for _, fn := range onConfigChange {
 		if err := fn(file); err != nil {
 			return err
@@ -69,7 +70,7 @@ func DefaultConfigWatcher(mustOk bool) {
 		switch name {
 		case conf:
 			time.Sleep(time.Second)
-			err := common.OnErrorRetry(config.ParseConfig, 3, time.Second)
+			err := nretry.OnErrorRetry(config.ParseConfig, 3, time.Second)
 			if err != nil {
 				if mustOk && config.IsInstalled() {
 					config.MustOK(err)

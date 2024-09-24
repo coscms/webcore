@@ -22,7 +22,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/coscms/webcore/registry/navigate"
+	"github.com/coscms/webcore/library/navigate"
 )
 
 type Map struct {

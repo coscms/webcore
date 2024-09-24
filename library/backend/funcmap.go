@@ -14,6 +14,7 @@ import (
 	"github.com/coscms/webcore/library/common"
 	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webcore/library/config/cmder"
+	"github.com/coscms/webcore/library/nerrors"
 	uploadLibrary "github.com/coscms/webcore/library/upload"
 	"github.com/coscms/webcore/registry/navigate"
 	"github.com/coscms/webcore/registry/route"
@@ -43,11 +44,11 @@ func init() {
 	tplfunc.TplFuncMap[`URLByName`] = subdomains.Default.URLByName
 	tplfunc.TplFuncMap[`BackendURLByName`] = getBackendURLByName
 	tplfunc.TplFuncMap[`FrontendURLByName`] = getFrontendURLByName
-	tplfunc.TplFuncMap[`IsMessage`] = common.IsMessage
-	tplfunc.TplFuncMap[`IsError`] = common.IsError
-	tplfunc.TplFuncMap[`IsOk`] = common.IsOk
-	tplfunc.TplFuncMap[`Message`] = common.Message
-	tplfunc.TplFuncMap[`Ok`] = common.OkString
+	tplfunc.TplFuncMap[`IsMessage`] = nerrors.IsMessage
+	tplfunc.TplFuncMap[`IsError`] = nerrors.IsError
+	tplfunc.TplFuncMap[`IsOk`] = nerrors.IsOk
+	tplfunc.TplFuncMap[`Message`] = nerrors.Message
+	tplfunc.TplFuncMap[`Ok`] = nerrors.OkString
 	tplfunc.TplFuncMap[`Version`] = func() *config.VersionInfo { return config.Version }
 	tplfunc.TplFuncMap[`VersionNumber`] = func() string { return config.Version.Number }
 	tplfunc.TplFuncMap[`CommitID`] = func() string { return config.Version.CommitID }

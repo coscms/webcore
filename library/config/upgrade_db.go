@@ -12,7 +12,7 @@ import (
 	"github.com/admpub/color"
 	"github.com/admpub/log"
 	"github.com/admpub/mysql-schema-sync/sync"
-	"github.com/coscms/webcore/library/common"
+	"github.com/coscms/webcore/library/nsql"
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/param"
@@ -89,7 +89,7 @@ func executePreupgrade() {
 			continue
 		}
 		log.Info(color.GreenString(`[preupgrade]`), `Execute SQL file: `, sqlFile)
-		err = common.ParseSQL(sqlFile, true, installer)
+		err = nsql.ParseSQL(sqlFile, true, installer)
 		if err != nil {
 			stdLog.Panicln(err.Error())
 		}
@@ -105,7 +105,7 @@ func executePreupgrade() {
 			}
 			for _, sqlContent := range sqlContents {
 				log.Info(color.GreenString(`[preupgrade]`), `Execute SQL: `, sqlContent)
-				err = common.ParseSQL(sqlContent, false, installer)
+				err = nsql.ParseSQL(sqlContent, false, installer)
 				if err != nil {
 					stdLog.Panicln(err.Error())
 				}

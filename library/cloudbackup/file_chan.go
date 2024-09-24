@@ -20,8 +20,8 @@ import (
 	"github.com/webx-top/echo/param"
 
 	"github.com/coscms/webcore/dbschema"
-	"github.com/coscms/webcore/library/common"
 	"github.com/coscms/webcore/library/flock"
+	"github.com/coscms/webcore/library/nretry"
 	"github.com/coscms/webcore/model"
 )
 
@@ -78,7 +78,7 @@ type ErrIsAccessDenied interface {
 }
 
 func RetryablePut(ctx context.Context, mgr Storager, fp io.ReadSeekCloser, objectName string, size int64) error {
-	return common.OnErrorRetry(func() error {
+	return nretry.OnErrorRetry(func() error {
 		err := mgr.Put(ctx, fp, objectName, size)
 		if cli, ok := mgr.(ErrIsAccessDenied); ok {
 			if cli.ErrIsAccessDenied(err) {

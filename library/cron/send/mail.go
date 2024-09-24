@@ -4,8 +4,7 @@ import (
 	"errors"
 	"html/template"
 
-	"github.com/admpub/mail"
-
+	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webcore/library/email"
 	"github.com/coscms/webcore/library/notice"
 )
@@ -42,8 +41,6 @@ var (
 ### 以下是任务执行输出
 {{.output}}
 `
-	// DefaultSMTPConfig 默认STMP配置
-	DefaultSMTPConfig = &mail.SMTPConfig{}
 	// DefaultEmailConfig 默认Email配置
 	DefaultEmailConfig = &EmailConfig{}
 	// ErrIncorrectRecipient 收信地址不正确
@@ -60,7 +57,7 @@ type EmailConfig struct {
 }
 
 func InitialHTMLTmpl() {
-	tmpl := DefaultEmailConfig.Template
+	tmpl := config.FromFile().Cron.Template
 	if len(tmpl) == 0 {
 		tmpl = defaultHTMLTmpl
 	}
@@ -126,17 +123,18 @@ func MailWithIDAndNoticer(id uint64, noticer notice.Noticer, toEmail string, toU
 	if len(toEmail) < 1 { //收信人邮箱地址不正确
 		return ErrIncorrectRecipient
 	}
+	emailCfg := config.FromFile().Settings().Email
 	conf := &email.Config{
 		ID:         id,
-		Engine:     DefaultEmailConfig.Engine,
-		SMTP:       DefaultSMTPConfig,
-		From:       DefaultEmailConfig.Sender,
+		Engine:     emailCfg.Engine,
+		SMTP:       emailCfg.SMTPConfig,
+		From:       emailCfg.From,
 		ToAddress:  toEmail,
 		ToUsername: toUsername,
 		Subject:    title,
 		Content:    content,
 		CcAddress:  ccList,
-		Timeout:    DefaultEmailConfig.Timeout,
+		Timeout:    emailCfg.Timeout,
 		Noticer:    noticer,
 	}
 	return email.SendMail(conf)

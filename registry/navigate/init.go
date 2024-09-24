@@ -20,6 +20,8 @@ package navigate
 
 import (
 	"github.com/admpub/events"
+	"github.com/coscms/webcore/library/httpserver"
+	"github.com/coscms/webcore/library/navigate"
 	"github.com/webx-top/echo"
 )
 
@@ -27,13 +29,13 @@ var (
 	topNavURLs = map[string]int{}
 
 	// EmptyList 空菜单列表
-	EmptyList = List{}
+	EmptyList = navigate.List{}
 
 	//LeftNavigate 左边导航菜单
-	LeftNavigate = &List{}
+	LeftNavigate = &navigate.List{}
 
 	//TopNavigate 顶部导航菜单
-	TopNavigate = &List{}
+	TopNavigate = &navigate.List{}
 )
 
 func TopNavURLs() map[string]int {
@@ -41,7 +43,7 @@ func TopNavURLs() map[string]int {
 }
 
 func init() {
-	Default.Backend.Add(Top, TopNavigate)
+	httpserver.Backend.Navigate.Add(navigate.Top, TopNavigate)
 	echo.OnCallback(`nging.httpserver.run.before`, func(_ events.Event) error {
 		ProjectInitURLsIdent()
 		for index, urlPath := range TopNavigate.FullPath(``) {

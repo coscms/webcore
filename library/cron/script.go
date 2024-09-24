@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/coscms/webcore/dbschema"
-	"github.com/coscms/webcore/library/common"
+	"github.com/coscms/webcore/library/filecache"
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo/param"
 )
@@ -17,10 +17,10 @@ func SaveScriptFile(m *dbschema.NgingTask) error {
 	}
 	name := param.AsString(m.Id) + `.bat`
 	if !strings.Contains(m.Command, "\n") {
-		_ = common.RemoveCache(`taskscripts`, name)
+		_ = filecache.RemoveCache(`taskscripts`, name)
 		return nil
 	}
-	err := common.WriteCache(`taskscripts`, name, com.Str2bytes(m.Command))
+	err := filecache.WriteCache(`taskscripts`, name, com.Str2bytes(m.Command))
 	if err != nil {
 		err = fmt.Errorf(`failed to cron.SaveScriptFile(%q): %w`, name, err)
 	}
@@ -32,7 +32,7 @@ func DeleteScriptFile(id uint) error {
 		return nil
 	}
 	name := param.AsString(id) + `.bat`
-	err := common.RemoveCache(`taskscripts`, name)
+	err := filecache.RemoveCache(`taskscripts`, name)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return nil
@@ -46,7 +46,7 @@ func ScriptFile(id uint) string {
 		return ``
 	}
 	name := param.AsString(id) + `.bat`
-	return common.CacheFile(`taskscripts`, name)
+	return filecache.CacheFile(`taskscripts`, name)
 }
 
 func ScriptCommand(id uint, command string) string {
