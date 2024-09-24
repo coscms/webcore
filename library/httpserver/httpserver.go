@@ -113,6 +113,11 @@ func (h *HTTPServer) I18n() *language.Language {
 	return h.language
 }
 
+func (h *HTTPServer) SetRenderDataWrapper(dataWrapper echo.DataWrapper) *HTTPServer {
+	h.Router.Echo().SetRenderDataWrapper(dataWrapper)
+	return h
+}
+
 func (h *HTTPServer) Apply() {
 	e := h.Router.Echo()
 	//e.SetRenderDataWrapper(echo.DefaultRenderDataWrapper)
