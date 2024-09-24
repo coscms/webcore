@@ -14,6 +14,7 @@ import (
 	"github.com/coscms/webcore/library/common"
 	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webcore/library/config/cmder"
+	"github.com/coscms/webcore/library/httpserver"
 	"github.com/coscms/webcore/library/nerrors"
 	uploadLibrary "github.com/coscms/webcore/library/upload"
 	"github.com/coscms/webcore/registry/navigate"
@@ -22,10 +23,8 @@ import (
 )
 
 var (
-	DefaultAvatarURL = `/public/assets/backend/images/user_128.png`
-	AssetsURLPath    = `/public/assets/backend`
-	tplFuncMap       map[string]interface{}
-	tplOnce          sync.Once
+	tplFuncMap map[string]interface{}
+	tplOnce    sync.Once
 )
 
 func initTplFuncMap() {
@@ -98,7 +97,7 @@ func getAvatar(avatar string, defaults ...string) string {
 	if len(defaults) > 0 && len(defaults[0]) > 0 {
 		return defaults[0]
 	}
-	return DefaultAvatarURL
+	return httpserver.Backend.DefaultAvatarURL
 }
 
 func indexStrSlice(slice []string, index int) string {
@@ -139,7 +138,7 @@ func addGlobalFuncMap(fm map[string]interface{}) map[string]interface{} {
 }
 
 func getAssetsURL(paths ...string) (r string) {
-	r = AssetsURLPath
+	r = httpserver.Backend.AssetsURLPath
 	for _, ppath := range paths {
 		r += ppath
 	}
