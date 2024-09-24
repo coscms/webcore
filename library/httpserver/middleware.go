@@ -3,6 +3,7 @@ package httpserver
 import (
 	"html/template"
 	"net/url"
+	"regexp"
 	"strings"
 
 	"github.com/coscms/webcore/library/captcha/captchabiz"
@@ -65,6 +66,23 @@ func TrimPathSuffix(ignorePrefixes ...string) echo.MiddlewareFuncd {
 			cleanedPath := strings.TrimSuffix(upath, c.DefaultExtension())
 			c.Request().URL().SetPath(cleanedPath)
 			return h.Handle(c)
+		}
+	}
+}
+
+func HostChecker(key string) echo.MiddlewareFuncd {
+	return func(h echo.Handler) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			re, ok := echo.Get(key).(*regexp.Regexp)
+			if !ok {
+				return h.Handle(c)
+			}
+			// c.Host() 不含端口号
+			if re.MatchString(c.Host()) {
+				return h.Handle(c)
+			}
+			c.Response().NotFound()
+			return nil
 		}
 	}
 }

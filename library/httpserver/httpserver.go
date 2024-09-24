@@ -74,6 +74,7 @@ type HTTPServer struct {
 	Middlewares           []interface{}
 	GlobalFuncMap         map[string]interface{}
 	FuncSetters           []func(echo.Context) error
+	HostCheckerRegexpKey  string
 	renderOptions         *render.Config
 	language              *language.Language
 }
@@ -127,6 +128,9 @@ func (h *HTTPServer) Apply() {
 	//e.SetRenderDataWrapper(echo.DefaultRenderDataWrapper)
 
 	e.Use(middleware.Recover())
+	if len(h.HostCheckerRegexpKey)>0 {
+		e.Use(HostChecker(h.HostCheckerRegexpKey))
+	}
 	e.Use(MaxRequestBodySize)
 	if len(h.Middlewares) == 0 {
 		if !config.FromFile().Sys.DisableHTTPLog {
