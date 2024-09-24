@@ -107,6 +107,16 @@ func (h *HTTPServer) SetNavigate(nav *navigate.ProjectNavigates) *HTTPServer {
 	return h
 }
 
+func (h *HTTPServer) SetTmplCustomParser(parser func(tmpl string, content []byte) []byte) *HTTPServer {
+	h.TmplCustomParser = parser
+	return h
+}
+
+func (h *HTTPServer) SetKeepExtensionPrefixes(keepExtensionPrefixes []string) *HTTPServer {
+	h.KeepExtensionPrefixes = keepExtensionPrefixes
+	return h
+}
+
 func (h *HTTPServer) Renderer() driver.Driver {
 	if h.renderOptions == nil {
 		return nil
@@ -128,7 +138,7 @@ func (h *HTTPServer) Apply() {
 	//e.SetRenderDataWrapper(echo.DefaultRenderDataWrapper)
 
 	e.Use(middleware.Recover())
-	if len(h.HostCheckerRegexpKey)>0 {
+	if len(h.HostCheckerRegexpKey) > 0 {
 		e.Use(HostChecker(h.HostCheckerRegexpKey))
 	}
 	e.Use(MaxRequestBodySize)
