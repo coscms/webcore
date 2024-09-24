@@ -73,6 +73,7 @@ type HTTPServer struct {
 	ParseStringFuncs      map[string]func() string                 //模板内容替换函数
 	Middlewares           []interface{}
 	GlobalFuncMap         map[string]interface{}
+	FuncSetters           []func(echo.Context) error
 	renderOptions         *render.Config
 	language              *language.Language
 }
@@ -184,7 +185,13 @@ func (h *HTTPServer) Apply() {
 	if h.RendererDo != nil {
 		h.renderOptions.AddRendererDo(h.RendererDo)
 	}
-	h.renderOptions.AddFuncSetter(ErrorPageFunc)
+	funcSetters := make([]echo.HandlerFunc, 0, len(h.FuncSetters)+1)
+	for _, f := range h.FuncSetters {
+		funcSetters = append(funcSetters, f)
+	}
+	funcSetters = append(funcSetters, ErrorPageFunc)
+	h.renderOptions.AddFuncSetter(funcSetters...)
+
 	h.renderOptions.ApplyTo(e, h.TmplMgr)
 
 	if len(h.RouteDefaultExtension) > 0 {
