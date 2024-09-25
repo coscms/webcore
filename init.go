@@ -20,13 +20,16 @@ package webcore
 
 import (
 	"github.com/coscms/webcore/cmd"
+	"github.com/coscms/webcore/library/module"
+
+	// init
 	_ "github.com/coscms/webcore/initialize"
 	_ "github.com/coscms/webcore/library/config/sessionstore"
 	_ "github.com/coscms/webcore/library/cron/cmder"
-	"github.com/coscms/webcore/library/module"
 	_ "github.com/coscms/webcore/library/sqlite"
 	_ "github.com/coscms/webcore/library/upload"
 	_ "github.com/coscms/webcore/listener"
+	_ "github.com/coscms/webcore/registry"
 	_ "github.com/coscms/webcore/upgrade"
 )
 
