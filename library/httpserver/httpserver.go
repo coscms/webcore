@@ -133,6 +133,21 @@ func (h *HTTPServer) SetRenderDataWrapper(dataWrapper echo.DataWrapper) *HTTPSer
 	return h
 }
 
+func (h *HTTPServer) GetStaticMW() echo.MiddlewareFunc {
+	// 注册静态资源文件(网站素材文件)
+	if h.StaticMW == nil && h.StaticOptions != nil {
+		if len(h.StaticOptions.Root) == 0 {
+			h.StaticOptions.Root = h.AssetsDir
+		}
+		if len(h.StaticOptions.Path) == 0 {
+			h.StaticOptions.Path = h.Prefix() + "/public/assets/" + h.Name
+		}
+		h.StaticOptions.TrimPrefix = h.Prefix()
+		return middleware.Static(h.StaticOptions)
+	}
+	return h.StaticMW
+}
+
 func (h *HTTPServer) Apply() {
 	e := h.Router.Echo()
 	//e.SetRenderDataWrapper(echo.DefaultRenderDataWrapper)
@@ -151,17 +166,7 @@ func (h *HTTPServer) Apply() {
 	}
 
 	// 注册静态资源文件(网站素材文件)
-	if h.StaticMW == nil && h.StaticOptions != nil {
-		if len(h.StaticOptions.Root) == 0 {
-			h.StaticOptions.Root = h.AssetsDir
-		}
-		if len(h.StaticOptions.Path) == 0 {
-			h.StaticOptions.Path = h.Prefix() + "/public/assets/" + h.Name
-		}
-		h.StaticOptions.TrimPrefix = h.Prefix()
-		h.StaticMW = middleware.Static(h.StaticOptions)
-	}
-	if h.StaticMW != nil {
+	if staticMW := h.GetStaticMW(); staticMW != nil {
 		e.Use(h.StaticMW)
 	}
 
