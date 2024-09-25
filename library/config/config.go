@@ -33,6 +33,7 @@ import (
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/middleware/language"
 
+	"github.com/coscms/webcore/cmd/bootconfig"
 	"github.com/coscms/webcore/library/config/extend"
 	"github.com/coscms/webcore/library/config/subconfig/scookie"
 	"github.com/coscms/webcore/library/config/subconfig/scron"
@@ -275,6 +276,7 @@ func AddConfigInitor(initors ...func(*Config)) {
 func (c *Config) AsDefault() *Config {
 	c.Validations.Register()
 	echo.Set(ConfigName, c)
+	c.Language.SetFSFunc(bootconfig.LangFSFunc)
 	for _, initor := range configInitors {
 		initor(c)
 	}

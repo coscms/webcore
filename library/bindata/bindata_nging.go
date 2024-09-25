@@ -56,10 +56,13 @@ var (
 	StaticAssetFS           *assetfs.AssetFS
 	BackendTmplAssetFS      *assetfs.AssetFS
 	FrontendTmplAssetFS     *assetfs.AssetFS
-	LanguageAssetFSFunc     = func(dir string) http.FileSystem {
+)
+
+func init() {
+	bootconfig.LangFSFunc = func(dir string) http.FileSystem {
 		return NewAssetFS(dir)
 	}
-)
+}
 
 func Initialize() {
 	bootconfig.Bindata = true
@@ -109,7 +112,6 @@ func Initialize() {
 		}
 		return f, err
 	}
-	bootconfig.LangFSFunc = LanguageAssetFSFunc
 	httpserver.Backend.RendererDo = func(renderer driver.Driver) {
 		renderer.SetTmplPathFixer(func(c echo.Context, tmpl string) string {
 			return tmpl
