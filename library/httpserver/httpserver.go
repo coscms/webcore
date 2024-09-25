@@ -143,7 +143,7 @@ func (h *HTTPServer) GetStaticMW() echo.MiddlewareFunc {
 			h.StaticOptions.Path = h.Prefix() + "/public/assets/" + h.Name
 		}
 		h.StaticOptions.TrimPrefix = h.Prefix()
-		return middleware.Static(h.StaticOptions)
+		h.StaticMW = middleware.Static(h.StaticOptions)
 	}
 	return h.StaticMW
 }
@@ -167,7 +167,7 @@ func (h *HTTPServer) Apply() {
 
 	// 注册静态资源文件(网站素材文件)
 	if staticMW := h.GetStaticMW(); staticMW != nil {
-		e.Use(h.StaticMW)
+		e.Use(staticMW)
 	}
 
 	// 启用session
