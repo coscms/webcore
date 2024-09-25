@@ -107,6 +107,8 @@ func start() {
 	e := httpserver.Backend.Router.Echo() // 不需要内部重启，所以直接操作*Echo
 	config.FromFile().Sys.SetRealIPParams(e.RealIPConfig())
 	e.SetRenderDataWrapper(echo.DefaultRenderDataWrapper)
+
+	// 子域名设置
 	subdomains.Default.Default = httpserver.KindBackend
 	subdomains.Default.Boot = httpserver.KindBackend
 	domainName := subdomains.Default.Default
@@ -116,7 +118,7 @@ func start() {
 	}
 	subdomains.Default.Add(domainName, e)
 
-	config.FromFile().Language.SetFSFunc(bootconfig.LangFSFunc)
+	// 后台服务设置
 	httpserver.Backend.GlobalFuncMap = backend.GlobalFuncMap()
 	httpserver.Backend.Apply()
 	httpserver.Backend.Renderer().MonitorEvent(func(file string) {

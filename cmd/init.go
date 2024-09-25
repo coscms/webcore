@@ -34,6 +34,9 @@ import (
 	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webcore/library/config/subconfig/sdb"
 	"github.com/coscms/webcore/request"
+
+	// 执行 init()
+	_ "github.com/coscms/webcore/library/bindata" // 初始化 bootconfig.LangFSFunc
 )
 
 // 静默安装
