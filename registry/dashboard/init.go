@@ -7,7 +7,7 @@ import (
 	"github.com/webx-top/echo"
 )
 
-func Init() {
+func init() {
 	httpserver.Backend.Dashboard.Cards.Add(0, (&dashboard.Card{
 		IconName:  `fa-user`,
 		IconColor: `success`,
