@@ -33,7 +33,6 @@ import (
 	"github.com/webx-top/image"
 
 	"github.com/coscms/webcore/cmd/bootconfig"
-	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webcore/library/httpserver"
 	"github.com/coscms/webcore/library/modal"
 	uploadLibrary "github.com/coscms/webcore/library/upload"
@@ -117,11 +116,4 @@ func Initialize() {
 			return tmpl
 		})
 	}
-	config.AddConfigInitor(func(c *config.Config) {
-		c.AddReloader(func(newConfig *config.Config) {
-			newConfig.Language.SetFSFunc(func(root string) http.FileSystem {
-				return NewStaticAssetFSToSubdir(root, StaticAssetFS)
-			})
-		})
-	})
 }
