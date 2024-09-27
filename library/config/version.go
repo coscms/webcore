@@ -60,6 +60,9 @@ func (v *VersionInfo) VString() string {
 	} else {
 		licenseTag = `unlicensed`
 	}
+	if len(v.Package) > 0 {
+		licenseTag += `(` + v.Package + `)`
+	}
 	return `v` + v.VNumberString() + ` ` + licenseTag
 }
 
