@@ -225,7 +225,7 @@ func URLValues(ctx echo.Context, newVersion ...string) url.Values {
 	}
 	v.Set(`package`, Package())
 	if ctx != nil {
-		v.Set(`source`, ctx.RequestURI())
+		v.Set(`source`, ctx.FullRequestURI())
 	}
 	switch licenseMode {
 	case ModeMachineID:
