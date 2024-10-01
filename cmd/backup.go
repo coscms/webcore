@@ -24,11 +24,13 @@ func backupRunE(_ *cobra.Command, args []string) error {
 	compressedFile := bootconfig.SoftwareName + `_` + time.Now().Format(`2006_01_02_15_04_05`) + `.zip`
 	var saveDir string
 	com.SliceExtract(args, &saveDir)
-	regexpIgnoreFile := regexp.MustCompile(`^(temp|pid|logs|sessions|dist|html|upgrade_.+\.log\.html|\..+|.*\.zip|.*\.gz)$`)
-	var regexpFileName *regexp.Regexp
 	if len(saveDir) > 0 {
 		compressedFile = filepath.Join(saveDir, compressedFile)
 	}
+
+	regexpIgnoreFile := regexp.MustCompile(`^(temp|pid|logs|sessions|dist|html|upgrade_.+\.log\.html|\..+|.*\.zip|.*\.gz)$`)
+	var regexpFileName *regexp.Regexp
+
 	_, err := com.Zip(workDir, compressedFile, regexpFileName, regexpIgnoreFile)
 	if err != nil {
 		com.ExitOnFailure(err.Error(), 1)
