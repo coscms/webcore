@@ -38,7 +38,7 @@ func backupRunE(_ *cobra.Command, args []string) error {
 	if len(backupIgnore) > 0 {
 		backupIgnore = `|` + backupIgnore
 	}
-	regexpIgnoreFile := regexp.MustCompile(`^(temp|pid|logs|sessions|dist|html|upgrade_.+\.log\.html|\..+|.*\.zip|.*\.gz` + backupIgnore + `)$`)
+	regexpIgnoreFile := regexp.MustCompile(`^(temp|pid|logs|sessions|dist|html|upgrade_.+\.log\.html|\..+|.*\.zip|.*\.gz|.*\.log|.*\.go` + backupIgnore + `)$`)
 	var regexpFileName *regexp.Regexp
 
 	var err error
