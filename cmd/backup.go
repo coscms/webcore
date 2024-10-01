@@ -24,7 +24,12 @@ var backupIgnore string
 
 func backupRunE(_ *cobra.Command, args []string) error {
 	workDir := echo.Wd()
-	compressedFile := bootconfig.SoftwareName + `_` + time.Now().Format(`2006_01_02_15_04_05`) + `.zip`
+	compressedFile := bootconfig.SoftwareName + `_` + time.Now().Format(`2006_01_02_15_04_05`)
+	if com.IsWindows {
+		compressedFile += `.zip`
+	} else {
+		compressedFile += `.tar.gz`
+	}
 	var saveDir string
 	com.SliceExtract(args, &saveDir)
 	if len(saveDir) > 0 {
