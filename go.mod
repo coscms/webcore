@@ -142,7 +142,7 @@ require (
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
-	github.com/google/pprof v0.0.0-20240925223930-fa3061bff0bc // indirect
+	github.com/google/pprof v0.0.0-20241001023024-f4c0cfd0cf1d // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/css v1.0.1 // indirect
 	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79 // indirect
