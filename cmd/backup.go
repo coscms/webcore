@@ -1,8 +1,10 @@
 package cmd
 
 import (
+	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 	"time"
 
 	"github.com/coscms/webcore/cmd/bootconfig"
@@ -12,14 +14,15 @@ import (
 )
 
 var backupCmd = &cobra.Command{
-	Use:   "backup",
-	Short: "Backup",
-	RunE:  backupRunE,
+	Use:     "backup",
+	Short:   "Backup",
+	Example: os.Args[0] + " backup [saveDir]",
+	RunE:    backupRunE,
 }
 
+var backupIgnore string
+
 func backupRunE(_ *cobra.Command, args []string) error {
-	// configFile := config.FromCLI().Conf
-	// lockFile := config.InstalledLockFile()
 	workDir := echo.Wd()
 	compressedFile := bootconfig.SoftwareName + `_` + time.Now().Format(`2006_01_02_15_04_05`) + `.zip`
 	var saveDir string
@@ -27,11 +30,18 @@ func backupRunE(_ *cobra.Command, args []string) error {
 	if len(saveDir) > 0 {
 		compressedFile = filepath.Join(saveDir, compressedFile)
 	}
-
-	regexpIgnoreFile := regexp.MustCompile(`^(temp|pid|logs|sessions|dist|html|upgrade_.+\.log\.html|\..+|.*\.zip|.*\.gz)$`)
+	if len(backupIgnore) > 0 {
+		backupIgnore = `|` + backupIgnore
+	}
+	regexpIgnoreFile := regexp.MustCompile(`^(temp|pid|logs|sessions|dist|html|upgrade_.+\.log\.html|\..+|.*\.zip|.*\.gz` + backupIgnore + `)$`)
 	var regexpFileName *regexp.Regexp
 
-	_, err := com.Zip(workDir, compressedFile, regexpFileName, regexpIgnoreFile)
+	var err error
+	if strings.EqualFold(filepath.Base(compressedFile), `.zip`) {
+		_, err = com.Zip(workDir, compressedFile, regexpFileName, regexpIgnoreFile)
+	} else {
+		err = com.TarGz(workDir, compressedFile, regexpFileName, regexpIgnoreFile)
+	}
 	if err != nil {
 		com.ExitOnFailure(err.Error(), 1)
 	}
@@ -40,4 +50,6 @@ func backupRunE(_ *cobra.Command, args []string) error {
 
 func init() {
 	rootCmd.AddCommand(backupCmd)
+
+	backupCmd.Flags().StringVar(&backupIgnore, `ignore`, backupIgnore, `忽略的文件正则表达式`)
 }
