@@ -27,6 +27,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"runtime"
 	"strings"
 
 	"github.com/admpub/confl"
@@ -260,7 +261,14 @@ func FixWd() error {
 	executableFile := filepath.Base(os.Args[0])
 	if strings.HasSuffix(executableFile, `.test.exe`) ||
 		strings.HasSuffix(executableFile, `.test`) ||
-		strings.HasPrefix(executableFile, os.TempDir()) {
+		strings.HasPrefix(os.Args[0], os.TempDir()) {
+		_, file, _, ok := runtime.Caller(0)
+		if ok {
+			parts := strings.SplitN(file, echo.FilePathSeparator+`vendor`+echo.FilePathSeparator, 2)
+			if len(parts) == 2 {
+				echo.SetWorkDir(parts[0])
+			}
+		}
 		return nil
 	}
 
