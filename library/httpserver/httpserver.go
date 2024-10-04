@@ -151,7 +151,9 @@ func (h *HTTPServer) GetStaticMW() echo.MiddlewareFunc {
 func (h *HTTPServer) Apply() {
 	e := h.Router.Echo()
 	//e.SetRenderDataWrapper(echo.DefaultRenderDataWrapper)
-
+	if len(h.Router.Prefix()) > 0 {
+		e.Pre(FixedUploadURLPrefix())
+	}
 	e.Use(middleware.Recover())
 	if len(h.HostCheckerRegexpKey) > 0 {
 		e.Use(HostChecker(h.HostCheckerRegexpKey))

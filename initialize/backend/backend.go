@@ -107,6 +107,9 @@ func start() {
 	e := httpserver.Backend.Router.Echo() // 不需要内部重启，所以直接操作*Echo
 	config.FromFile().Sys.SetRealIPParams(e.RealIPConfig())
 	e.SetRenderDataWrapper(echo.DefaultRenderDataWrapper)
+	if len(Prefix()) > 0 {
+		e.Pre(httpserver.FixedUploadURLPrefix())
+	}
 
 	// 子域名设置
 	subdomains.Default.Default = httpserver.KindBackend
