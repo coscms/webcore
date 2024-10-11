@@ -132,7 +132,7 @@ func (c *OAuthAccount) ToAccount() *oauth2.Account {
 }
 
 // InitOauth 第三方登录
-func InitOauth(e *echo.Echo) {
+func InitOauth(e *echo.Echo, middlewares ...interface{}) {
 	oCfg, _ := common.ExtendConfig().Get(`oauth2backend`).(*OAuth2Config)
 	host := common.BackendURL(nil)
 	if len(host) == 0 {
@@ -147,7 +147,7 @@ func InitOauth(e *echo.Echo) {
 	defaultOAuth.SetSuccessHandler(SuccessHandler)
 	defaultOAuth.SetBeginAuthHandler(BeginAuthHandler)
 	e.Group(defaultOAuth.Config.Path).SetMetaKV(route.PermGuestKV())
-	defaultOAuth.Wrapper(e)
+	defaultOAuth.Wrapper(e, middlewares...)
 }
 
 // RegisterProvider 注册Provider
