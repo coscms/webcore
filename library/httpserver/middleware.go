@@ -83,6 +83,15 @@ func FixedUploadURLPrefix() echo.MiddlewareFuncd {
 	}
 }
 
+func SearchEngineNoindex() echo.MiddlewareFuncd {
+	return func(h echo.Handler) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			echo.SearchEngineNoindex(c)
+			return h.Handle(c)
+		}
+	}
+}
+
 func HostChecker(key string) echo.MiddlewareFuncd {
 	return func(h echo.Handler) echo.HandlerFunc {
 		return func(c echo.Context) error {
