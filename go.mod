@@ -63,7 +63,7 @@ require (
 	github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0
 	github.com/mattn/go-runewidth v0.0.16
 	github.com/microcosm-cc/bluemonday v1.0.27
-	github.com/minio/minio-go/v7 v7.0.77
+	github.com/minio/minio-go/v7 v7.0.78
 	github.com/pkg/sftp v1.13.6
 	github.com/shirou/gopsutil/v3 v3.24.5
 	github.com/spf13/cobra v1.8.1
@@ -75,7 +75,7 @@ require (
 	github.com/webx-top/client v0.9.5
 	github.com/webx-top/codec v0.3.0
 	github.com/webx-top/com v1.3.10
-	github.com/webx-top/db v1.27.11
+	github.com/webx-top/db v1.27.12
 	github.com/webx-top/echo v1.11.0
 	github.com/webx-top/image v0.1.1
 	github.com/webx-top/restyclient v0.0.4
