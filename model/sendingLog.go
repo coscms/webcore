@@ -37,5 +37,7 @@ func (c *SendingLog) Add() (interface{}, error) {
 	if len(c.Status) == 0 {
 		c.Status = `failure`
 	}
+	c.Result = dbschema.DBI.Fields.TrimOverflowText(c.Short_(), `result`, c.Result)
+	c.Content = dbschema.DBI.Fields.TrimOverflowText(c.Short_(), `content`, c.Content)
 	return c.NgingSendingLog.Insert()
 }
