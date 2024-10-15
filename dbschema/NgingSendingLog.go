@@ -107,7 +107,6 @@ type NgingSendingLog struct {
 	SentAt          uint   `db:"sent_at" bson:"sent_at" comment:"发送时间" json:"sent_at" xml:"sent_at"`
 	SourceId        uint64 `db:"source_id" bson:"source_id" comment:"来源ID" json:"source_id" xml:"source_id"`
 	SourceType      string `db:"source_type" bson:"source_type" comment:"来源类型" json:"source_type" xml:"source_type"`
-	Disabled        string `db:"disabled" bson:"disabled" comment:"是否禁用" json:"disabled" xml:"disabled"`
 	Method          string `db:"method" bson:"method" comment:"发送方式(mobile-手机;email-邮箱)" json:"method" xml:"method"`
 	To              string `db:"to" bson:"to" comment:"发送目标" json:"to" xml:"to"`
 	Provider        string `db:"provider" bson:"provider" comment:"发送平台" json:"provider" xml:"provider"`
@@ -344,9 +343,6 @@ func (a *NgingSendingLog) Insert() (pk interface{}, err error) {
 	if len(a.SourceType) == 0 {
 		a.SourceType = "user"
 	}
-	if len(a.Disabled) == 0 {
-		a.Disabled = "N"
-	}
 	if len(a.Method) == 0 {
 		a.Method = "mobile"
 	}
@@ -378,9 +374,6 @@ func (a *NgingSendingLog) Update(mw func(db.Result) db.Result, args ...interface
 	if len(a.SourceType) == 0 {
 		a.SourceType = "user"
 	}
-	if len(a.Disabled) == 0 {
-		a.Disabled = "N"
-	}
 	if len(a.Method) == 0 {
 		a.Method = "mobile"
 	}
@@ -403,9 +396,6 @@ func (a *NgingSendingLog) Updatex(mw func(db.Result) db.Result, args ...interfac
 
 	if len(a.SourceType) == 0 {
 		a.SourceType = "user"
-	}
-	if len(a.Disabled) == 0 {
-		a.Disabled = "N"
 	}
 	if len(a.Method) == 0 {
 		a.Method = "mobile"
@@ -430,9 +420,6 @@ func (a *NgingSendingLog) UpdateByFields(mw func(db.Result) db.Result, fields []
 
 	if len(a.SourceType) == 0 {
 		a.SourceType = "user"
-	}
-	if len(a.Disabled) == 0 {
-		a.Disabled = "N"
 	}
 	if len(a.Method) == 0 {
 		a.Method = "mobile"
@@ -461,9 +448,6 @@ func (a *NgingSendingLog) UpdatexByFields(mw func(db.Result) db.Result, fields [
 
 	if len(a.SourceType) == 0 {
 		a.SourceType = "user"
-	}
-	if len(a.Disabled) == 0 {
-		a.Disabled = "N"
 	}
 	if len(a.Method) == 0 {
 		a.Method = "mobile"
@@ -507,11 +491,6 @@ func (a *NgingSendingLog) UpdateFields(mw func(db.Result) db.Result, kvset map[s
 			kvset["source_type"] = "user"
 		}
 	}
-	if val, ok := kvset["disabled"]; ok && val != nil {
-		if v, ok := val.(string); ok && len(v) == 0 {
-			kvset["disabled"] = "N"
-		}
-	}
 	if val, ok := kvset["method"]; ok && val != nil {
 		if v, ok := val.(string); ok && len(v) == 0 {
 			kvset["method"] = "mobile"
@@ -545,11 +524,6 @@ func (a *NgingSendingLog) UpdatexFields(mw func(db.Result) db.Result, kvset map[
 	if val, ok := kvset["source_type"]; ok && val != nil {
 		if v, ok := val.(string); ok && len(v) == 0 {
 			kvset["source_type"] = "user"
-		}
-	}
-	if val, ok := kvset["disabled"]; ok && val != nil {
-		if v, ok := val.(string); ok && len(v) == 0 {
-			kvset["disabled"] = "N"
 		}
 	}
 	if val, ok := kvset["method"]; ok && val != nil {
@@ -601,9 +575,6 @@ func (a *NgingSendingLog) Upsert(mw func(db.Result) db.Result, args ...interface
 		if len(a.SourceType) == 0 {
 			a.SourceType = "user"
 		}
-		if len(a.Disabled) == 0 {
-			a.Disabled = "N"
-		}
 		if len(a.Method) == 0 {
 			a.Method = "mobile"
 		}
@@ -619,9 +590,6 @@ func (a *NgingSendingLog) Upsert(mw func(db.Result) db.Result, args ...interface
 		a.Id = 0
 		if len(a.SourceType) == 0 {
 			a.SourceType = "user"
-		}
-		if len(a.Disabled) == 0 {
-			a.Disabled = "N"
 		}
 		if len(a.Method) == 0 {
 			a.Method = "mobile"
@@ -694,7 +662,6 @@ func (a *NgingSendingLog) Reset() *NgingSendingLog {
 	a.SentAt = 0
 	a.SourceId = 0
 	a.SourceType = ``
-	a.Disabled = ``
 	a.Method = ``
 	a.To = ``
 	a.Provider = ``
@@ -715,7 +682,6 @@ func (a *NgingSendingLog) AsMap(onlyFields ...string) param.Store {
 		r["SentAt"] = a.SentAt
 		r["SourceId"] = a.SourceId
 		r["SourceType"] = a.SourceType
-		r["Disabled"] = a.Disabled
 		r["Method"] = a.Method
 		r["To"] = a.To
 		r["Provider"] = a.Provider
@@ -739,8 +705,6 @@ func (a *NgingSendingLog) AsMap(onlyFields ...string) param.Store {
 			r["SourceId"] = a.SourceId
 		case "SourceType":
 			r["SourceType"] = a.SourceType
-		case "Disabled":
-			r["Disabled"] = a.Disabled
 		case "Method":
 			r["Method"] = a.Method
 		case "To":
@@ -777,8 +741,6 @@ func (a *NgingSendingLog) FromRow(row map[string]interface{}) {
 			a.SourceId = param.AsUint64(value)
 		case "source_type":
 			a.SourceType = param.AsString(value)
-		case "disabled":
-			a.Disabled = param.AsString(value)
 		case "method":
 			a.Method = param.AsString(value)
 		case "to":
@@ -831,8 +793,6 @@ func (a *NgingSendingLog) Set(key interface{}, value ...interface{}) {
 			a.SourceId = param.AsUint64(vv)
 		case "SourceType":
 			a.SourceType = param.AsString(vv)
-		case "Disabled":
-			a.Disabled = param.AsString(vv)
 		case "Method":
 			a.Method = param.AsString(vv)
 		case "To":
@@ -863,7 +823,6 @@ func (a *NgingSendingLog) AsRow(onlyFields ...string) param.Store {
 		r["sent_at"] = a.SentAt
 		r["source_id"] = a.SourceId
 		r["source_type"] = a.SourceType
-		r["disabled"] = a.Disabled
 		r["method"] = a.Method
 		r["to"] = a.To
 		r["provider"] = a.Provider
@@ -887,8 +846,6 @@ func (a *NgingSendingLog) AsRow(onlyFields ...string) param.Store {
 			r["source_id"] = a.SourceId
 		case "source_type":
 			r["source_type"] = a.SourceType
-		case "disabled":
-			r["disabled"] = a.Disabled
 		case "method":
 			r["method"] = a.Method
 		case "to":

@@ -431,17 +431,19 @@ CREATE TABLE `nging_sending_log` (
   `sent_at` int unsigned NOT NULL COMMENT '发送时间',
   `source_id` bigint unsigned NOT NULL DEFAULT '0' COMMENT '来源ID',
   `source_type` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'user' COMMENT '来源类型',
-  `disabled` enum('Y','N') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'N' COMMENT '是否禁用',
   `method` varchar(60) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'mobile' COMMENT '发送方式(mobile-手机;email-邮箱)',
   `to` varchar(120) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '发送目标',
   `provider` varchar(60) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '发送平台',
   `result` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '发送结果描述',
   `status` enum('success','failure','waiting','queued','none') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'waiting' COMMENT '发送状态(none-无需发送)',
   `retries` int unsigned NOT NULL DEFAULT '0' COMMENT '重试次数',
-  `content` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '发送消息内容',
+  `content` varchar(2000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '发送消息内容',
   `params` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '发送消息参数(JSON)',
   `appointment_time` int unsigned NOT NULL DEFAULT '0' COMMENT '预约发送时间',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `sending_status` (`status`),
+  KEY `sending_provider` (`provider`),
+  KEY `sending_source` (`source_type`,`source_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='邮件短信等发送日志';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -646,4 +648,4 @@ CREATE TABLE `nging_user_u2f` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-08-29 18:41:24
+-- Dump completed on 2024-10-15 12:41:24
