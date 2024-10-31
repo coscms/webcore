@@ -2,6 +2,7 @@ package codec
 
 import (
 	"crypto/rand"
+	"encoding/base64"
 	"encoding/hex"
 	"errors"
 	"fmt"
@@ -164,30 +165,45 @@ func (s *SM2) DefaultDecryptHex(cipher string, noBase64 ...bool) (string, error)
 
 // Encrypt 私钥加密
 func (r *SM2) Encrypt(input []byte) ([]byte, error) {
-	decrypted, err := r.DefaultEncryptHex(com.Bytes2str(input))
+	encrypted, err := SM2Encrypt(&r.DefaultKey().PublicKey, input)
 	if err != nil {
 		return nil, err
 	}
-	return com.Str2bytes(decrypted), err
+	v := base64.StdEncoding.EncodeToString(encrypted)
+	return com.Str2bytes(v), err
 }
 
 // Decrypt  私钥解密
 func (r *SM2) Decrypt(input []byte) ([]byte, error) {
-	decrypted, err := r.DefaultDecryptHex(com.Bytes2str(input))
+	var err error
+	input, err = base64.StdEncoding.DecodeString(com.Bytes2str(input))
 	if err != nil {
 		return nil, err
 	}
-	return com.Str2bytes(decrypted), err
+	return SM2Decrypt(r.DefaultKey(), input)
 }
 
 // Encrypt 私钥加密
 func (r *SM2) EncryptString(input string) (string, error) {
-	return r.DefaultEncryptHex(input)
+	encrypted, err := SM2Encrypt(&r.DefaultKey().PublicKey, com.Str2bytes(input))
+	if err != nil {
+		return ``, err
+	}
+	v := base64.StdEncoding.EncodeToString(encrypted)
+	return v, err
 }
 
 // Decrypt  私钥解密
 func (r *SM2) DecryptString(input string) (string, error) {
-	return r.DefaultDecryptHex(input)
+	v, err := base64.StdEncoding.DecodeString(input)
+	if err != nil {
+		return ``, err
+	}
+	decrypted, err := SM2Decrypt(r.DefaultKey(), v)
+	if err != nil {
+		return ``, err
+	}
+	return com.Bytes2str(decrypted), err
 }
 
 func (s *SM2) Reset() {
