@@ -69,3 +69,17 @@ func TestDefaultDecryptHex(t *testing.T) {
 	}
 	test.Eq(t, excepted, plain)
 }
+
+func TestSM2String(t *testing.T) {
+	excepted := `123`
+	crypted, err := DefaultSM2.EncryptString(excepted)
+	if err != nil {
+		panic(err)
+	}
+	t.Logf(`sm2 crypted: %v`, crypted)
+	plain, err := DefaultSM2.DecryptString(crypted)
+	if err != nil {
+		panic(err)
+	}
+	test.Eq(t, excepted, plain)
+}
