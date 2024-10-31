@@ -162,6 +162,34 @@ func (s *SM2) DefaultDecryptHex(cipher string, noBase64 ...bool) (string, error)
 	return SM2DecryptHex(s.DefaultKey(), cipher, noBase64...)
 }
 
+// Encrypt 私钥加密
+func (r *SM2) Encrypt(input []byte) ([]byte, error) {
+	decrypted, err := r.DefaultEncryptHex(com.Bytes2str(input))
+	if err != nil {
+		return nil, err
+	}
+	return com.Str2bytes(decrypted), err
+}
+
+// Decrypt  私钥解密
+func (r *SM2) Decrypt(input []byte) ([]byte, error) {
+	decrypted, err := r.DefaultDecryptHex(com.Bytes2str(input))
+	if err != nil {
+		return nil, err
+	}
+	return com.Str2bytes(decrypted), err
+}
+
+// Encrypt 私钥加密
+func (r *SM2) EncryptString(input string) (string, error) {
+	return r.DefaultEncryptHex(input)
+}
+
+// Decrypt  私钥解密
+func (r *SM2) DecryptString(input string) (string, error) {
+	return r.DefaultDecryptHex(input)
+}
+
 func (s *SM2) Reset() {
 	s.sm2once.Reset()
 }

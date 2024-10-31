@@ -21,6 +21,7 @@ import (
 	"reflect"
 
 	"github.com/admpub/log"
+	"github.com/coscms/webcore/library/codec"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/middleware/session/engine"
 	"github.com/webx-top/echo/middleware/session/engine/cookie"
@@ -74,6 +75,7 @@ func InitSessionOptions(c *Config) {
 		MaxAge:   c.Cookie.MaxAge,
 		HttpOnly: c.Cookie.HttpOnly,
 		SameSite: c.Cookie.SameSite,
+		Cryptor:  codec.DefaultSM2,
 	}
 	if CookieOptions == nil || SessionOptions == nil ||
 		!reflect.DeepEqual(_cookieOptions, CookieOptions) ||

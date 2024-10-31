@@ -90,6 +90,24 @@ func (r *RSA) Decrypt(input []byte) ([]byte, error) {
 	return r.DefaultKey().PrivateKey().Decrypt(input)
 }
 
+// Encrypt 私钥加密
+func (r *RSA) EncryptString(input string) (string, error) {
+	encrypted, err := r.Encrypt(com.Str2bytes(input))
+	if err != nil {
+		return ``, err
+	}
+	return com.Bytes2str(encrypted), nil
+}
+
+// Decrypt  私钥解密
+func (r *RSA) DecryptString(input string) (string, error) {
+	decrypted, err := r.Decrypt(com.Str2bytes(input))
+	if err != nil {
+		return ``, err
+	}
+	return com.Bytes2str(decrypted), nil
+}
+
 // SignMd5 使用RSAWithMD5算法签名
 func (r *RSA) SignMd5(data []byte) ([]byte, error) {
 	return r.DefaultKey().PrivateKey().SignMd5(data)
