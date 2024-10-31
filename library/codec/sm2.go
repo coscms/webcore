@@ -165,21 +165,11 @@ func (s *SM2) DefaultDecryptHex(cipher string, noBase64 ...bool) (string, error)
 
 // Encrypt 私钥加密
 func (r *SM2) Encrypt(input []byte) ([]byte, error) {
-	encrypted, err := SM2Encrypt(&r.DefaultKey().PublicKey, input)
-	if err != nil {
-		return nil, err
-	}
-	v := base64.StdEncoding.EncodeToString(encrypted)
-	return com.Str2bytes(v), err
+	return SM2Encrypt(&r.DefaultKey().PublicKey, input)
 }
 
 // Decrypt  私钥解密
 func (r *SM2) Decrypt(input []byte) ([]byte, error) {
-	var err error
-	input, err = base64.StdEncoding.DecodeString(com.Bytes2str(input))
-	if err != nil {
-		return nil, err
-	}
 	return SM2Decrypt(r.DefaultKey(), input)
 }
 

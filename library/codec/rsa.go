@@ -2,6 +2,7 @@ package codec
 
 import (
 	"crypto/rsa"
+	"encoding/base64"
 	"encoding/pem"
 	"errors"
 	"os"
@@ -92,16 +93,21 @@ func (r *RSA) Decrypt(input []byte) ([]byte, error) {
 
 // Encrypt 私钥加密
 func (r *RSA) EncryptString(input string) (string, error) {
-	encrypted, err := r.Encrypt(com.Str2bytes(input))
+	encrypted, err := r.DefaultKey().PublicKey().Encrypt(com.Str2bytes(input))
 	if err != nil {
 		return ``, err
 	}
-	return com.Bytes2str(encrypted), nil
+	v := base64.StdEncoding.EncodeToString(encrypted)
+	return v, nil
 }
 
 // Decrypt  私钥解密
 func (r *RSA) DecryptString(input string) (string, error) {
-	decrypted, err := r.Decrypt(com.Str2bytes(input))
+	v, err := base64.StdEncoding.DecodeString(input)
+	if err != nil {
+		return ``, err
+	}
+	decrypted, err := r.DefaultKey().PrivateKey().Decrypt(v)
 	if err != nil {
 		return ``, err
 	}
