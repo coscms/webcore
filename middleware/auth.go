@@ -45,7 +45,7 @@ func TwoFactorAuth(c echo.Context, before func() error) (need bool, err error) {
 			}
 		}
 		c.Data().SetError(c.E(`请先进行第二步验证`))
-		jump = com.WithURLParams(jump, `next`, echo.ReturnToCurrentURL(c))
+		jump = com.WithURLParams(jump, echo.DefaultNextURLVarName, echo.ReturnToCurrentURL(c))
 		err = c.Redirect(jump)
 	}
 	return

@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/webx-top/db"
+	"github.com/webx-top/echo"
 )
 
 func NewSortedURLValues(query string) SortedURLValues {
@@ -144,4 +145,16 @@ func (s SortedURLValues) Has(key string) bool {
 		}
 	}
 	return false
+}
+
+func GetSavedNextURL(ctx echo.Context, defaultURL string) string {
+	next, _ := ctx.Session().Get(echo.DefaultNextURLVarName).(string)
+	if len(next) > 0 {
+		return next
+	}
+	next = ctx.Cookie().Get(echo.DefaultNextURLVarName)
+	if len(next) == 0 {
+		next = defaultURL
+	}
+	return next
 }

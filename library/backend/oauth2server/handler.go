@@ -51,7 +51,7 @@ func makeLoginHandler(login func(echo.Context) error) func(w http.ResponseWriter
 			println(`[loginHandler.Forms]:`, echo.Dump(ctx.Forms(), false))
 		}
 
-		ctx.Request().Form().Set(`next`, backend.URLFor(RoutePrefix+`/auth`))
+		ctx.Request().Form().Set(echo.DefaultNextURLVarName, backend.URLFor(RoutePrefix+`/auth`))
 		err := login(ctx)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)

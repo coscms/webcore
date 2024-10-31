@@ -259,13 +259,7 @@ func successHandler(ctx echo.Context) error {
 		return err
 	}
 	if len(next) == 0 {
-		next, _ = ctx.Session().Get(`next`).(string)
-		if len(next) == 0 {
-			next = ctx.Cookie().Get(`next`)
-			if len(next) == 0 {
-				next = `/`
-			}
-		}
+		next = common.GetSavedNextURL(ctx, `/`)
 	}
 	return ctx.Redirect(next)
 }
