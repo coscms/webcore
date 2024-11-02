@@ -172,11 +172,11 @@ func ReverseURL(u string) string {
 }
 
 func GetSavedNextURL(ctx echo.Context, defaultURL string) string {
-	next := ctx.Cookie().Get(echo.DefaultNextURLVarName)
+	next, _ := ctx.Session().Get(echo.DefaultNextURLVarName).(string)
 	if len(next) > 0 {
 		return ReverseURL(next)
 	}
-	next, _ = ctx.Session().Get(echo.DefaultNextURLVarName).(string)
+	next = ctx.Cookie().Get(echo.DefaultNextURLVarName)
 	if len(next) == 0 {
 		next = defaultURL
 	}
