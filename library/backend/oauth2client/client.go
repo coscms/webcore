@@ -182,7 +182,7 @@ func successHandler(ctx echo.Context) error {
 	if err != nil || end {
 		return err
 	}
-	var next string
+	next := ctx.Form(echo.DefaultNextURLVarName)
 	oauthM := model.NewUserOAuth(ctx)
 	user := backend.User(ctx)
 	err = oauthM.GetByOutUser(ouser)
