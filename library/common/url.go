@@ -5,6 +5,7 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/admpub/log"
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
 )
@@ -147,14 +148,37 @@ func (s SortedURLValues) Has(key string) bool {
 	return false
 }
 
-func GetSavedNextURL(ctx echo.Context, defaultURL string) string {
-	next, _ := ctx.Session().Get(echo.DefaultNextURLVarName).(string)
-	if len(next) > 0 {
-		return next
+func ReverseURL(u string) string {
+	sz := len(u)
+	var de bool
+	switch {
+	case sz > 14 && u[0:14] == `https%3A%2F%2F`: // https://
+		de = true
+	case sz > 13 && u[0:13] == `http%3A%2F%2F`: // http://
+		de = true
+	case sz >= 3 && (u[0:3] == `%2F` || (u[0:1] == `.` && strings.HasPrefix(strings.TrimLeft(u, `.`), `%2F`))):
+		de = true
+	default:
 	}
-	next = ctx.Cookie().Get(echo.DefaultNextURLVarName)
+	if de {
+		ur, err := url.QueryUnescape(u)
+		if err == nil {
+			u = ur
+		} else {
+			log.Warn(err)
+		}
+	}
+	return u
+}
+
+func GetSavedNextURL(ctx echo.Context, defaultURL string) string {
+	next := ctx.Cookie().Get(echo.DefaultNextURLVarName)
+	if len(next) > 0 {
+		return ReverseURL(next)
+	}
+	next, _ = ctx.Session().Get(echo.DefaultNextURLVarName).(string)
 	if len(next) == 0 {
 		next = defaultURL
 	}
-	return next
+	return ReverseURL(next)
 }

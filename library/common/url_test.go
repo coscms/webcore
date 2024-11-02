@@ -1,11 +1,27 @@
 package common
 
 import (
+	"net/url"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/webx-top/com"
 )
+
+func TestReverseURL(t *testing.T) {
+	r := ReverseURL(`https%3A%2F%2Fwww.coscms.com%2Fuser%2Fprofile%2Fbinding%3Ftype%3Doauth`)
+	assert.Equal(t, `https://www.coscms.com/user/profile/binding?type=oauth`, r)
+	r = ReverseURL(`http%3A%2F%2Fwww.coscms.com%2Fuser%2Fprofile%2Fbinding%3Ftype%3Doauth`)
+	assert.Equal(t, `http://www.coscms.com/user/profile/binding?type=oauth`, r)
+	r = ReverseURL(`%2F`)
+	assert.Equal(t, `/`, r)
+	v := url.QueryEscape(`./`)
+	assert.Equal(t, `.%2F`, v)
+	r = ReverseURL(v)
+	assert.Equal(t, `./`, r)
+	r = ReverseURL(`..%2F`)
+	assert.Equal(t, `../`, r)
+}
 
 func TestSortedURLValues(t *testing.T) {
 	r := NewSortedURLValues(`a=b&b=100&a=c`)
