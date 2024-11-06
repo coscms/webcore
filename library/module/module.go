@@ -2,6 +2,7 @@ package module
 
 import (
 	"path"
+	"path/filepath"
 	"strings"
 
 	"github.com/coscms/webcore/library/config"
@@ -152,10 +153,15 @@ func SetTemplate(backendPa *ntemplate.PathAliases, frontendPa *ntemplate.PathAli
 	if len(templatePath) == 0 {
 		return
 	}
-	if templatePath[0] != '.' && templatePath[0] != '/' && !strings.HasPrefix(templatePath, `vendor/`) {
-		templatePath = NgingPluginDir + `/` + templatePath
+	var dir string
+	if filepath.IsAbs(templatePath) {
+		dir = filepath.Base(templatePath)
+	} else {
+		if templatePath[0] != '.' && templatePath[0] != '/' && !strings.HasPrefix(templatePath, `vendor/`) {
+			templatePath = NgingPluginDir + `/` + templatePath
+		}
+		dir = path.Base(templatePath)
 	}
-	dir := path.Base(templatePath)
 	switch dir {
 	case `frontend`:
 		if frontendPa != nil {
@@ -178,10 +184,15 @@ func SetAssets(backendSo *middleware.StaticOptions, frontendSo *middleware.Stati
 	if len(assetsPath) == 0 {
 		return
 	}
-	if assetsPath[0] != '.' && assetsPath[0] != '/' && !strings.HasPrefix(assetsPath, `vendor/`) {
-		assetsPath = NgingPluginDir + `/` + assetsPath
+	var dir string
+	if filepath.IsAbs(assetsPath) {
+		dir = filepath.Base(assetsPath)
+	} else {
+		if assetsPath[0] != '.' && assetsPath[0] != '/' && !strings.HasPrefix(assetsPath, `vendor/`) {
+			assetsPath = NgingPluginDir + `/` + assetsPath
+		}
+		dir = path.Base(assetsPath)
 	}
-	dir := path.Base(assetsPath)
 	switch dir {
 	case `frontend`:
 		if frontendSo != nil {
