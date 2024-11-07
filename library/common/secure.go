@@ -299,8 +299,7 @@ func MyRemoveXSS(content string) string {
 }
 
 func MyCleanText(value string) string {
-	value = com.StripTags(value)
-	value = com.RemoveEOL(value)
+	value = com.StripTags(value, true)
 	return value
 }
 
@@ -391,7 +390,6 @@ func ContentEncode(content string, contypes ...string) string {
 
 	case `list`:
 		content = MyCleanText(content)
-		content = strings.TrimSpace(content)
 		content = strings.Trim(content, `,`)
 
 	case `text`:
