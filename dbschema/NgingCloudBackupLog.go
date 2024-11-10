@@ -503,7 +503,7 @@ func (a *NgingCloudBackupLog) UpdateFields(mw func(db.Result) db.Result, kvset m
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -538,7 +538,7 @@ func (a *NgingCloudBackupLog) UpdatexFields(mw func(db.Result) db.Result, kvset 
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -715,6 +715,9 @@ func (a *NgingCloudBackupLog) AsMap(onlyFields ...string) param.Store {
 
 func (a *NgingCloudBackupLog) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint64(value)
@@ -739,6 +742,80 @@ func (a *NgingCloudBackupLog) FromRow(row map[string]interface{}) {
 		case "created":
 			a.Created = param.AsUint(value)
 		}
+	}
+}
+
+func (a *NgingCloudBackupLog) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "BackupId":
+		return a.BackupId
+	case "BackupType":
+		return a.BackupType
+	case "BackupFile":
+		return a.BackupFile
+	case "RemoteFile":
+		return a.RemoteFile
+	case "Operation":
+		return a.Operation
+	case "Error":
+		return a.Error
+	case "Status":
+		return a.Status
+	case "Size":
+		return a.Size
+	case "Elapsed":
+		return a.Elapsed
+	case "Created":
+		return a.Created
+	default:
+		return nil
+	}
+}
+
+func (a *NgingCloudBackupLog) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"BackupId",
+		"BackupType",
+		"BackupFile",
+		"RemoteFile",
+		"Operation",
+		"Error",
+		"Status",
+		"Size",
+		"Elapsed",
+		"Created",
+	}
+}
+
+func (a *NgingCloudBackupLog) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "BackupId":
+		return true
+	case "BackupType":
+		return true
+	case "BackupFile":
+		return true
+	case "RemoteFile":
+		return true
+	case "Operation":
+		return true
+	case "Error":
+		return true
+	case "Status":
+		return true
+	case "Size":
+		return true
+	case "Elapsed":
+		return true
+	case "Created":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -834,17 +911,19 @@ func (a *NgingCloudBackupLog) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *NgingCloudBackupLog) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *NgingCloudBackupLog) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *NgingCloudBackupLog) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *NgingCloudBackupLog) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *NgingCloudBackupLog) BatchValidate(kvset map[string]interface{}) error {

@@ -506,7 +506,7 @@ func (a *NgingSendingLog) UpdateFields(mw func(db.Result) db.Result, kvset map[s
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -541,7 +541,7 @@ func (a *NgingSendingLog) UpdatexFields(mw func(db.Result) db.Result, kvset map[
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -730,6 +730,9 @@ func (a *NgingSendingLog) AsMap(onlyFields ...string) param.Store {
 
 func (a *NgingSendingLog) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint64(value)
@@ -760,6 +763,95 @@ func (a *NgingSendingLog) FromRow(row map[string]interface{}) {
 		case "appointment_time":
 			a.AppointmentTime = param.AsUint(value)
 		}
+	}
+}
+
+func (a *NgingSendingLog) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "Created":
+		return a.Created
+	case "SentAt":
+		return a.SentAt
+	case "SourceId":
+		return a.SourceId
+	case "SourceType":
+		return a.SourceType
+	case "Method":
+		return a.Method
+	case "To":
+		return a.To
+	case "Provider":
+		return a.Provider
+	case "Result":
+		return a.Result
+	case "Status":
+		return a.Status
+	case "Retries":
+		return a.Retries
+	case "Content":
+		return a.Content
+	case "Params":
+		return a.Params
+	case "AppointmentTime":
+		return a.AppointmentTime
+	default:
+		return nil
+	}
+}
+
+func (a *NgingSendingLog) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"Created",
+		"SentAt",
+		"SourceId",
+		"SourceType",
+		"Method",
+		"To",
+		"Provider",
+		"Result",
+		"Status",
+		"Retries",
+		"Content",
+		"Params",
+		"AppointmentTime",
+	}
+}
+
+func (a *NgingSendingLog) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "Created":
+		return true
+	case "SentAt":
+		return true
+	case "SourceId":
+		return true
+	case "SourceType":
+		return true
+	case "Method":
+		return true
+	case "To":
+		return true
+	case "Provider":
+		return true
+	case "Result":
+		return true
+	case "Status":
+		return true
+	case "Retries":
+		return true
+	case "Content":
+		return true
+	case "Params":
+		return true
+	case "AppointmentTime":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -870,17 +962,19 @@ func (a *NgingSendingLog) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *NgingSendingLog) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *NgingSendingLog) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *NgingSendingLog) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *NgingSendingLog) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *NgingSendingLog) BatchValidate(kvset map[string]interface{}) error {

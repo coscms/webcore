@@ -440,7 +440,7 @@ func (a *NgingFileThumb) UpdateFields(mw func(db.Result) db.Result, kvset map[st
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -460,7 +460,7 @@ func (a *NgingFileThumb) UpdatexFields(mw func(db.Result) db.Result, kvset map[s
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -618,6 +618,9 @@ func (a *NgingFileThumb) AsMap(onlyFields ...string) param.Store {
 
 func (a *NgingFileThumb) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint64(value)
@@ -642,6 +645,80 @@ func (a *NgingFileThumb) FromRow(row map[string]interface{}) {
 		case "md5":
 			a.Md5 = param.AsString(value)
 		}
+	}
+}
+
+func (a *NgingFileThumb) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "FileId":
+		return a.FileId
+	case "Size":
+		return a.Size
+	case "Width":
+		return a.Width
+	case "Height":
+		return a.Height
+	case "Dpi":
+		return a.Dpi
+	case "SaveName":
+		return a.SaveName
+	case "SavePath":
+		return a.SavePath
+	case "ViewUrl":
+		return a.ViewUrl
+	case "UsedTimes":
+		return a.UsedTimes
+	case "Md5":
+		return a.Md5
+	default:
+		return nil
+	}
+}
+
+func (a *NgingFileThumb) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"FileId",
+		"Size",
+		"Width",
+		"Height",
+		"Dpi",
+		"SaveName",
+		"SavePath",
+		"ViewUrl",
+		"UsedTimes",
+		"Md5",
+	}
+}
+
+func (a *NgingFileThumb) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "FileId":
+		return true
+	case "Size":
+		return true
+	case "Width":
+		return true
+	case "Height":
+		return true
+	case "Dpi":
+		return true
+	case "SaveName":
+		return true
+	case "SavePath":
+		return true
+	case "ViewUrl":
+		return true
+	case "UsedTimes":
+		return true
+	case "Md5":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -737,17 +814,19 @@ func (a *NgingFileThumb) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *NgingFileThumb) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *NgingFileThumb) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *NgingFileThumb) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *NgingFileThumb) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *NgingFileThumb) BatchValidate(kvset map[string]interface{}) error {

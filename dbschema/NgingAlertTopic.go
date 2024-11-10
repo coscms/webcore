@@ -458,7 +458,7 @@ func (a *NgingAlertTopic) UpdateFields(mw func(db.Result) db.Result, kvset map[s
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -483,7 +483,7 @@ func (a *NgingAlertTopic) UpdatexFields(mw func(db.Result) db.Result, kvset map[
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -629,6 +629,9 @@ func (a *NgingAlertTopic) AsMap(onlyFields ...string) param.Store {
 
 func (a *NgingAlertTopic) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint(value)
@@ -643,6 +646,55 @@ func (a *NgingAlertTopic) FromRow(row map[string]interface{}) {
 		case "updated":
 			a.Updated = param.AsUint(value)
 		}
+	}
+}
+
+func (a *NgingAlertTopic) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "Topic":
+		return a.Topic
+	case "RecipientId":
+		return a.RecipientId
+	case "Disabled":
+		return a.Disabled
+	case "Created":
+		return a.Created
+	case "Updated":
+		return a.Updated
+	default:
+		return nil
+	}
+}
+
+func (a *NgingAlertTopic) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"Topic",
+		"RecipientId",
+		"Disabled",
+		"Created",
+		"Updated",
+	}
+}
+
+func (a *NgingAlertTopic) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "Topic":
+		return true
+	case "RecipientId":
+		return true
+	case "Disabled":
+		return true
+	case "Created":
+		return true
+	case "Updated":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -713,17 +765,19 @@ func (a *NgingAlertTopic) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *NgingAlertTopic) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *NgingAlertTopic) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *NgingAlertTopic) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *NgingAlertTopic) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *NgingAlertTopic) BatchValidate(kvset map[string]interface{}) error {

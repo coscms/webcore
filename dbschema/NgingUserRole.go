@@ -459,7 +459,7 @@ func (a *NgingUserRole) UpdateFields(mw func(db.Result) db.Result, kvset map[str
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -484,7 +484,7 @@ func (a *NgingUserRole) UpdatexFields(mw func(db.Result) db.Result, kvset map[st
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -634,6 +634,9 @@ func (a *NgingUserRole) AsMap(onlyFields ...string) param.Store {
 
 func (a *NgingUserRole) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint(value)
@@ -650,6 +653,60 @@ func (a *NgingUserRole) FromRow(row map[string]interface{}) {
 		case "parent_id":
 			a.ParentId = param.AsUint(value)
 		}
+	}
+}
+
+func (a *NgingUserRole) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "Name":
+		return a.Name
+	case "Description":
+		return a.Description
+	case "Created":
+		return a.Created
+	case "Updated":
+		return a.Updated
+	case "Disabled":
+		return a.Disabled
+	case "ParentId":
+		return a.ParentId
+	default:
+		return nil
+	}
+}
+
+func (a *NgingUserRole) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"Name",
+		"Description",
+		"Created",
+		"Updated",
+		"Disabled",
+		"ParentId",
+	}
+}
+
+func (a *NgingUserRole) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "Name":
+		return true
+	case "Description":
+		return true
+	case "Created":
+		return true
+	case "Updated":
+		return true
+	case "Disabled":
+		return true
+	case "ParentId":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -725,17 +782,19 @@ func (a *NgingUserRole) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *NgingUserRole) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *NgingUserRole) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *NgingUserRole) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *NgingUserRole) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *NgingUserRole) BatchValidate(kvset map[string]interface{}) error {

@@ -504,7 +504,7 @@ func (a *NgingCodeVerification) UpdateFields(mw func(db.Result) db.Result, kvset
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -539,7 +539,7 @@ func (a *NgingCodeVerification) UpdatexFields(mw func(db.Result) db.Result, kvse
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -720,6 +720,9 @@ func (a *NgingCodeVerification) AsMap(onlyFields ...string) param.Store {
 
 func (a *NgingCodeVerification) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint64(value)
@@ -746,6 +749,85 @@ func (a *NgingCodeVerification) FromRow(row map[string]interface{}) {
 		case "send_to":
 			a.SendTo = param.AsString(value)
 		}
+	}
+}
+
+func (a *NgingCodeVerification) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "Code":
+		return a.Code
+	case "Created":
+		return a.Created
+	case "OwnerId":
+		return a.OwnerId
+	case "OwnerType":
+		return a.OwnerType
+	case "Used":
+		return a.Used
+	case "Purpose":
+		return a.Purpose
+	case "Start":
+		return a.Start
+	case "End":
+		return a.End
+	case "Disabled":
+		return a.Disabled
+	case "SendMethod":
+		return a.SendMethod
+	case "SendTo":
+		return a.SendTo
+	default:
+		return nil
+	}
+}
+
+func (a *NgingCodeVerification) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"Code",
+		"Created",
+		"OwnerId",
+		"OwnerType",
+		"Used",
+		"Purpose",
+		"Start",
+		"End",
+		"Disabled",
+		"SendMethod",
+		"SendTo",
+	}
+}
+
+func (a *NgingCodeVerification) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "Code":
+		return true
+	case "Created":
+		return true
+	case "OwnerId":
+		return true
+	case "OwnerType":
+		return true
+	case "Used":
+		return true
+	case "Purpose":
+		return true
+	case "Start":
+		return true
+	case "End":
+		return true
+	case "Disabled":
+		return true
+	case "SendMethod":
+		return true
+	case "SendTo":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -846,17 +928,19 @@ func (a *NgingCodeVerification) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *NgingCodeVerification) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *NgingCodeVerification) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *NgingCodeVerification) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *NgingCodeVerification) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *NgingCodeVerification) BatchValidate(kvset map[string]interface{}) error {

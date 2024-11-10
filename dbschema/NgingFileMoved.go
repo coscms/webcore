@@ -438,7 +438,7 @@ func (a *NgingFileMoved) UpdateFields(mw func(db.Result) db.Result, kvset map[st
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -458,7 +458,7 @@ func (a *NgingFileMoved) UpdatexFields(mw func(db.Result) db.Result, kvset map[s
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -597,6 +597,9 @@ func (a *NgingFileMoved) AsMap(onlyFields ...string) param.Store {
 
 func (a *NgingFileMoved) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint64(value)
@@ -611,6 +614,55 @@ func (a *NgingFileMoved) FromRow(row map[string]interface{}) {
 		case "created":
 			a.Created = param.AsUint(value)
 		}
+	}
+}
+
+func (a *NgingFileMoved) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "FileId":
+		return a.FileId
+	case "From":
+		return a.From
+	case "To":
+		return a.To
+	case "ThumbId":
+		return a.ThumbId
+	case "Created":
+		return a.Created
+	default:
+		return nil
+	}
+}
+
+func (a *NgingFileMoved) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"FileId",
+		"From",
+		"To",
+		"ThumbId",
+		"Created",
+	}
+}
+
+func (a *NgingFileMoved) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "FileId":
+		return true
+	case "From":
+		return true
+	case "To":
+		return true
+	case "ThumbId":
+		return true
+	case "Created":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -681,17 +733,19 @@ func (a *NgingFileMoved) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *NgingFileMoved) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *NgingFileMoved) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *NgingFileMoved) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *NgingFileMoved) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *NgingFileMoved) BatchValidate(kvset map[string]interface{}) error {

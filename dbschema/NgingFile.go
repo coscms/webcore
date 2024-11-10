@@ -497,7 +497,7 @@ func (a *NgingFile) UpdateFields(mw func(db.Result) db.Result, kvset map[string]
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -527,7 +527,7 @@ func (a *NgingFile) UpdatexFields(mw func(db.Result) db.Result, kvset map[string
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -755,6 +755,9 @@ func (a *NgingFile) AsMap(onlyFields ...string) param.Store {
 
 func (a *NgingFile) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint64(value)
@@ -807,6 +810,150 @@ func (a *NgingFile) FromRow(row map[string]interface{}) {
 		case "used_times":
 			a.UsedTimes = param.AsUint(value)
 		}
+	}
+}
+
+func (a *NgingFile) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "OwnerType":
+		return a.OwnerType
+	case "OwnerId":
+		return a.OwnerId
+	case "Name":
+		return a.Name
+	case "SaveName":
+		return a.SaveName
+	case "SavePath":
+		return a.SavePath
+	case "ViewUrl":
+		return a.ViewUrl
+	case "Ext":
+		return a.Ext
+	case "Mime":
+		return a.Mime
+	case "Type":
+		return a.Type
+	case "Size":
+		return a.Size
+	case "Width":
+		return a.Width
+	case "Height":
+		return a.Height
+	case "Dpi":
+		return a.Dpi
+	case "Md5":
+		return a.Md5
+	case "StorerName":
+		return a.StorerName
+	case "StorerId":
+		return a.StorerId
+	case "Created":
+		return a.Created
+	case "Updated":
+		return a.Updated
+	case "Sort":
+		return a.Sort
+	case "Status":
+		return a.Status
+	case "CategoryId":
+		return a.CategoryId
+	case "Tags":
+		return a.Tags
+	case "Subdir":
+		return a.Subdir
+	case "UsedTimes":
+		return a.UsedTimes
+	default:
+		return nil
+	}
+}
+
+func (a *NgingFile) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"OwnerType",
+		"OwnerId",
+		"Name",
+		"SaveName",
+		"SavePath",
+		"ViewUrl",
+		"Ext",
+		"Mime",
+		"Type",
+		"Size",
+		"Width",
+		"Height",
+		"Dpi",
+		"Md5",
+		"StorerName",
+		"StorerId",
+		"Created",
+		"Updated",
+		"Sort",
+		"Status",
+		"CategoryId",
+		"Tags",
+		"Subdir",
+		"UsedTimes",
+	}
+}
+
+func (a *NgingFile) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "OwnerType":
+		return true
+	case "OwnerId":
+		return true
+	case "Name":
+		return true
+	case "SaveName":
+		return true
+	case "SavePath":
+		return true
+	case "ViewUrl":
+		return true
+	case "Ext":
+		return true
+	case "Mime":
+		return true
+	case "Type":
+		return true
+	case "Size":
+		return true
+	case "Width":
+		return true
+	case "Height":
+		return true
+	case "Dpi":
+		return true
+	case "Md5":
+		return true
+	case "StorerName":
+		return true
+	case "StorerId":
+		return true
+	case "Created":
+		return true
+	case "Updated":
+		return true
+	case "Sort":
+		return true
+	case "Status":
+		return true
+	case "CategoryId":
+		return true
+	case "Tags":
+		return true
+	case "Subdir":
+		return true
+	case "UsedTimes":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -972,17 +1119,19 @@ func (a *NgingFile) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *NgingFile) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *NgingFile) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *NgingFile) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *NgingFile) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *NgingFile) BatchValidate(kvset map[string]interface{}) error {

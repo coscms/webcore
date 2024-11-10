@@ -440,7 +440,7 @@ func (a *NgingTaskGroup) UpdateFields(mw func(db.Result) db.Result, kvset map[st
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -460,7 +460,7 @@ func (a *NgingTaskGroup) UpdatexFields(mw func(db.Result) db.Result, kvset map[s
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -608,6 +608,9 @@ func (a *NgingTaskGroup) AsMap(onlyFields ...string) param.Store {
 
 func (a *NgingTaskGroup) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint(value)
@@ -626,6 +629,65 @@ func (a *NgingTaskGroup) FromRow(row map[string]interface{}) {
 		case "cmd_suffix":
 			a.CmdSuffix = param.AsString(value)
 		}
+	}
+}
+
+func (a *NgingTaskGroup) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "Uid":
+		return a.Uid
+	case "Name":
+		return a.Name
+	case "Description":
+		return a.Description
+	case "Created":
+		return a.Created
+	case "Updated":
+		return a.Updated
+	case "CmdPrefix":
+		return a.CmdPrefix
+	case "CmdSuffix":
+		return a.CmdSuffix
+	default:
+		return nil
+	}
+}
+
+func (a *NgingTaskGroup) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"Uid",
+		"Name",
+		"Description",
+		"Created",
+		"Updated",
+		"CmdPrefix",
+		"CmdSuffix",
+	}
+}
+
+func (a *NgingTaskGroup) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "Uid":
+		return true
+	case "Name":
+		return true
+	case "Description":
+		return true
+	case "Created":
+		return true
+	case "Updated":
+		return true
+	case "CmdPrefix":
+		return true
+	case "CmdSuffix":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -706,17 +768,19 @@ func (a *NgingTaskGroup) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *NgingTaskGroup) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *NgingTaskGroup) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *NgingTaskGroup) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *NgingTaskGroup) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *NgingTaskGroup) BatchValidate(kvset map[string]interface{}) error {

@@ -484,7 +484,7 @@ func (a *NgingCloudStorage) UpdateFields(mw func(db.Result) db.Result, kvset map
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -514,7 +514,7 @@ func (a *NgingCloudStorage) UpdatexFields(mw func(db.Result) db.Result, kvset ma
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -690,6 +690,9 @@ func (a *NgingCloudStorage) AsMap(onlyFields ...string) param.Store {
 
 func (a *NgingCloudStorage) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint(value)
@@ -716,6 +719,85 @@ func (a *NgingCloudStorage) FromRow(row map[string]interface{}) {
 		case "updated":
 			a.Updated = param.AsUint(value)
 		}
+	}
+}
+
+func (a *NgingCloudStorage) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "Name":
+		return a.Name
+	case "Type":
+		return a.Type
+	case "Key":
+		return a.Key
+	case "Secret":
+		return a.Secret
+	case "Bucket":
+		return a.Bucket
+	case "Endpoint":
+		return a.Endpoint
+	case "Region":
+		return a.Region
+	case "Secure":
+		return a.Secure
+	case "Baseurl":
+		return a.Baseurl
+	case "Created":
+		return a.Created
+	case "Updated":
+		return a.Updated
+	default:
+		return nil
+	}
+}
+
+func (a *NgingCloudStorage) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"Name",
+		"Type",
+		"Key",
+		"Secret",
+		"Bucket",
+		"Endpoint",
+		"Region",
+		"Secure",
+		"Baseurl",
+		"Created",
+		"Updated",
+	}
+}
+
+func (a *NgingCloudStorage) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "Name":
+		return true
+	case "Type":
+		return true
+	case "Key":
+		return true
+	case "Secret":
+		return true
+	case "Bucket":
+		return true
+	case "Endpoint":
+		return true
+	case "Region":
+		return true
+	case "Secure":
+		return true
+	case "Baseurl":
+		return true
+	case "Created":
+		return true
+	case "Updated":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -816,17 +898,19 @@ func (a *NgingCloudStorage) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *NgingCloudStorage) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *NgingCloudStorage) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *NgingCloudStorage) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *NgingCloudStorage) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *NgingCloudStorage) BatchValidate(kvset map[string]interface{}) error {

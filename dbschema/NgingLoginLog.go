@@ -498,7 +498,7 @@ func (a *NgingLoginLog) UpdateFields(mw func(db.Result) db.Result, kvset map[str
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -533,7 +533,7 @@ func (a *NgingLoginLog) UpdatexFields(mw func(db.Result) db.Result, kvset map[st
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -711,6 +711,9 @@ func (a *NgingLoginLog) AsMap(onlyFields ...string) param.Store {
 
 func (a *NgingLoginLog) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "owner_type":
 			a.OwnerType = param.AsString(value)
@@ -739,6 +742,90 @@ func (a *NgingLoginLog) FromRow(row map[string]interface{}) {
 		case "created":
 			a.Created = param.AsUint(value)
 		}
+	}
+}
+
+func (a *NgingLoginLog) GetField(field string) interface{} {
+	switch field {
+	case "OwnerType":
+		return a.OwnerType
+	case "OwnerId":
+		return a.OwnerId
+	case "SessionId":
+		return a.SessionId
+	case "Username":
+		return a.Username
+	case "AuthType":
+		return a.AuthType
+	case "Errpwd":
+		return a.Errpwd
+	case "IpAddress":
+		return a.IpAddress
+	case "IpLocation":
+		return a.IpLocation
+	case "UserAgent":
+		return a.UserAgent
+	case "Success":
+		return a.Success
+	case "Failmsg":
+		return a.Failmsg
+	case "Day":
+		return a.Day
+	case "Created":
+		return a.Created
+	default:
+		return nil
+	}
+}
+
+func (a *NgingLoginLog) GetAllFieldNames() []string {
+	return []string{
+		"OwnerType",
+		"OwnerId",
+		"SessionId",
+		"Username",
+		"AuthType",
+		"Errpwd",
+		"IpAddress",
+		"IpLocation",
+		"UserAgent",
+		"Success",
+		"Failmsg",
+		"Day",
+		"Created",
+	}
+}
+
+func (a *NgingLoginLog) HasField(field string) bool {
+	switch field {
+	case "OwnerType":
+		return true
+	case "OwnerId":
+		return true
+	case "SessionId":
+		return true
+	case "Username":
+		return true
+	case "AuthType":
+		return true
+	case "Errpwd":
+		return true
+	case "IpAddress":
+		return true
+	case "IpLocation":
+		return true
+	case "UserAgent":
+		return true
+	case "Success":
+		return true
+	case "Failmsg":
+		return true
+	case "Day":
+		return true
+	case "Created":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -844,17 +931,19 @@ func (a *NgingLoginLog) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *NgingLoginLog) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *NgingLoginLog) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *NgingLoginLog) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *NgingLoginLog) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *NgingLoginLog) BatchValidate(kvset map[string]interface{}) error {

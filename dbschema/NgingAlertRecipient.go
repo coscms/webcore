@@ -482,7 +482,7 @@ func (a *NgingAlertRecipient) UpdateFields(mw func(db.Result) db.Result, kvset m
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -512,7 +512,7 @@ func (a *NgingAlertRecipient) UpdatexFields(mw func(db.Result) db.Result, kvset 
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -680,6 +680,9 @@ func (a *NgingAlertRecipient) AsMap(onlyFields ...string) param.Store {
 
 func (a *NgingAlertRecipient) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint(value)
@@ -702,6 +705,75 @@ func (a *NgingAlertRecipient) FromRow(row map[string]interface{}) {
 		case "updated":
 			a.Updated = param.AsUint(value)
 		}
+	}
+}
+
+func (a *NgingAlertRecipient) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "Name":
+		return a.Name
+	case "Account":
+		return a.Account
+	case "Extra":
+		return a.Extra
+	case "Type":
+		return a.Type
+	case "Platform":
+		return a.Platform
+	case "Description":
+		return a.Description
+	case "Disabled":
+		return a.Disabled
+	case "Created":
+		return a.Created
+	case "Updated":
+		return a.Updated
+	default:
+		return nil
+	}
+}
+
+func (a *NgingAlertRecipient) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"Name",
+		"Account",
+		"Extra",
+		"Type",
+		"Platform",
+		"Description",
+		"Disabled",
+		"Created",
+		"Updated",
+	}
+}
+
+func (a *NgingAlertRecipient) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "Name":
+		return true
+	case "Account":
+		return true
+	case "Extra":
+		return true
+	case "Type":
+		return true
+	case "Platform":
+		return true
+	case "Description":
+		return true
+	case "Disabled":
+		return true
+	case "Created":
+		return true
+	case "Updated":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -792,17 +864,19 @@ func (a *NgingAlertRecipient) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *NgingAlertRecipient) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *NgingAlertRecipient) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *NgingAlertRecipient) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *NgingAlertRecipient) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *NgingAlertRecipient) BatchValidate(kvset map[string]interface{}) error {

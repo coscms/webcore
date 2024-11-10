@@ -459,7 +459,7 @@ func (a *NgingTaskLog) UpdateFields(mw func(db.Result) db.Result, kvset map[stri
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -484,7 +484,7 @@ func (a *NgingTaskLog) UpdatexFields(mw func(db.Result) db.Result, kvset map[str
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -633,6 +633,9 @@ func (a *NgingTaskLog) AsMap(onlyFields ...string) param.Store {
 
 func (a *NgingTaskLog) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint64(value)
@@ -649,6 +652,60 @@ func (a *NgingTaskLog) FromRow(row map[string]interface{}) {
 		case "created":
 			a.Created = param.AsUint(value)
 		}
+	}
+}
+
+func (a *NgingTaskLog) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "TaskId":
+		return a.TaskId
+	case "Output":
+		return a.Output
+	case "Error":
+		return a.Error
+	case "Status":
+		return a.Status
+	case "Elapsed":
+		return a.Elapsed
+	case "Created":
+		return a.Created
+	default:
+		return nil
+	}
+}
+
+func (a *NgingTaskLog) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"TaskId",
+		"Output",
+		"Error",
+		"Status",
+		"Elapsed",
+		"Created",
+	}
+}
+
+func (a *NgingTaskLog) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "TaskId":
+		return true
+	case "Output":
+		return true
+	case "Error":
+		return true
+	case "Status":
+		return true
+	case "Elapsed":
+		return true
+	case "Created":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -724,17 +781,19 @@ func (a *NgingTaskLog) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *NgingTaskLog) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *NgingTaskLog) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *NgingTaskLog) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *NgingTaskLog) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *NgingTaskLog) BatchValidate(kvset map[string]interface{}) error {

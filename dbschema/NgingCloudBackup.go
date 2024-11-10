@@ -573,7 +573,7 @@ func (a *NgingCloudBackup) UpdateFields(mw func(db.Result) db.Result, kvset map[
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -623,7 +623,7 @@ func (a *NgingCloudBackup) UpdatexFields(mw func(db.Result) db.Result, kvset map
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -859,6 +859,9 @@ func (a *NgingCloudBackup) AsMap(onlyFields ...string) param.Store {
 
 func (a *NgingCloudBackup) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint(value)
@@ -903,6 +906,130 @@ func (a *NgingCloudBackup) FromRow(row map[string]interface{}) {
 		case "updated":
 			a.Updated = param.AsUint(value)
 		}
+	}
+}
+
+func (a *NgingCloudBackup) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "Name":
+		return a.Name
+	case "SourcePath":
+		return a.SourcePath
+	case "IgnoreRule":
+		return a.IgnoreRule
+	case "MatchRule":
+		return a.MatchRule
+	case "WaitFillCompleted":
+		return a.WaitFillCompleted
+	case "MinModifyInterval":
+		return a.MinModifyInterval
+	case "IgnoreWaitRule":
+		return a.IgnoreWaitRule
+	case "Delay":
+		return a.Delay
+	case "StorageEngine":
+		return a.StorageEngine
+	case "StorageConfig":
+		return a.StorageConfig
+	case "DestStorage":
+		return a.DestStorage
+	case "DestPath":
+		return a.DestPath
+	case "Result":
+		return a.Result
+	case "LastExecuted":
+		return a.LastExecuted
+	case "Status":
+		return a.Status
+	case "Disabled":
+		return a.Disabled
+	case "LogDisabled":
+		return a.LogDisabled
+	case "LogType":
+		return a.LogType
+	case "Created":
+		return a.Created
+	case "Updated":
+		return a.Updated
+	default:
+		return nil
+	}
+}
+
+func (a *NgingCloudBackup) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"Name",
+		"SourcePath",
+		"IgnoreRule",
+		"MatchRule",
+		"WaitFillCompleted",
+		"MinModifyInterval",
+		"IgnoreWaitRule",
+		"Delay",
+		"StorageEngine",
+		"StorageConfig",
+		"DestStorage",
+		"DestPath",
+		"Result",
+		"LastExecuted",
+		"Status",
+		"Disabled",
+		"LogDisabled",
+		"LogType",
+		"Created",
+		"Updated",
+	}
+}
+
+func (a *NgingCloudBackup) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "Name":
+		return true
+	case "SourcePath":
+		return true
+	case "IgnoreRule":
+		return true
+	case "MatchRule":
+		return true
+	case "WaitFillCompleted":
+		return true
+	case "MinModifyInterval":
+		return true
+	case "IgnoreWaitRule":
+		return true
+	case "Delay":
+		return true
+	case "StorageEngine":
+		return true
+	case "StorageConfig":
+		return true
+	case "DestStorage":
+		return true
+	case "DestPath":
+		return true
+	case "Result":
+		return true
+	case "LastExecuted":
+		return true
+	case "Status":
+		return true
+	case "Disabled":
+		return true
+	case "LogDisabled":
+		return true
+	case "LogType":
+		return true
+	case "Created":
+		return true
+	case "Updated":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -1048,17 +1175,19 @@ func (a *NgingCloudBackup) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *NgingCloudBackup) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *NgingCloudBackup) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *NgingCloudBackup) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *NgingCloudBackup) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *NgingCloudBackup) BatchValidate(kvset map[string]interface{}) error {

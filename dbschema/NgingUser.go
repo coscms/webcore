@@ -512,7 +512,7 @@ func (a *NgingUser) UpdateFields(mw func(db.Result) db.Result, kvset map[string]
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -547,7 +547,7 @@ func (a *NgingUser) UpdatexFields(mw func(db.Result) db.Result, kvset map[string
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -761,6 +761,9 @@ func (a *NgingUser) AsMap(onlyFields ...string) param.Store {
 
 func (a *NgingUser) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint(value)
@@ -803,6 +806,125 @@ func (a *NgingUser) FromRow(row map[string]interface{}) {
 		case "file_num":
 			a.FileNum = param.AsUint64(value)
 		}
+	}
+}
+
+func (a *NgingUser) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "Username":
+		return a.Username
+	case "Email":
+		return a.Email
+	case "Mobile":
+		return a.Mobile
+	case "Password":
+		return a.Password
+	case "Salt":
+		return a.Salt
+	case "SafePwd":
+		return a.SafePwd
+	case "SessionId":
+		return a.SessionId
+	case "Avatar":
+		return a.Avatar
+	case "Gender":
+		return a.Gender
+	case "LastLogin":
+		return a.LastLogin
+	case "LastIp":
+		return a.LastIp
+	case "LoginFails":
+		return a.LoginFails
+	case "Disabled":
+		return a.Disabled
+	case "Online":
+		return a.Online
+	case "RoleIds":
+		return a.RoleIds
+	case "Created":
+		return a.Created
+	case "Updated":
+		return a.Updated
+	case "FileSize":
+		return a.FileSize
+	case "FileNum":
+		return a.FileNum
+	default:
+		return nil
+	}
+}
+
+func (a *NgingUser) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"Username",
+		"Email",
+		"Mobile",
+		"Password",
+		"Salt",
+		"SafePwd",
+		"SessionId",
+		"Avatar",
+		"Gender",
+		"LastLogin",
+		"LastIp",
+		"LoginFails",
+		"Disabled",
+		"Online",
+		"RoleIds",
+		"Created",
+		"Updated",
+		"FileSize",
+		"FileNum",
+	}
+}
+
+func (a *NgingUser) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "Username":
+		return true
+	case "Email":
+		return true
+	case "Mobile":
+		return true
+	case "Password":
+		return true
+	case "Salt":
+		return true
+	case "SafePwd":
+		return true
+	case "SessionId":
+		return true
+	case "Avatar":
+		return true
+	case "Gender":
+		return true
+	case "LastLogin":
+		return true
+	case "LastIp":
+		return true
+	case "LoginFails":
+		return true
+	case "Disabled":
+		return true
+	case "Online":
+		return true
+	case "RoleIds":
+		return true
+	case "Created":
+		return true
+	case "Updated":
+		return true
+	case "FileSize":
+		return true
+	case "FileNum":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -943,17 +1065,19 @@ func (a *NgingUser) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *NgingUser) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *NgingUser) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *NgingUser) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *NgingUser) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *NgingUser) BatchValidate(kvset map[string]interface{}) error {

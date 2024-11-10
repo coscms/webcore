@@ -460,7 +460,7 @@ func (a *NgingKv) UpdateFields(mw func(db.Result) db.Result, kvset map[string]in
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -485,7 +485,7 @@ func (a *NgingKv) UpdatexFields(mw func(db.Result) db.Result, kvset map[string]i
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -642,6 +642,9 @@ func (a *NgingKv) AsMap(onlyFields ...string) param.Store {
 
 func (a *NgingKv) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint(value)
@@ -662,6 +665,70 @@ func (a *NgingKv) FromRow(row map[string]interface{}) {
 		case "child_key_type":
 			a.ChildKeyType = param.AsString(value)
 		}
+	}
+}
+
+func (a *NgingKv) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "Key":
+		return a.Key
+	case "Value":
+		return a.Value
+	case "Description":
+		return a.Description
+	case "Help":
+		return a.Help
+	case "Type":
+		return a.Type
+	case "Sort":
+		return a.Sort
+	case "Updated":
+		return a.Updated
+	case "ChildKeyType":
+		return a.ChildKeyType
+	default:
+		return nil
+	}
+}
+
+func (a *NgingKv) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"Key",
+		"Value",
+		"Description",
+		"Help",
+		"Type",
+		"Sort",
+		"Updated",
+		"ChildKeyType",
+	}
+}
+
+func (a *NgingKv) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "Key":
+		return true
+	case "Value":
+		return true
+	case "Description":
+		return true
+	case "Help":
+		return true
+	case "Type":
+		return true
+	case "Sort":
+		return true
+	case "Updated":
+		return true
+	case "ChildKeyType":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -747,17 +814,19 @@ func (a *NgingKv) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *NgingKv) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *NgingKv) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *NgingKv) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *NgingKv) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *NgingKv) BatchValidate(kvset map[string]interface{}) error {

@@ -492,7 +492,7 @@ func (a *NgingTask) UpdateFields(mw func(db.Result) db.Result, kvset map[string]
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -522,7 +522,7 @@ func (a *NgingTask) UpdatexFields(mw func(db.Result) db.Result, kvset map[string
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -730,6 +730,9 @@ func (a *NgingTask) AsMap(onlyFields ...string) param.Store {
 
 func (a *NgingTask) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint(value)
@@ -772,6 +775,125 @@ func (a *NgingTask) FromRow(row map[string]interface{}) {
 		case "closed_log":
 			a.ClosedLog = param.AsString(value)
 		}
+	}
+}
+
+func (a *NgingTask) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "Uid":
+		return a.Uid
+	case "GroupId":
+		return a.GroupId
+	case "Name":
+		return a.Name
+	case "Type":
+		return a.Type
+	case "Description":
+		return a.Description
+	case "CronSpec":
+		return a.CronSpec
+	case "Concurrent":
+		return a.Concurrent
+	case "Command":
+		return a.Command
+	case "WorkDirectory":
+		return a.WorkDirectory
+	case "Env":
+		return a.Env
+	case "Disabled":
+		return a.Disabled
+	case "EnableNotify":
+		return a.EnableNotify
+	case "NotifyEmail":
+		return a.NotifyEmail
+	case "Timeout":
+		return a.Timeout
+	case "ExecuteTimes":
+		return a.ExecuteTimes
+	case "PrevTime":
+		return a.PrevTime
+	case "Created":
+		return a.Created
+	case "Updated":
+		return a.Updated
+	case "ClosedLog":
+		return a.ClosedLog
+	default:
+		return nil
+	}
+}
+
+func (a *NgingTask) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"Uid",
+		"GroupId",
+		"Name",
+		"Type",
+		"Description",
+		"CronSpec",
+		"Concurrent",
+		"Command",
+		"WorkDirectory",
+		"Env",
+		"Disabled",
+		"EnableNotify",
+		"NotifyEmail",
+		"Timeout",
+		"ExecuteTimes",
+		"PrevTime",
+		"Created",
+		"Updated",
+		"ClosedLog",
+	}
+}
+
+func (a *NgingTask) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "Uid":
+		return true
+	case "GroupId":
+		return true
+	case "Name":
+		return true
+	case "Type":
+		return true
+	case "Description":
+		return true
+	case "CronSpec":
+		return true
+	case "Concurrent":
+		return true
+	case "Command":
+		return true
+	case "WorkDirectory":
+		return true
+	case "Env":
+		return true
+	case "Disabled":
+		return true
+	case "EnableNotify":
+		return true
+	case "NotifyEmail":
+		return true
+	case "Timeout":
+		return true
+	case "ExecuteTimes":
+		return true
+	case "PrevTime":
+		return true
+	case "Created":
+		return true
+	case "Updated":
+		return true
+	case "ClosedLog":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -912,17 +1034,19 @@ func (a *NgingTask) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *NgingTask) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *NgingTask) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *NgingTask) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *NgingTask) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *NgingTask) BatchValidate(kvset map[string]interface{}) error {

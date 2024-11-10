@@ -476,7 +476,7 @@ func (a *NgingFileEmbedded) UpdateFields(mw func(db.Result) db.Result, kvset map
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -506,7 +506,7 @@ func (a *NgingFileEmbedded) UpdatexFields(mw func(db.Result) db.Result, kvset ma
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -660,6 +660,9 @@ func (a *NgingFileEmbedded) AsMap(onlyFields ...string) param.Store {
 
 func (a *NgingFileEmbedded) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint64(value)
@@ -676,6 +679,60 @@ func (a *NgingFileEmbedded) FromRow(row map[string]interface{}) {
 		case "embedded":
 			a.Embedded = param.AsString(value)
 		}
+	}
+}
+
+func (a *NgingFileEmbedded) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "Project":
+		return a.Project
+	case "TableId":
+		return a.TableId
+	case "TableName":
+		return a.TableName
+	case "FieldName":
+		return a.FieldName
+	case "FileIds":
+		return a.FileIds
+	case "Embedded":
+		return a.Embedded
+	default:
+		return nil
+	}
+}
+
+func (a *NgingFileEmbedded) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"Project",
+		"TableId",
+		"TableName",
+		"FieldName",
+		"FileIds",
+		"Embedded",
+	}
+}
+
+func (a *NgingFileEmbedded) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "Project":
+		return true
+	case "TableId":
+		return true
+	case "TableName":
+		return true
+	case "FieldName":
+		return true
+	case "FileIds":
+		return true
+	case "Embedded":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -751,17 +808,19 @@ func (a *NgingFileEmbedded) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *NgingFileEmbedded) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *NgingFileEmbedded) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *NgingFileEmbedded) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *NgingFileEmbedded) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *NgingFileEmbedded) BatchValidate(kvset map[string]interface{}) error {

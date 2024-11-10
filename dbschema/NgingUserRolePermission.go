@@ -426,7 +426,7 @@ func (a *NgingUserRolePermission) UpdateFields(mw func(db.Result) db.Result, kvs
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -446,7 +446,7 @@ func (a *NgingUserRolePermission) UpdatexFields(mw func(db.Result) db.Result, kv
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -565,6 +565,9 @@ func (a *NgingUserRolePermission) AsMap(onlyFields ...string) param.Store {
 
 func (a *NgingUserRolePermission) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "role_id":
 			a.RoleId = param.AsUint(value)
@@ -573,6 +576,40 @@ func (a *NgingUserRolePermission) FromRow(row map[string]interface{}) {
 		case "permission":
 			a.Permission = param.AsString(value)
 		}
+	}
+}
+
+func (a *NgingUserRolePermission) GetField(field string) interface{} {
+	switch field {
+	case "RoleId":
+		return a.RoleId
+	case "Type":
+		return a.Type
+	case "Permission":
+		return a.Permission
+	default:
+		return nil
+	}
+}
+
+func (a *NgingUserRolePermission) GetAllFieldNames() []string {
+	return []string{
+		"RoleId",
+		"Type",
+		"Permission",
+	}
+}
+
+func (a *NgingUserRolePermission) HasField(field string) bool {
+	switch field {
+	case "RoleId":
+		return true
+	case "Type":
+		return true
+	case "Permission":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -628,17 +665,19 @@ func (a *NgingUserRolePermission) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *NgingUserRolePermission) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *NgingUserRolePermission) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *NgingUserRolePermission) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *NgingUserRolePermission) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *NgingUserRolePermission) BatchValidate(kvset map[string]interface{}) error {

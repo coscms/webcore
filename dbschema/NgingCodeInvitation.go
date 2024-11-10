@@ -462,7 +462,7 @@ func (a *NgingCodeInvitation) UpdateFields(mw func(db.Result) db.Result, kvset m
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -487,7 +487,7 @@ func (a *NgingCodeInvitation) UpdatexFields(mw func(db.Result) db.Result, kvset 
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -648,6 +648,9 @@ func (a *NgingCodeInvitation) AsMap(onlyFields ...string) param.Store {
 
 func (a *NgingCodeInvitation) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint(value)
@@ -670,6 +673,75 @@ func (a *NgingCodeInvitation) FromRow(row map[string]interface{}) {
 		case "role_ids":
 			a.RoleIds = param.AsString(value)
 		}
+	}
+}
+
+func (a *NgingCodeInvitation) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "Uid":
+		return a.Uid
+	case "RecvUid":
+		return a.RecvUid
+	case "Code":
+		return a.Code
+	case "Created":
+		return a.Created
+	case "Used":
+		return a.Used
+	case "Start":
+		return a.Start
+	case "End":
+		return a.End
+	case "Disabled":
+		return a.Disabled
+	case "RoleIds":
+		return a.RoleIds
+	default:
+		return nil
+	}
+}
+
+func (a *NgingCodeInvitation) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"Uid",
+		"RecvUid",
+		"Code",
+		"Created",
+		"Used",
+		"Start",
+		"End",
+		"Disabled",
+		"RoleIds",
+	}
+}
+
+func (a *NgingCodeInvitation) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "Uid":
+		return true
+	case "RecvUid":
+		return true
+	case "Code":
+		return true
+	case "Created":
+		return true
+	case "Used":
+		return true
+	case "Start":
+		return true
+	case "End":
+		return true
+	case "Disabled":
+		return true
+	case "RoleIds":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -760,17 +832,19 @@ func (a *NgingCodeInvitation) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *NgingCodeInvitation) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *NgingCodeInvitation) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *NgingCodeInvitation) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *NgingCodeInvitation) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *NgingCodeInvitation) BatchValidate(kvset map[string]interface{}) error {
