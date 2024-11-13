@@ -42,8 +42,13 @@ func (c *captchaGo) Render(ctx echo.Context, templatePath string, keysValues ...
 		jsURL = c.jsURL
 	}
 	options.Set("jsURL", jsURL)
-	c.captchaID = com.RandomAlphanumeric(16)
+	if len(c.captchaID) == 0 {
+		c.captchaID = com.RandomAlphanumeric(16)
+	}
 	options.Set("captchaID", c.captchaID)
+	if !options.Has("captchaName") {
+		options.Set("captchaName", "captchaGo")
+	}
 	return captchaLib.RenderTemplate(ctx, captchaLib.TypeGo, templatePath, options)
 }
 
@@ -56,7 +61,11 @@ func (c *captchaGo) Verify(ctx echo.Context, hostAlias string, captchaName strin
 	} else {
 		idGet = ctx.FormValues
 	}
-	id := idGet("captchaGo")
+	id := idGet(captchaName)
+	if len(id) == 0 {
+		captchaName = "captchaGo"
+		id = idGet(captchaName)
+	}
 	if len(id) == 0 { // 为空说明表单没有显示验证码输入框，此时返回验证码信息供前端显示
 		return ctx.Data().SetInfo(ctx.T(`行为验证码显示失败`), captchaLib.ErrCaptchaIdMissing.Code.Int())
 	}
@@ -74,31 +83,13 @@ func (c *captchaGo) MakeData(ctx echo.Context, hostAlias string, name string) ec
 	data := echo.H{}
 	data.Set("driver", c.driver)
 	data.Set("type", c.cType)
-	data.Set("jsURL", c.jsURL)
 	if len(c.captchaID) == 0 {
 		c.captchaID = com.RandomAlphanumeric(16)
 	}
 	data.Set("captchaType", captchaLib.TypeGo)
 	data.Set("captchaID", c.captchaID)
-	locationID := `captchago-` + c.captchaID
-	var jsCallback string
-	jsInit := `(function(){
-    var baseURL=IS_BACKEND?BACKEND_URL:FRONTEND_URL;
-    $('#` + locationID + `').captcha({
-        api:baseURL+'/captchago',
-        success:function(){
-        },
-        error:function(){
-        }
-    });
-	})()`
-	htmlCode := ``
-	var captchaName string
-	data.Set("jsCallback", jsCallback)
-	data.Set("jsInit", jsInit)
-	data.Set("locationID", locationID)
+	htmlCode := c.Render(ctx, ``)
 	data.Set("html", htmlCode)
-	data.Set("captchaIdent", `captchaGo`)
-	data.Set("captchaName", captchaName)
+	data.Set("captchaName", name)
 	return data
 }

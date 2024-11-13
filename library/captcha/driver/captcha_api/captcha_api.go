@@ -64,6 +64,14 @@ func (c *captchaAPI) Render(ctx echo.Context, templatePath string, keysValues ..
 	options.Set("jsURL", jsURL)
 	c.captchaID = com.RandomAlphanumeric(16)
 	options.Set("captchaID", c.captchaID)
+	if !options.Has("captchaName") {
+		switch c.endpoint {
+		case captcha.CloudflareTurnstile:
+			options.Set("captchaName", "cf-turnstile-response")
+		default:
+			options.Set("captchaName", "g-recaptcha-response")
+		}
+	}
 	if len(templatePath) == 0 {
 		var htmlContent string
 		switch c.endpoint {
@@ -136,7 +144,7 @@ window.addEventListener('load', function(){
 	return captchaLib.RenderTemplate(ctx, captchaLib.TypeAPI, templatePath, options)
 }
 
-func (c *captchaAPI) Verify(ctx echo.Context, hostAlias string, _ string, _ ...string) echo.Data {
+func (c *captchaAPI) Verify(ctx echo.Context, hostAlias string, captchaName string, _ ...string) echo.Data {
 	var name string
 	switch c.endpoint {
 	case captcha.CloudflareTurnstile:
@@ -154,10 +162,15 @@ func (c *captchaAPI) Verify(ctx echo.Context, hostAlias string, _ string, _ ...s
 	if len(c.captchaID) == 0 {
 		return captchaLib.GenCaptchaError(ctx, captchaLib.ErrCaptchaIdMissing, name, c.MakeData(ctx, hostAlias, name))
 	}
-	token := ctx.Form(name)
-	if len(token) == 0 { // 为空说明没有验证码
-		return ctx.Data().SetError(captchaLib.ErrCaptchaCodeRequired.SetMessage(ctx.T(`请先进行人机验证`)).SetZone(name))
+	vcode := ctx.FormValues(captchaName)
+	if len(vcode) == 0 {
+		captchaName = name
+		vcode = ctx.FormValues(captchaName)
 	}
+	if len(vcode) == 0 { // 为空说明没有验证码
+		return ctx.Data().SetInfo(ctx.T(`请先进行人机验证`), captchaLib.ErrCaptchaCodeRequired.Code.Int()).SetZone(name)
+	}
+	token := vcode[0]
 	c.verifier.ExpectedHostname = ctx.Domain()
 	var clientIP string
 	if c.cfg.Bool(`verifyIP`) {
@@ -169,7 +182,8 @@ func (c *captchaAPI) Verify(ctx echo.Context, hostAlias string, _ string, _ ...s
 	}
 	if !ok {
 		log.Warnf(`failed to captchaAPI.Verify: %s`, formatter.AsStringer(resp))
-		return captchaLib.GenCaptchaError(ctx, captchaLib.ErrCaptcha.SetMessage(ctx.T(`抱歉，未能通过人机验证`)), name, c.MakeData(ctx, hostAlias, name))
+		data := captchaLib.GenCaptchaError(ctx, nil, name, c.MakeData(ctx, hostAlias, name))
+		return data.SetInfo(ctx.T(`未能通过人机验证，请重试`), captchaLib.ErrCaptcha.Code.Int())
 	}
 	return ctx.Data().SetCode(code.Success.Int())
 }
