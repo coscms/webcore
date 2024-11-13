@@ -21,6 +21,9 @@ func (c *defaultCaptcha) Init(_ echo.H) error {
 func (c *defaultCaptcha) Render(ctx echo.Context, templatePath string, keysValues ...interface{}) template.HTML {
 	options := tplfunc.MakeMap(keysValues)
 	options.Set("captchaId", GetHistoryOrNewCaptchaID(ctx, hdlCaptcha.DefaultOptions))
+	if !options.Has("captchaName") {
+		options.Set("captchaName", "code")
+	}
 	if len(templatePath) == 0 {
 		return tplfunc.CaptchaFormWithURLPrefix(ctx.Echo().Prefix(), options)
 	}
