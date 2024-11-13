@@ -15,7 +15,9 @@ func GenCaptchaError(ctx echo.Context, err error, captchaName string, data inter
 	d := ctx.Data()
 	d.SetZone(captchaName)
 	d.SetData(data)
-	d.SetError(err)
+	if err != nil {
+		d.SetError(err)
+	}
 	return d
 }
 
