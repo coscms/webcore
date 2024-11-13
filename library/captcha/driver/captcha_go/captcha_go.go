@@ -12,13 +12,27 @@ import (
 
 func newCaptchaGo() captchaLib.ICaptcha {
 	initialized.Do(initialize)
-	return &captchaGo{jsURL: `1`}
+	return &captchaGo{}
 }
+
+var (
+	cssURLs = []string{
+		`/js/captchago/css/style.css`,
+	}
+	jsURLs = []string{
+		`/js/captchago/css/style.css`,
+		`/js/captchago/js/common.js`,
+		`/js/captchago/js/click.js`,
+		`/js/captchago/js/rotate.js`,
+		`/js/captchago/js/slide-basic.js`,
+		`/js/captchago/js/slide-region.js`,
+		`/js/captchago/js/jquery.captcha.js.js`,
+	}
+)
 
 type captchaGo struct {
 	driver    string
 	cType     string
-	jsURL     string
 	captchaID string
 	cfg       echo.H
 }
@@ -35,13 +49,13 @@ func (c *captchaGo) Render(ctx echo.Context, templatePath string, keysValues ...
 	options := tplfunc.MakeMap(keysValues)
 	options.Set("driver", c.driver)
 	options.Set("type", c.cType)
-	initedKey := `CaptchaGoJSInited.` + c.driver
-	var jsURL string
+	initedKey := `CaptchaGoJSInited`
+	var loadResource bool
 	if !ctx.Internal().Bool(initedKey) {
 		ctx.Internal().Set(initedKey, true)
-		jsURL = c.jsURL
+		loadResource = true
 	}
-	options.Set("jsURL", jsURL)
+	options.Set("loadResource", loadResource)
 	if len(c.captchaID) == 0 {
 		c.captchaID = com.RandomAlphanumeric(16)
 	}
@@ -49,6 +63,8 @@ func (c *captchaGo) Render(ctx echo.Context, templatePath string, keysValues ...
 	if !options.Has("captchaName") {
 		options.Set("captchaName", "captchaGo")
 	}
+	options.Set("jsURLs", jsURLs)
+	options.Set("cssURLs", cssURLs)
 	return captchaLib.RenderTemplate(ctx, captchaLib.TypeGo, templatePath, options)
 }
 
@@ -90,7 +106,11 @@ func (c *captchaGo) MakeData(ctx echo.Context, hostAlias string, name string) ec
 	}
 	data.Set("captchaType", captchaLib.TypeGo)
 	data.Set("captchaID", c.captchaID)
-	htmlCode := c.Render(ctx, `default`)
+	data.Set("jsURLs", jsURLs)
+	data.Set("cssURLs", cssURLs)
+	jsInit := c.Render(ctx, `jsinit`)
+	data.Set("jsInit", jsInit)
+	htmlCode := c.Render(ctx, `main`)
 	data.Set("html", htmlCode)
 	data.Set("captchaName", name)
 	return data
