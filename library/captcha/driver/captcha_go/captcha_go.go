@@ -25,7 +25,8 @@ type captchaGo struct {
 
 func (c *captchaGo) Init(opt echo.H) error {
 	c.driver = opt.String(`driver`, `click`)
-	c.cType = opt.String(`type`, `basic`)
+	c.cfg = opt.GetStore(c.driver)
+	c.cType = c.cfg.String(`type`, `basic`)
 	return nil
 }
 
