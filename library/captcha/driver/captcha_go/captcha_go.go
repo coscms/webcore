@@ -108,9 +108,9 @@ func (c *captchaGo) MakeData(ctx echo.Context, hostAlias string, name string) ec
 	data.Set("captchaID", c.captchaID)
 	data.Set("jsURLs", jsURLs)
 	data.Set("cssURLs", cssURLs)
-	jsInit := c.Render(ctx, `jsinit`)
+	jsInit := c.Render(ctx, `partial_jsinit`)
 	data.Set("jsInit", jsInit)
-	htmlCode := c.Render(ctx, `main`)
+	htmlCode := c.Render(ctx, `partial_main`)
 	data.Set("html", htmlCode)
 	data.Set("captchaName", name)
 	return data
