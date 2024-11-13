@@ -45,19 +45,22 @@ func (c *captchaGo) Render(ctx echo.Context, templatePath string, keysValues ...
 }
 
 func (c *captchaGo) Verify(ctx echo.Context, hostAlias string, captchaName string, captchaIdent ...string) echo.Data {
-	var idGet func(name string, defaults ...string) string
+	var idGet func(name string) []string
 	if len(captchaIdent) > 0 {
-		idGet = func(_ string, defaults ...string) string {
-			return ctx.Form(captchaIdent[0], defaults...)
+		idGet = func(_ string) []string {
+			return ctx.FormValues(captchaIdent[0])
 		}
 	} else {
-		idGet = ctx.Form
+		idGet = ctx.FormValues
 	}
 	id := idGet("captchaGo")
 	if len(id) == 0 { // 为空说明表单没有显示验证码输入框，此时返回验证码信息供前端显示
 		return ctx.Data().SetError(captchaLib.ErrCaptchaIdMissing)
 	}
-	if !captchaGoVerifySuccessKey(ctx, id, true) {
+	if len(id[0]) == 0 {
+		return captchaLib.GenCaptchaError(ctx, captchaLib.ErrCaptcha, captchaName, nil)
+	}
+	if !captchaGoVerifySuccessKey(ctx, id[0], true) {
 		return captchaLib.GenCaptchaError(ctx, captchaLib.ErrCaptcha, captchaName, c.MakeData(ctx, hostAlias, captchaName))
 	}
 	return ctx.Data().SetCode(code.Success.Int())
