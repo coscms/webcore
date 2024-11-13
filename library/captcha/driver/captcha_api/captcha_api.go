@@ -169,7 +169,7 @@ func (c *captchaAPI) Verify(ctx echo.Context, hostAlias string, captchaName stri
 	}
 	if len(vcode) == 0 || len(vcode[0]) == 0 { // 为空说明没有验证码
 		data := captchaLib.GenCaptchaError(ctx, nil, captchaName, c.MakeData(ctx, hostAlias, captchaName))
-		return data.SetInfo(ctx.T(`请先进行人机验证`), captchaLib.ErrCaptchaCodeRequired.Code.Int()).SetZone(captchaName)
+		return data.SetInfo(ctx.T(`请先进行人机验证`), captchaLib.ErrCaptchaCodeRequired.Code.Int())
 	}
 	token := vcode[0]
 	c.verifier.ExpectedHostname = ctx.Domain()
