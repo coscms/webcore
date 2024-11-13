@@ -16,29 +16,25 @@ func newCaptchaGo() captchaLib.ICaptcha {
 }
 
 type captchaGo struct {
-	provider    string
-	driver      string
-	captchaType string
-	jsURL       string
-	captchaID   string
-	cfg         echo.H
+	driver    string
+	cType     string
+	jsURL     string
+	captchaID string
+	cfg       echo.H
 }
 
 func (c *captchaGo) Init(opt echo.H) error {
-	c.provider = opt.String(`provider`)
 	c.driver = opt.String(`driver`, `click`)
-	c.captchaType = opt.String(`captchaType`, `basic`)
-	c.cfg = opt.GetStore(c.provider)
+	c.cType = opt.String(`type`, `basic`)
 	return nil
 }
 
 // keysValues: key1, value1, key2, value2
 func (c *captchaGo) Render(ctx echo.Context, templatePath string, keysValues ...interface{}) template.HTML {
 	options := tplfunc.MakeMap(keysValues)
-	options.Set("provider", c.provider)
 	options.Set("driver", c.driver)
-	options.Set("type", c.captchaType)
-	initedKey := `CaptchaGoJSInited.` + c.provider
+	options.Set("type", c.cType)
+	initedKey := `CaptchaGoJSInited.` + c.driver
 	var jsURL string
 	if !ctx.Internal().Bool(initedKey) {
 		ctx.Internal().Set(initedKey, true)
@@ -75,7 +71,8 @@ func (c *captchaGo) Verify(ctx echo.Context, hostAlias string, captchaName strin
 
 func (c *captchaGo) MakeData(ctx echo.Context, hostAlias string, name string) echo.H {
 	data := echo.H{}
-	data.Set("provider", c.provider)
+	data.Set("driver", c.driver)
+	data.Set("type", c.cType)
 	data.Set("jsURL", c.jsURL)
 	if len(c.captchaID) == 0 {
 		c.captchaID = com.RandomAlphanumeric(16)
