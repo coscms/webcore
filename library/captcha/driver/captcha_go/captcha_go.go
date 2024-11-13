@@ -90,7 +90,7 @@ func (c *captchaGo) MakeData(ctx echo.Context, hostAlias string, name string) ec
 	}
 	data.Set("captchaType", captchaLib.TypeGo)
 	data.Set("captchaID", c.captchaID)
-	htmlCode := c.Render(ctx, ``)
+	htmlCode := c.Render(ctx, `default`)
 	data.Set("html", htmlCode)
 	data.Set("captchaName", name)
 	return data
