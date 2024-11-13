@@ -16,14 +16,18 @@ func newCaptchaGo() captchaLib.ICaptcha {
 }
 
 type captchaGo struct {
-	provider  string
-	jsURL     string
-	captchaID string
-	cfg       echo.H
+	provider    string
+	driver      string
+	captchaType string
+	jsURL       string
+	captchaID   string
+	cfg         echo.H
 }
 
 func (c *captchaGo) Init(opt echo.H) error {
 	c.provider = opt.String(`provider`)
+	c.driver = opt.String(`driver`, `click`)
+	c.captchaType = opt.String(`captchaType`, `basic`)
 	c.cfg = opt.GetStore(c.provider)
 	return nil
 }
@@ -32,6 +36,8 @@ func (c *captchaGo) Init(opt echo.H) error {
 func (c *captchaGo) Render(ctx echo.Context, templatePath string, keysValues ...interface{}) template.HTML {
 	options := tplfunc.MakeMap(keysValues)
 	options.Set("provider", c.provider)
+	options.Set("driver", c.driver)
+	options.Set("type", c.captchaType)
 	initedKey := `CaptchaGoJSInited.` + c.provider
 	var jsURL string
 	if !ctx.Internal().Bool(initedKey) {
