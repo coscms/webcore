@@ -36,6 +36,7 @@ func CaptchaGoVerify(ctx echo.Context) error {
 	if err != nil {
 		return ctx.JSON(resp.SetError(err.Error()))
 	}
+	captchaGoSetSuccessKey(ctx, key)
 	return ctx.JSON(resp.SetSuccess())
 }
 
