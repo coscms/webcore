@@ -53,7 +53,7 @@ require (
 	github.com/admpub/web-terminal v0.2.1
 	github.com/aws/aws-sdk-go v1.55.5
 	github.com/caddy-plugins/webdav v1.2.10
-	github.com/coscms/captcha v0.0.0-20241113084529-2e8b3b66dea5
+	github.com/coscms/captcha v0.0.0-20241113094847-a87ffd4b43b8
 	github.com/coscms/forms v1.12.2
 	github.com/coscms/go-imgparse v0.0.1
 	github.com/coscms/oauth2s v0.4.1
@@ -97,6 +97,7 @@ require (
 	github.com/admpub/fasthttp v0.0.5 // indirect
 	github.com/admpub/fsnotify v1.7.0 // indirect
 	github.com/admpub/gifresize v1.0.2 // indirect
+	github.com/admpub/go-captcha/v2 v2.0.2 // indirect
 	github.com/admpub/go-reuseport v0.0.4 // indirect
 	github.com/admpub/go-utility v0.0.1 // indirect
 	github.com/admpub/gohttp v0.0.0-20190322032039-b55c707b8f1e // indirect
@@ -215,7 +216,6 @@ require (
 	github.com/webx-top/poolx v0.0.0-20210912044716-5cfa2d58e380 // indirect
 	github.com/webx-top/tagfast v0.0.1 // indirect
 	github.com/wenlng/go-captcha-assets v1.0.1 // indirect
-	github.com/wenlng/go-captcha/v2 v2.0.1 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	go.etcd.io/bbolt v1.3.11 // indirect
 	go.uber.org/mock v0.5.0 // indirect

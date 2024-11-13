@@ -680,6 +680,8 @@ github.com/admpub/gifresize v1.0.2 h1:aFLkKkdyfyg4OIl84R2xA/q/+itFd/mOlGPnhIAbq8
 github.com/admpub/gifresize v1.0.2/go.mod h1:4cJFfCR1yfgyq7lZiQZomEGeR/OVQVPeflN38P0T+M0=
 github.com/admpub/go-bindata-assetfs v0.0.0-20170428090253-36eaa4c19588 h1:OzETPaPe3vghcMkx/J6VpnNFg+Sd8TiQ5L+xaty3vJY=
 github.com/admpub/go-bindata-assetfs v0.0.0-20170428090253-36eaa4c19588/go.mod h1:ukjkgape3aExDbQ8N5uIbsU2m/dHL800EdWSSl46ECc=
+github.com/admpub/go-captcha/v2 v2.0.2 h1:tAgVK4zIBaIacRSJhC3g7Ew9PaRe07cXhTk9fbh3KtE=
+github.com/admpub/go-captcha/v2 v2.0.2/go.mod h1:UwwIyP2m1/ugC/zoWAfz0GjenaxWWSAg1ZJerpbbmXk=
 github.com/admpub/go-download/v2 v2.1.15 h1:MWGYEzBgRS1Fe/5q7rI5ss91bUIjZSIY4DjJxLjODY8=
 github.com/admpub/go-download/v2 v2.1.15/go.mod h1:i9ZAXwXjSfMTF3Qp165OzwEQY8nfUShUbUiu92puJJE=
 github.com/admpub/go-figure v0.0.0-20180619031829-18b2b544842c h1:oYhSKy3uos97Kbr+Z0ussJh/xaAHxk8LZJSyyRnZ2l4=
@@ -879,8 +881,8 @@ github.com/coreos/go-systemd v0.0.0-20181012123002-c6f51f82210d/go.mod h1:F5haX7
 github.com/coreos/go-systemd v0.0.0-20190321100706-95778dfbb74e/go.mod h1:F5haX7vjVVG0kc13fIWeqUViNPyEJxv/OmvnBo0Yme4=
 github.com/coreos/go-systemd/v22 v22.3.2/go.mod h1:Y58oyj3AT4RCenI/lSvhwexgC+NSVTIJ3seZv2GcEnc=
 github.com/coreos/pkg v0.0.0-20180928190104-399ea9e2e55f/go.mod h1:E3G3o1h8I7cfcXa63jLwjI0eiQQMgzzUDFVpN/nH/eA=
-github.com/coscms/captcha v0.0.0-20241113084529-2e8b3b66dea5 h1:I9g+EMLfU55tCDj/DPzV/uERjtmvNS2Yb3Ureq/Hbos=
-github.com/coscms/captcha v0.0.0-20241113084529-2e8b3b66dea5/go.mod h1:D9V+MCLjxToPeHNyDW7//4kcgqDQLCANH05OYRj89fw=
+github.com/coscms/captcha v0.0.0-20241113094847-a87ffd4b43b8 h1:p92obZujZbwBzrZMf6sIfgukx1QOnkVDOlTd/fM6Wcc=
+github.com/coscms/captcha v0.0.0-20241113094847-a87ffd4b43b8/go.mod h1:3lIe0hRvCHxGZLMJ3MsNjC457SihnjE1ybKa3j88f4Y=
 github.com/coscms/forms v1.12.2 h1:ag3NvoXNWiVTUcbeO4cukkMPhe5XAMYbq462ZG8x2Zg=
 github.com/coscms/forms v1.12.2/go.mod h1:WsTYDKG+4cXt1wBNsqv9hFJ34sdkRHai9n/scu4ap2g=
 github.com/coscms/go-imgparse v0.0.1 h1:RMnw3/VtfTOil3SdukPgdGm4xmO5KoQpyVNtPKuFKFY=
@@ -1806,8 +1808,6 @@ github.com/webx-top/validator v0.3.0 h1:LjbZL0qL4pmYH/7BeQJ4GehgNuDBbjUVWKmX2K8q
 github.com/webx-top/validator v0.3.0/go.mod h1:ymozAcEIO2os3TW25D0J75QFzyCSU0kH9iAOPETKjUw=
 github.com/wenlng/go-captcha-assets v1.0.1 h1:AdjRFMKmadPRWRTv0XEYfjDvcaayZ2yExITDvlK/7bk=
 github.com/wenlng/go-captcha-assets v1.0.1/go.mod h1:yQqc7rRbxgLCg+tWtVp+7Y317D1wIZDan/yIwt8wSac=
-github.com/wenlng/go-captcha/v2 v2.0.1 h1:N6XSHymJ7e9Z/LyWWTWLMAkAXtW27ZROZpvNrqPhSnA=
-github.com/wenlng/go-captcha/v2 v2.0.1/go.mod h1:5hac1em3uXoyC5ipZ0xFv9umNM/waQvYAQdr0cx/h34=
 github.com/willf/bitset v1.1.11/go.mod h1:83CECat5yLh5zVOf4P1ErAgKA5UDvKtgyUABdr3+MjI=
 github.com/xeipuuv/gojsonpointer v0.0.0-20180127040702-4e3ac2762d5f h1:J9EGpcZtP0E/raorCMxlFGSTBrsSlaDGf3jU/qvAE2c=
 github.com/xeipuuv/gojsonpointer v0.0.0-20180127040702-4e3ac2762d5f/go.mod h1:N2zxlSyiKSe5eX1tZViRH5QA0qijqEDrYZiPEAiq3wU=
