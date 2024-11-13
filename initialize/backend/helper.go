@@ -26,6 +26,9 @@ import (
 	"github.com/webx-top/echo/handler/captcha"
 	"github.com/webx-top/echo/middleware/render"
 
+	captchaLib "github.com/coscms/webcore/library/captcha"
+	"github.com/coscms/webcore/library/captcha/captchabiz"
+	"github.com/coscms/webcore/library/captcha/driver/captcha_go"
 	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webcore/library/nerrors"
 	"github.com/coscms/webcore/library/nretry"
@@ -90,6 +93,10 @@ func DefaultConfigWatcher(mustOk bool) {
 
 func addRouter() {
 	captcha.New(``).Wrapper(route.IRegister().Echo()).SetMetaKV(route.PermGuestKV())
+
+	captchaGoG := route.IRegister().Echo().Group(`/captchago`, captchabiz.CheckEnable(captchaLib.TypeGo)).SetMetaKV(route.PermGuestKV())
+	captcha_go.RegisterRoute(captchaGoG)
+
 	route.UseToGroup(`*`, middleware.AuthCheck) //应用中间件到所有子组
 	route.Apply()
 }

@@ -7,6 +7,9 @@ import (
 	"github.com/coscms/webcore/library/config"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/code"
+
+	_ "github.com/coscms/webcore/library/captcha/driver/captcha_api"
+	_ "github.com/coscms/webcore/library/captcha/driver/captcha_go"
 )
 
 func GetCaptchaEngine(ctx echo.Context, types ...string) (captcha.ICaptcha, error) {
@@ -69,4 +72,17 @@ func CaptchaFormWithType(ctx echo.Context, captchaType string, tmpl string, args
 		return template.HTML(err.Error())
 	}
 	return cpt.Render(ctx, tmpl, args...)
+}
+
+func CheckEnable(typ string) func(h echo.Handler) echo.HandlerFunc {
+	return func(h echo.Handler) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			cfg := config.FromDB().GetStore(`captcha`)
+			if cfg.String(`type`, captcha.TypeDefault) != typ {
+				return echo.ErrNotFound
+			}
+
+			return h.Handle(c)
+		}
+	}
 }

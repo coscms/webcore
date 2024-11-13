@@ -1,4 +1,4 @@
-package captcha
+package captcha_api
 
 import (
 	"html/template"
@@ -6,6 +6,7 @@ import (
 
 	"github.com/admpub/captcha-go"
 	"github.com/admpub/log"
+	captchaLib "github.com/coscms/webcore/library/captcha"
 	"github.com/webx-top/com"
 	"github.com/webx-top/com/formatter"
 	"github.com/webx-top/echo"
@@ -13,7 +14,7 @@ import (
 	"github.com/webx-top/echo/middleware/tplfunc"
 )
 
-func newCaptchaAPI() ICaptcha {
+func newCaptchaAPI() captchaLib.ICaptcha {
 	return &captchaAPI{}
 }
 
@@ -68,7 +69,7 @@ func (c *captchaAPI) Render(ctx echo.Context, templatePath string, keysValues ..
 		switch c.endpoint {
 		case captcha.CloudflareTurnstile:
 			if len(jsURL) > 0 {
-				htmlContent += `<script src="` + jsURL + `" async defer></script>`
+				htmlContent += `<script src="` + jsURL + `"></script>`
 			}
 			locationID := `turnstile-` + c.captchaID
 			htmlContent += `<input type="hidden" name="captchaId" value="` + c.captchaID + `" />`
@@ -96,7 +97,7 @@ window.addEventListener('load', function(){
 			htmlContent += `<input type="hidden" id="` + locationID + `" name="g-recaptcha-response" value="" />`
 			htmlContent += `<input type="hidden" id="` + locationID + `-extend" disabled />`
 			if len(jsURL) > 0 {
-				htmlContent += `<script src="` + jsURL + `" async defer></script>`
+				htmlContent += `<script src="` + jsURL + `"></script>`
 			}
 			htmlContent += `<script>
 window.addEventListener('load', function(){
@@ -132,7 +133,7 @@ window.addEventListener('load', function(){
 		}
 		return template.HTML(htmlContent)
 	}
-	return RenderTemplate(ctx, TypeAPI, templatePath, options)
+	return captchaLib.RenderTemplate(ctx, captchaLib.TypeAPI, templatePath, options)
 }
 
 func (c *captchaAPI) Verify(ctx echo.Context, hostAlias string, _ string, _ ...string) echo.Data {
@@ -151,11 +152,11 @@ func (c *captchaAPI) Verify(ctx echo.Context, hostAlias string, _ string, _ ...s
 	}
 	c.captchaID = ctx.Formx(`captchaId`).String()
 	if len(c.captchaID) == 0 {
-		return GenCaptchaError(ctx, ErrCaptchaIdMissing, name, c.MakeData(ctx, hostAlias, name))
+		return captchaLib.GenCaptchaError(ctx, captchaLib.ErrCaptchaIdMissing, name, c.MakeData(ctx, hostAlias, name))
 	}
 	token := ctx.Form(name)
 	if len(token) == 0 { // 为空说明没有验证码
-		return ctx.Data().SetError(ErrCaptchaCodeRequired.SetMessage(ctx.T(`请先进行人机验证`)).SetZone(name))
+		return ctx.Data().SetError(captchaLib.ErrCaptchaCodeRequired.SetMessage(ctx.T(`请先进行人机验证`)).SetZone(name))
 	}
 	c.verifier.ExpectedHostname = ctx.Domain()
 	var clientIP string
@@ -164,11 +165,11 @@ func (c *captchaAPI) Verify(ctx echo.Context, hostAlias string, _ string, _ ...s
 	}
 	resp, ok, err := c.verifier.VerifyActionWithResponse(token, clientIP, c.verifier.ExpectedAction)
 	if err != nil {
-		return GenCaptchaError(ctx, err, name, c.MakeData(ctx, hostAlias, name))
+		return captchaLib.GenCaptchaError(ctx, err, name, c.MakeData(ctx, hostAlias, name))
 	}
 	if !ok {
 		log.Warnf(`failed to captchaAPI.Verify: %s`, formatter.AsStringer(resp))
-		return GenCaptchaError(ctx, ErrCaptcha.SetMessage(ctx.T(`抱歉，未能通过人机验证`)), name, c.MakeData(ctx, hostAlias, name))
+		return captchaLib.GenCaptchaError(ctx, captchaLib.ErrCaptcha.SetMessage(ctx.T(`抱歉，未能通过人机验证`)), name, c.MakeData(ctx, hostAlias, name))
 	}
 	return ctx.Data().SetCode(code.Success.Int())
 }
@@ -181,7 +182,7 @@ func (c *captchaAPI) MakeData(ctx echo.Context, hostAlias string, name string) e
 	if len(c.captchaID) == 0 {
 		c.captchaID = com.RandomAlphanumeric(16)
 	}
-	data.Set("captchaType", TypeAPI)
+	data.Set("captchaType", captchaLib.TypeAPI)
 	data.Set("captchaID", c.captchaID)
 	var jsInit, jsCallback string
 	var locationID string

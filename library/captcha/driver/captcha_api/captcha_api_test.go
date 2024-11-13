@@ -1,4 +1,4 @@
-package captcha
+package captcha_api
 
 import (
 	"strconv"

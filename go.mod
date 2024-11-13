@@ -1,6 +1,6 @@
 module github.com/coscms/webcore
 
-go 1.23
+go 1.23.1
 
 require (
 	gitee.com/admpub/certmagic v0.8.8
@@ -52,6 +52,7 @@ require (
 	github.com/admpub/web-terminal v0.2.1
 	github.com/aws/aws-sdk-go v1.55.5
 	github.com/caddy-plugins/webdav v1.2.10
+	github.com/coscms/captcha v0.0.0-20241113084529-2e8b3b66dea5
 	github.com/coscms/forms v1.12.2
 	github.com/coscms/go-imgparse v0.0.1
 	github.com/coscms/oauth2s v0.4.1
@@ -215,7 +216,7 @@ require (
 	go.etcd.io/bbolt v1.3.11 // indirect
 	go.uber.org/mock v0.5.0 // indirect
 	golang.org/x/exp v0.0.0-20241009180824-f66d83c29e7c // indirect
-	golang.org/x/image v0.21.0 // indirect
+	golang.org/x/image v0.22.0 // indirect
 	golang.org/x/mod v0.21.0 // indirect
 	golang.org/x/sync v0.9.0 // indirect
 	golang.org/x/sys v0.27.0 // indirect

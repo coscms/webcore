@@ -5,11 +5,11 @@ import "sort"
 const (
 	TypeDefault = `default`
 	TypeAPI     = `api`
+	TypeGo      = `go`
 )
 
 var drivers = map[string]func() ICaptcha{
 	TypeDefault: func() ICaptcha { return dflt },
-	TypeAPI:     newCaptchaAPI,
 }
 
 func Register(name string, ic func() ICaptcha) {
