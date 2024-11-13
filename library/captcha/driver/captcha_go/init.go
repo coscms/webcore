@@ -2,6 +2,7 @@ package captcha_go
 
 import (
 	"context"
+	"encoding/gob"
 
 	"github.com/admpub/cache"
 	_ "github.com/admpub/cache/redis5"
@@ -15,6 +16,10 @@ import (
 
 func init() {
 	captchaLib.Register(captchaLib.TypeGo, newCaptchaGo)
+	func() {
+		defer recover()
+		gob.Register(map[string]int64{})
+	}()
 }
 
 var initialized once.Once
