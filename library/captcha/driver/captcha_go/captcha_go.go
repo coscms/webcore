@@ -55,13 +55,13 @@ func (c *captchaGo) Verify(ctx echo.Context, hostAlias string, captchaName strin
 	}
 	id := idGet("captchaGo")
 	if len(id) == 0 { // 为空说明表单没有显示验证码输入框，此时返回验证码信息供前端显示
-		return ctx.Data().SetError(captchaLib.ErrCaptchaIdMissing)
+		return ctx.Data().SetError(captchaLib.ErrCaptchaIdMissing.SetMessage(ctx.T(`行为验证码显示失败`)))
 	}
 	if len(id[0]) == 0 {
-		return ctx.Data().SetError(captchaLib.ErrCaptcha)
+		return ctx.Data().SetError(captchaLib.ErrCaptcha.SetMessage(ctx.T(`请进行行为验证`)))
 	}
 	if !captchaGoVerifySuccessKey(ctx, id[0], true) {
-		return captchaLib.GenCaptchaError(ctx, captchaLib.ErrCaptcha, captchaName, c.MakeData(ctx, hostAlias, captchaName))
+		return captchaLib.GenCaptchaError(ctx, captchaLib.ErrCaptcha.SetMessage(ctx.T(`行为验证未通过，请重试`)), captchaName, c.MakeData(ctx, hostAlias, captchaName))
 	}
 	return ctx.Data().SetCode(code.Success.Int())
 }
