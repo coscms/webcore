@@ -20,13 +20,12 @@ var (
 		`/js/captchago/css/style.css`,
 	}
 	jsURLs = []string{
-		`/js/captchago/css/style.css`,
 		`/js/captchago/js/common.js`,
 		`/js/captchago/js/click.js`,
 		`/js/captchago/js/rotate.js`,
 		`/js/captchago/js/slide-basic.js`,
 		`/js/captchago/js/slide-region.js`,
-		`/js/captchago/js/jquery.captcha.js.js`,
+		`/js/captchago/js/jquery.captcha.js`,
 	}
 )
 
