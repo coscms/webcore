@@ -7,6 +7,7 @@ require (
 	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/abh/errorutil v1.0.0
 	github.com/admpub/9t v0.0.0-20190605154903-a68069ace5e1
+	github.com/admpub/cache v0.7.2
 	github.com/admpub/captcha-go v0.0.1
 	github.com/admpub/ccs-gm v0.0.5
 	github.com/admpub/checksum v1.1.0
@@ -103,6 +104,7 @@ require (
 	github.com/admpub/i18n v0.3.2 // indirect
 	github.com/admpub/identicon v1.0.2 // indirect
 	github.com/admpub/imaging v1.6.3 // indirect
+	github.com/admpub/ini v1.38.2 // indirect
 	github.com/admpub/json5 v0.0.1 // indirect
 	github.com/admpub/pester v0.0.0-20200411024648-005672a2bd48 // indirect
 	github.com/admpub/randomize v0.0.2 // indirect
@@ -212,6 +214,8 @@ require (
 	github.com/webx-top/pagination v0.3.1 // indirect
 	github.com/webx-top/poolx v0.0.0-20210912044716-5cfa2d58e380 // indirect
 	github.com/webx-top/tagfast v0.0.1 // indirect
+	github.com/wenlng/go-captcha-assets v1.0.1 // indirect
+	github.com/wenlng/go-captcha/v2 v2.0.1 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	go.etcd.io/bbolt v1.3.11 // indirect
 	go.uber.org/mock v0.5.0 // indirect

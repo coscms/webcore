@@ -11,6 +11,7 @@ import (
 )
 
 func newCaptchaGo() captchaLib.ICaptcha {
+	initialized.Do(initialize)
 	return &captchaGo{jsURL: `1`}
 }
 
