@@ -158,17 +158,18 @@ func (c *captchaAPI) Verify(ctx echo.Context, hostAlias string, captchaName stri
 		}
 		c.verifier.ExpectedAction = ctx.Form(`captchaAction`, `submit`)
 	}
-	c.captchaID = ctx.Formx(`captchaId`).String()
-	if len(c.captchaID) == 0 {
-		return captchaLib.GenCaptchaError(ctx, captchaLib.ErrCaptchaIdMissing, name, c.MakeData(ctx, hostAlias, name))
-	}
 	vcode := ctx.FormValues(captchaName)
 	if len(vcode) == 0 {
 		captchaName = name
 		vcode = ctx.FormValues(captchaName)
 	}
-	if len(vcode) == 0 { // 为空说明没有验证码
-		return ctx.Data().SetInfo(ctx.T(`请先进行人机验证`), captchaLib.ErrCaptchaCodeRequired.Code.Int()).SetZone(name)
+	c.captchaID = ctx.Formx(`captchaId`).String()
+	if len(c.captchaID) == 0 {
+		return captchaLib.GenCaptchaError(ctx, captchaLib.ErrCaptchaIdMissing, captchaName, c.MakeData(ctx, hostAlias, captchaName))
+	}
+	if len(vcode) == 0 || len(vcode[0]) == 0 { // 为空说明没有验证码
+		data := captchaLib.GenCaptchaError(ctx, nil, captchaName, c.MakeData(ctx, hostAlias, captchaName))
+		return data.SetInfo(ctx.T(`请先进行人机验证`), captchaLib.ErrCaptchaCodeRequired.Code.Int()).SetZone(captchaName)
 	}
 	token := vcode[0]
 	c.verifier.ExpectedHostname = ctx.Domain()
@@ -178,11 +179,11 @@ func (c *captchaAPI) Verify(ctx echo.Context, hostAlias string, captchaName stri
 	}
 	resp, ok, err := c.verifier.VerifyActionWithResponse(token, clientIP, c.verifier.ExpectedAction)
 	if err != nil {
-		return captchaLib.GenCaptchaError(ctx, err, name, c.MakeData(ctx, hostAlias, name))
+		return captchaLib.GenCaptchaError(ctx, err, captchaName, c.MakeData(ctx, hostAlias, captchaName))
 	}
 	if !ok {
 		log.Warnf(`failed to captchaAPI.Verify: %s`, formatter.AsStringer(resp))
-		data := captchaLib.GenCaptchaError(ctx, nil, name, c.MakeData(ctx, hostAlias, name))
+		data := captchaLib.GenCaptchaError(ctx, nil, captchaName, c.MakeData(ctx, hostAlias, captchaName))
 		return data.SetInfo(ctx.T(`未能通过人机验证，请重试`), captchaLib.ErrCaptcha.Code.Int())
 	}
 	return ctx.Data().SetCode(code.Success.Int())
