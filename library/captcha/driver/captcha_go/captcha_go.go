@@ -58,7 +58,7 @@ func (c *captchaGo) Verify(ctx echo.Context, hostAlias string, captchaName strin
 		return ctx.Data().SetError(captchaLib.ErrCaptchaIdMissing)
 	}
 	if len(id[0]) == 0 {
-		return captchaLib.GenCaptchaError(ctx, captchaLib.ErrCaptcha, captchaName, nil)
+		return ctx.Data().SetError(captchaLib.ErrCaptcha)
 	}
 	if !captchaGoVerifySuccessKey(ctx, id[0], true) {
 		return captchaLib.GenCaptchaError(ctx, captchaLib.ErrCaptcha, captchaName, c.MakeData(ctx, hostAlias, captchaName))
