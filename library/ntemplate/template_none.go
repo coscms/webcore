@@ -25,7 +25,7 @@ func (p *PathFixers) Fix(ctx echo.Context, t *Template, theme string, tmpl strin
 	subdir, newTmpl, group := p.parsePath(theme, tmpl)
 	if len(group) > 0 {
 		if t, ok := groups[group]; ok {
-			r := t.Handle(ctx, subdir, tmpl)
+			r := t.Handle(ctx, subdir, newTmpl)
 			t.cachedPathData.set(cacheKey, sql.NullString{String: r, Valid: true})
 			return r, true
 		}

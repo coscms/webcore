@@ -83,6 +83,7 @@ func (p *PathFixers) parsePath(theme string, tmpl string) (subdir string, newTmp
 			if len(subdirAndGroup) == 2 {
 				subdir = strings.TrimRight(subdirAndGroup[0], whitespace)
 				group = strings.TrimLeft(subdirAndGroup[1], whitespace)
+				newTmpl = splited[1]
 				return
 			}
 		}
