@@ -8,6 +8,7 @@ import (
 
 	"github.com/admpub/log"
 	"github.com/coscms/captcha"
+	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/param"
 )
@@ -25,8 +26,7 @@ const (
 
 func (a *storeCookie) Put(ctx context.Context, key string, val interface{}, timeout int64) error {
 	eCtx := ctx.(echo.Context)
-	var uid int64
-	value := fmt.Sprintf(`%d|%d|%s`, time.Now().Unix(), uid, val)
+	value := fmt.Sprintf(`%d|%s|%s`, time.Now().Unix(), com.Md5(eCtx.RealIP()+eCtx.Request().UserAgent()), val)
 	log.Debugf(`set cookie value for %s: %s`, cookieKey, value)
 	eCtx.Cookie().EncryptSet(cookieKey, value, captcha.MaxAge)
 	return nil
@@ -46,6 +46,10 @@ func (a *storeCookie) Get(ctx context.Context, key string, value interface{}) er
 	}
 	if time.Now().Unix()-param.AsInt64(parts[0]) > captcha.MaxAge {
 		log.Debugf(`cookie has expired: %s`, cookieKey)
+		return captcha.ErrIllegalKey
+	}
+	if parts[1] != com.Md5(eCtx.RealIP()+eCtx.Request().UserAgent()) {
+		log.Debugf(`illegal cookie: [%s] %s`, eCtx.RealIP(), eCtx.Request())
 		return captcha.ErrIllegalKey
 	}
 	*(value.(*[]byte)) = []byte(parts[2])
