@@ -90,12 +90,10 @@ func (c *captchaGo) Verify(ctx echo.Context, hostAlias string, captchaName strin
 		return data.SetInfo(ctx.T(`行为验证码显示失败`), captchaLib.ErrCaptchaIdMissing.Code.Int())
 	}
 	if len(id[0]) == 0 {
-		data := captchaLib.GenCaptchaError(ctx, nil, captchaName, c.MakeData(ctx, hostAlias, captchaName))
-		return data.SetInfo(ctx.T(`请进行行为验证`), captchaLib.ErrCaptchaCodeRequired.Code.Int())
+		return ctx.Data().SetInfo(ctx.T(`请进行行为验证`), captchaLib.ErrCaptchaCodeRequired.Code.Int()).SetZone(captchaName)
 	}
 	if !captchaGoVerifySuccessKey(ctx, id[0], true) {
-		data := captchaLib.GenCaptchaError(ctx, nil, captchaName, c.MakeData(ctx, hostAlias, captchaName))
-		return data.SetInfo(ctx.T(`行为验证未通过，请重试`), captchaLib.ErrCaptcha.Code.Int())
+		return ctx.Data().SetInfo(ctx.T(`行为验证未通过，请重试`), captchaLib.ErrCaptcha.Code.Int()).SetZone(captchaName)
 	}
 	return ctx.Data().SetCode(code.Success.Int())
 }
