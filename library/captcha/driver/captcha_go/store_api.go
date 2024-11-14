@@ -27,17 +27,17 @@ type storeAPI struct {
 }
 
 func (a *storeAPI) Put(ctx context.Context, key string, val interface{}, timeout int64) error {
-	_, err := a.request(http.MethodPost, map[string]interface{}{
-		`key`:     key,
-		`val`:     com.String(val),
-		`timeout`: timeout,
+	_, err := a.request(http.MethodPost, storeAPIRequest{
+		Key:     key,
+		Val:     com.String(val),
+		Timeout: timeout,
 	})
 	return err
 }
 
 func (a *storeAPI) Get(ctx context.Context, key string, value interface{}) error {
-	res, err := a.request(http.MethodGet, map[string]interface{}{
-		`key`: key,
+	res, err := a.request(http.MethodGet, storeAPIRequest{
+		Key: key,
 	})
 	if err != nil {
 		return err
@@ -47,13 +47,13 @@ func (a *storeAPI) Get(ctx context.Context, key string, value interface{}) error
 }
 
 func (a *storeAPI) Delete(ctx context.Context, key string) error {
-	_, err := a.request(http.MethodDelete, map[string]interface{}{
-		`key`: key,
+	_, err := a.request(http.MethodDelete, storeAPIRequest{
+		Key: key,
 	})
 	return err
 }
 
-func (a *storeAPI) request(method string, body map[string]interface{}) (echo.H, error) {
+func (a *storeAPI) request(method string, body storeAPIRequest) (echo.H, error) {
 	req := restyclient.Retryable()
 	if len(a.secret) > 0 {
 		b, _ := com.JSONEncode(body)
@@ -64,8 +64,12 @@ func (a *storeAPI) request(method string, body map[string]interface{}) (echo.H, 
 	reqURL := a.apiURL
 	if method == http.MethodGet {
 		q := url.Values{}
-		for k, v := range body {
-			q.Set(k, com.String(v))
+		q.Set(`key`, body.Key)
+		if len(body.Val) > 0 {
+			q.Set(`val`, body.Val)
+		}
+		if body.Timeout > 0 {
+			q.Set(`timeout`, com.String(body.Timeout))
 		}
 		reqURL += `?` + q.Encode()
 	}
