@@ -643,8 +643,6 @@ github.com/admpub/9t v0.0.0-20190605154903-a68069ace5e1 h1:xsQdFhjyxhFJBWcCSmMtj
 github.com/admpub/9t v0.0.0-20190605154903-a68069ace5e1/go.mod h1:s3tGBV3LzrDsg+hvXTwkdCLNJAB9kanmJ2p1XWHSCyY=
 github.com/admpub/boltstore v1.1.2 h1:eg9H+M8rPu2gbK6C2Oe1TChsUvSHwZO9TebCynyvF54=
 github.com/admpub/boltstore v1.1.2/go.mod h1:ekSv9vnePbyr6EtSAGLfXzwX/7TpjE5TlL22FCHaMQY=
-github.com/admpub/cache v0.7.2 h1:N3QBLpfaF0sxTuRSvLIHQteVBWGztowkJE/OGleduBk=
-github.com/admpub/cache v0.7.2/go.mod h1:3ZEmMDqI1yX7XldAUMvF4uHSMYgs0yPEshbpVwC96fE=
 github.com/admpub/caddy v1.1.11/go.mod h1:wb4LgV+7tN5tOI+D4pQyjz31wKEziN5TshwZXxEpbbg=
 github.com/admpub/caddy v1.2.7 h1:voEKwn/f1dcqy5o4uavF02U0jLEJll76qoDGtg9IKEg=
 github.com/admpub/caddy v1.2.7/go.mod h1:Zeu0/sjGrLm4AmSSROQ4vibRINYcppsS5885k1bZsOE=
@@ -718,8 +716,6 @@ github.com/admpub/imageproxy v0.10.0 h1:GglEszlYXwxOIcQSOb16Ur0gj4ofKSASn6Lh2RTw
 github.com/admpub/imageproxy v0.10.0/go.mod h1:rNm7OoRfNpGIAFBQdjRUUuGh2XkL/lsRy5HrAOtt91s=
 github.com/admpub/imaging v1.6.3 h1:MCc/eATbjynupG7N39HpGsbIQbOUYEjfKhzKA0WNL4g=
 github.com/admpub/imaging v1.6.3/go.mod h1:krwZ51a7U69i7Jsi3lENxZsUu8k9vk+k+oekV99E2W4=
-github.com/admpub/ini v1.38.2 h1:wFFVcy3759iXLCCyhT8iIK8d89T5quUjQlyEKA0UD5o=
-github.com/admpub/ini v1.38.2/go.mod h1:u/q+5wpokfDPIHK0Y/IbGWpaZ7m3MysmwxNzRWkBiuU=
 github.com/admpub/ip2region/v2 v2.0.1 h1:GdqxShon3Dp/vY5ArpE2/Acx8lcmgzXQk9CJBrARjFk=
 github.com/admpub/ip2region/v2 v2.0.1/go.mod h1:gcBWNm2NyIHgzfZZQZDMt8tUPEg8fbo3bi53JnjnVpQ=
 github.com/admpub/json5 v0.0.1 h1:ZgD9YKNEpOqjcg553hqi1Zv8f8tNWLjxZrFcoksCRCw=
@@ -2692,7 +2688,6 @@ gopkg.in/ini.v1 v1.51.0/go.mod h1:pNLf8WUiyNEtQjuu5G5vTm06TEv9tsIgeAvK8hOrP4k=
 gopkg.in/ini.v1 v1.51.1/go.mod h1:pNLf8WUiyNEtQjuu5G5vTm06TEv9tsIgeAvK8hOrP4k=
 gopkg.in/ini.v1 v1.57.0/go.mod h1:pNLf8WUiyNEtQjuu5G5vTm06TEv9tsIgeAvK8hOrP4k=
 gopkg.in/ini.v1 v1.62.0/go.mod h1:pNLf8WUiyNEtQjuu5G5vTm06TEv9tsIgeAvK8hOrP4k=
-gopkg.in/ini.v1 v1.67.0 h1:Dgnx+6+nfE+IfzjUEISNeydPJh9AXNNsWbGP9KzCsOA=
 gopkg.in/ini.v1 v1.67.0/go.mod h1:pNLf8WUiyNEtQjuu5G5vTm06TEv9tsIgeAvK8hOrP4k=
 gopkg.in/mcuadros/go-syslog.v2 v2.3.0 h1:kcsiS+WsTKyIEPABJBJtoG0KkOS6yzvJ+/eZlhD79kk=
 gopkg.in/mcuadros/go-syslog.v2 v2.3.0/go.mod h1:l5LPIyOOyIdQquNg+oU6Z3524YwrcqEm0aKH+5zpt2U=
@@ -2700,8 +2695,6 @@ gopkg.in/natefinch/lumberjack.v2 v2.0.0/go.mod h1:l0ndWWf7gzL7RNwBG7wST/UCcT4T24
 gopkg.in/natefinch/lumberjack.v2 v2.2.1 h1:bBRl1b0OH9s/DuPhuXpNl+VtCaJXFZ5/uEFST95x9zc=
 gopkg.in/natefinch/lumberjack.v2 v2.2.1/go.mod h1:YD8tP3GAjkrDg1eZH7EGmyESg/lsYskCTPBJVb9jqSc=
 gopkg.in/ns1/ns1-go.v2 v2.4.4/go.mod h1:GMnKY+ZuoJ+lVLL+78uSTjwTz2jMazq6AfGKQOYhsPk=
-gopkg.in/redis.v5 v5.2.9 h1:MNZYOLPomQzZMfpN3ZtD1uyJ2IDonTTlxYiV/pEApiw=
-gopkg.in/redis.v5 v5.2.9/go.mod h1:6gtv0/+A4iM08kdRfocWYB3bLX2tebpNtfKlFT6H4mY=
 gopkg.in/resty.v1 v1.12.0/go.mod h1:mDo4pnntr5jdWRML875a/NmxYqAlA73dVijT2AXvQQo=
 gopkg.in/square/go-jose.v2 v2.5.1/go.mod h1:M9dMgbHiYLoDGQrXy7OpJDJWiKiU//h+vD76mk0e1AI=
 gopkg.in/square/go-jose.v2 v2.6.0/go.mod h1:M9dMgbHiYLoDGQrXy7OpJDJWiKiU//h+vD76mk0e1AI=
