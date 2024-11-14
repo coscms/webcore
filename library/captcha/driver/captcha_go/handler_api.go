@@ -22,7 +22,7 @@ type storeAPIRequest struct {
 
 func storeAPIHandler(ctx echo.Context) error {
 	data := ctx.Data()
-	req := &storeAPIRequest{}
+	req := &storeAPIRequest{Key: ctx.Query(`key`)}
 	err := ctx.MustBindAndValidate(req)
 	if err != nil {
 		return ctx.JSON(data.SetError(err))
