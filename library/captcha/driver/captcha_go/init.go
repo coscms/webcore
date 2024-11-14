@@ -24,7 +24,7 @@ func init() {
 
 var initialized once.Once
 
-var DefaultStore captcha.Storer
+var DefaultStore captcha.Storer = NewStoreCookie()
 
 func initialize() {
 	var store captcha.Storer
