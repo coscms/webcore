@@ -10,6 +10,7 @@ import (
 func RegisterRoute(g echo.RouteRegister) {
 	g.Get(`/:driver/:type`, CaptchaGoData)
 	g.Post(`/:driver/:type`, CaptchaGoVerify)
+	RegisterAPIRoute(g)
 }
 
 func CaptchaGoData(ctx echo.Context) error {

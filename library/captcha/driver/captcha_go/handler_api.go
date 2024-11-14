@@ -11,7 +11,7 @@ import (
 )
 
 func RegisterAPIRoute(e echo.RouteRegister) {
-	e.Route(`POST,GET,DELETE`, `/store`, storeAPIHandler)
+	e.Route(`POST,GET,DELETE`, `/store`, storeAPIHandler, checkEnableAPIService)
 }
 
 type storeAPIRequest struct {
@@ -68,4 +68,14 @@ func (data *storeAPIRequest) checkToken(ctx echo.Context) error {
 		return echo.ErrBadRequest
 	}
 	return nil
+}
+
+func checkEnableAPIService(h echo.Handler) echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		cfg := config.FromFile().Extend.GetStore(`captchaGo`)
+		if !cfg.Bool(`apiService`) {
+			return echo.ErrNotImplemented
+		}
+		return h.Handle(ctx)
+	}
 }
