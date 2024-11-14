@@ -19,13 +19,33 @@ var (
 	cssURLs = []string{
 		`/js/captchago/css/style.css`,
 	}
-	jsURLs = []string{
-		`/js/captchago/js/common.js`,
-		`/js/captchago/js/click.js`,
-		`/js/captchago/js/rotate.js`,
-		`/js/captchago/js/slide-basic.js`,
-		`/js/captchago/js/slide-region.js`,
-		`/js/captchago/js/jquery.captcha.js`,
+	jsURLs = map[string]map[string][]string{
+		`click`: {
+			``: {
+				`/js/captchago/js/common.js`,
+				`/js/captchago/js/click.js`,
+				`/js/captchago/js/jquery.captcha.js`,
+			},
+		},
+		`rotate`: {
+			``: {
+				`/js/captchago/js/common.js`,
+				`/js/captchago/js/rotate.js`,
+				`/js/captchago/js/jquery.captcha.js`,
+			},
+		},
+		`slide`: {
+			`basic`: {
+				`/js/captchago/js/common.js`,
+				`/js/captchago/js/slide-basic.js`,
+				`/js/captchago/js/jquery.captcha.js`,
+			},
+			`region`: {
+				`/js/captchago/js/common.js`,
+				`/js/captchago/js/slide-region.js`,
+				`/js/captchago/js/jquery.captcha.js`,
+			},
+		},
 	}
 )
 
@@ -67,8 +87,20 @@ func (c *captchaGo) render(ctx echo.Context, templatePath string, keysValues ...
 		options.Set("captchaName", "captchaGo")
 	}
 	options.Set("jsURLs", jsURLs)
-	options.Set("cssURLs", cssURLs)
+	options.Set("cssURLs", c.getJSURLs())
 	return captchaLib.RenderTemplate(ctx, captchaLib.TypeGo, templatePath, options)
+}
+
+func (c *captchaGo) getJSURLs() []string {
+	g, y := jsURLs[c.driver]
+	if !y {
+		return []string{}
+	}
+	v, y := g[c.cType]
+	if y {
+		return v
+	}
+	return g[``]
 }
 
 func (c *captchaGo) Verify(ctx echo.Context, hostAlias string, captchaName string, captchaIdent ...string) echo.Data {
@@ -107,7 +139,7 @@ func (c *captchaGo) MakeData(ctx echo.Context, hostAlias string, name string) ec
 	}
 	data.Set("captchaType", captchaLib.TypeGo)
 	data.Set("captchaID", c.captchaID)
-	data.Set("jsURLs", jsURLs)
+	data.Set("jsURLs", c.getJSURLs())
 	data.Set("cssURLs", cssURLs)
 	jsInit := c.render(ctx, `partial_jsinit`, `captchaName`, name)
 	data.Set("jsInit", jsInit)
