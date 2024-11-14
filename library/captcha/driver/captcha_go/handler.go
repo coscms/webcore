@@ -41,7 +41,7 @@ func CaptchaGoVerify(ctx echo.Context) error {
 	return ctx.JSON(resp.SetSuccess())
 }
 
-const captchaGoSessionKey = `captchaGo`
+const captchaGoSessionKey = `captchaGoKey`
 
 func captchaGoSetSuccessKey(ctx echo.Context, key string) {
 	secrets, ok := ctx.Session().Get(captchaGoSessionKey).(map[string]int64)
