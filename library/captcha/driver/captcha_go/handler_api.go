@@ -74,7 +74,10 @@ func checkEnableAPIService(h echo.Handler) echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		cfg := config.FromFile().Extend.GetStore(`captchaGo`)
 		if !cfg.Bool(`apiService`) {
-			return echo.ErrNotImplemented
+			return echo.ErrNotAcceptable
+		}
+		if cfg.String(`store`) == `api` { // 如果自己的接口请求自己的服务则会导致死循环
+			return echo.ErrFailedDependency
 		}
 		return h.Handle(ctx)
 	}
