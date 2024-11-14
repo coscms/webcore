@@ -56,7 +56,7 @@ func (c *captchaGo) Render(ctx echo.Context, templatePath string, keysValues ...
 }
 
 func (c *captchaGo) render(ctx echo.Context, templatePath string, keysValues ...interface{}) template.HTML {
-	options := tplfunc.MakeMap(keysValues)
+	options := tplfunc.MakeMap(keysValues...)
 	options.Set("driver", c.driver)
 	options.Set("type", c.cType)
 	if len(c.captchaID) == 0 {

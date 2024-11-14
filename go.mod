@@ -78,14 +78,14 @@ require (
 	github.com/webx-top/codec v0.3.0
 	github.com/webx-top/com v1.3.17
 	github.com/webx-top/db v1.28.0
-	github.com/webx-top/echo v1.12.7
+	github.com/webx-top/echo v1.12.8
 	github.com/webx-top/image v0.1.1
 	github.com/webx-top/restyclient v0.0.5
 	github.com/webx-top/validation v0.0.3
 	github.com/webx-top/validator v0.3.0
 	golang.org/x/crypto v0.29.0
 	golang.org/x/net v0.31.0
-	golang.org/x/oauth2 v0.23.0
+	golang.org/x/oauth2 v0.24.0
 	golang.org/x/text v0.20.0
 	gopkg.in/yaml.v3 v3.0.1
 )
