@@ -19,29 +19,33 @@ func NewStoreCookie() captcha.Storer {
 type storeCookie struct {
 }
 
+const (
+	cookieKey = `CaptchaGo`
+)
+
 func (a *storeCookie) Put(ctx context.Context, key string, val interface{}, timeout int64) error {
 	eCtx := ctx.(echo.Context)
 	var uid int64
 	value := fmt.Sprintf(`%d|%d|%s`, time.Now().Unix(), uid, val)
-	log.Debug(`set cookie value for CaptchaGo: `, value)
-	eCtx.Cookie().EncryptSet(`CaptchaGo`, value, captcha.MaxAge)
+	log.Debugf(`set cookie value for %s: %s`, cookieKey, value)
+	eCtx.Cookie().EncryptSet(cookieKey, value, captcha.MaxAge)
 	return nil
 }
 
 func (a *storeCookie) Get(ctx context.Context, key string, value interface{}) error {
 	eCtx := ctx.(echo.Context)
-	cookieVal := eCtx.Cookie().DecryptGet(`CaptchaGo`)
+	cookieVal := eCtx.Cookie().DecryptGet(cookieKey)
 	if len(cookieVal) == 0 {
-		log.Debug(`failed to get cookie for CaptchaGo`)
+		log.Debugf(`failed to get cookie for %s`, cookieKey)
 		return captcha.ErrIllegalKey
 	}
 	parts := strings.SplitN(cookieVal, `|`, 3)
 	if len(parts) != 3 {
-		log.Debug(`failed to parse cookie for CaptchaGo: `, cookieVal)
+		log.Debugf(`failed to parse cookie for %s: %s`, cookieKey, cookieVal)
 		return captcha.ErrIllegalKey
 	}
 	if time.Now().Unix()-param.AsInt64(parts[0]) > captcha.MaxAge {
-		log.Debug(`cookie has expired: CaptchaGo`)
+		log.Debugf(`cookie has expired: %s`, cookieKey)
 		return captcha.ErrIllegalKey
 	}
 	*(value.(*[]byte)) = []byte(parts[2])
@@ -50,6 +54,6 @@ func (a *storeCookie) Get(ctx context.Context, key string, value interface{}) er
 
 func (a *storeCookie) Delete(ctx context.Context, key string) error {
 	eCtx := ctx.(echo.Context)
-	eCtx.Cookie().Set(`CaptchaGo`, ``, -1)
+	eCtx.Cookie().Set(cookieKey, ``, -1)
 	return nil
 }
