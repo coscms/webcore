@@ -86,8 +86,8 @@ func (c *captchaGo) render(ctx echo.Context, templatePath string, keysValues ...
 	if !options.Has("captchaName") {
 		options.Set("captchaName", "captchaGo")
 	}
-	options.Set("jsURLs", jsURLs)
-	options.Set("cssURLs", c.getJSURLs())
+	options.Set("jsURLs", c.getJSURLs())
+	options.Set("cssURLs", cssURLs)
 	return captchaLib.RenderTemplate(ctx, captchaLib.TypeGo, templatePath, options)
 }
 
