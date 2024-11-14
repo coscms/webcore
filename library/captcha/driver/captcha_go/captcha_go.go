@@ -45,16 +45,20 @@ func (c *captchaGo) Init(opt echo.H) error {
 
 // keysValues: key1, value1, key2, value2
 func (c *captchaGo) Render(ctx echo.Context, templatePath string, keysValues ...interface{}) template.HTML {
-	options := tplfunc.MakeMap(keysValues)
-	options.Set("driver", c.driver)
-	options.Set("type", c.cType)
 	initedKey := `CaptchaGoJSInited`
 	var loadResource bool
 	if !ctx.Internal().Bool(initedKey) {
 		ctx.Internal().Set(initedKey, true)
 		loadResource = true
 	}
-	options.Set("loadResource", loadResource)
+	keysValues = append(keysValues, `loadResource`, loadResource)
+	return c.render(ctx, templatePath, keysValues...)
+}
+
+func (c *captchaGo) render(ctx echo.Context, templatePath string, keysValues ...interface{}) template.HTML {
+	options := tplfunc.MakeMap(keysValues)
+	options.Set("driver", c.driver)
+	options.Set("type", c.cType)
 	if len(c.captchaID) == 0 {
 		c.captchaID = com.RandomAlphanumeric(16)
 	}
@@ -107,7 +111,7 @@ func (c *captchaGo) MakeData(ctx echo.Context, hostAlias string, name string) ec
 	data.Set("captchaID", c.captchaID)
 	data.Set("jsURLs", jsURLs)
 	data.Set("cssURLs", cssURLs)
-	jsInit := c.Render(ctx, `partial_jsinit`, `captchaName`, name)
+	jsInit := c.render(ctx, `partial_jsinit`, `captchaName`, name)
 	data.Set("jsInit", jsInit)
 	htmlCode := c.Render(ctx, `partial_main`, `captchaName`, name)
 	data.Set("html", htmlCode)

@@ -6,7 +6,6 @@ import (
 	"io/fs"
 	"strings"
 
-	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/param"
 )
@@ -34,5 +33,6 @@ func RenderTemplate(ctx echo.Context, captchaType string, templatePath string, o
 			return template.HTML(err.Error())
 		}
 	}
-	return template.HTML(com.Bytes2str(b))
+	// return template.HTML(com.Bytes2str(b)) // bug: will be overwritten by a second render
+	return template.HTML(string(b))
 }
