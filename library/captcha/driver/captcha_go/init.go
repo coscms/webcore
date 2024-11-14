@@ -27,7 +27,7 @@ func GetStore() captcha.Storer {
 	return store
 }
 
-var DefaultStore captcha.Storer = NewStoreCookie()
+var DefaultStore captcha.Storer = NewStoreSession()
 
 func initialize() {
 	cfg := config.FromFile().Extend.GetStore(`captchaGo`)
