@@ -37,6 +37,7 @@ func CaptchaGoVerify(ctx echo.Context) error {
 		return ctx.JSON(resp.SetError(err.Error()))
 	}
 	captchaGoSetSuccessKey(ctx, key)
+	c.Storer().Delete(ctx, key)
 	return ctx.JSON(resp.SetSuccess())
 }
 
