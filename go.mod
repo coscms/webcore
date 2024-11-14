@@ -78,7 +78,7 @@ require (
 	github.com/webx-top/codec v0.3.0
 	github.com/webx-top/com v1.3.17
 	github.com/webx-top/db v1.28.0
-	github.com/webx-top/echo v1.12.8
+	github.com/webx-top/echo v1.12.9
 	github.com/webx-top/image v0.1.1
 	github.com/webx-top/restyclient v0.0.5
 	github.com/webx-top/validation v0.0.3
