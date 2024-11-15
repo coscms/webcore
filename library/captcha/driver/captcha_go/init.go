@@ -9,6 +9,7 @@ import (
 	"github.com/coscms/webcore/cmd/bootconfig"
 	captchaLib "github.com/coscms/webcore/library/captcha"
 	"github.com/coscms/webcore/library/config"
+	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/param"
 )
 
@@ -20,13 +21,7 @@ func init() {
 				return nil
 			}
 			cfg := param.AsStore(d.Old)
-			cDriver := cfg.String(`driver`)
-			if len(cDriver) > 0 {
-				cType := cfg.GetStore(cDriver).String(`type`)
-				if len(cType) > 0 {
-					captcha.UnregisterInstance(cDriver, cType)
-				}
-			}
+			unregister(cfg)
 			return nil
 		})
 		config.OnKeySetSettings(`captcha.type`, func(d config.Diff) error {
@@ -36,14 +31,8 @@ func init() {
 			cType := param.AsString(d.Old)
 			if cType == `go` {
 				cfg := config.FromDB().GetStore(`captcha`)
-				cfgo := cfg.GetStore(`go`)
-				cDriver := cfgo.String(`driver`)
-				if len(cDriver) > 0 {
-					cType := cfgo.GetStore(cDriver).String(`type`)
-					if len(cType) > 0 {
-						captcha.UnregisterInstance(cDriver, cType)
-					}
-				}
+				cfgo := cfg.GetStore(cType)
+				unregister(cfgo)
 			}
 			return nil
 		})
@@ -52,6 +41,16 @@ func init() {
 		defer recover()
 		gob.Register(map[string]int64{})
 	}()
+}
+
+func unregister(cfgo echo.H) {
+	cDriver := cfgo.String(`driver`)
+	if len(cDriver) > 0 {
+		cType := cfgo.GetStore(cDriver).String(`type`)
+		if len(cType) > 0 {
+			captcha.UnregisterInstance(cDriver, cType)
+		}
+	}
 }
 
 var DefaultStorer captcha.Storer = NewStoreSession()
