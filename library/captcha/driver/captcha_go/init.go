@@ -11,6 +11,7 @@ import (
 	"github.com/coscms/webcore/library/config"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/param"
+	"golang.org/x/sync/singleflight"
 )
 
 func init() {
@@ -56,19 +57,27 @@ func unregister(cfgo echo.H) {
 var DefaultStorer captcha.Storer = NewStoreSession()
 var StorerConstructor = storerDefaultConstructor
 var usedStorer atomic.Value
+var sg singleflight.Group
 
 func GetStorer() (captcha.Storer, error) {
 	store, ok := usedStorer.Load().(captcha.Storer)
 	if ok {
 		return store, nil
 	}
-	store, err := StorerConstructor()
+	val, err, _ := sg.Do(`initStorer`, func() (interface{}, error) {
+		st, err := StorerConstructor()
+		if err != nil {
+			log.Errorf(`captchaGo initialization storage engine failed: %v`, err)
+			return st, err
+		}
+		log.Okayf(`captchaGo uses storage engine: %T`, st)
+		usedStorer.Store(st)
+		return st, err
+	})
 	if err != nil {
 		return nil, err
 	}
-	log.Okayf(`captchaGo uses storage engine: %T`, store)
-	usedStorer.Store(store)
-	return store, nil
+	return val.(captcha.Storer), nil
 }
 
 func storerDefaultConstructor() (captcha.Storer, error) {
