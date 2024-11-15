@@ -31,18 +31,22 @@ func storeAPIHandler(ctx echo.Context) error {
 	if err != nil {
 		return ctx.JSON(data.SetError(err).SetCode(code.Unauthenticated.Int()))
 	}
+	storer, err := GetStorer()
+	if err != nil {
+		return ctx.JSON(data.SetError(err))
+	}
 	switch ctx.Method() {
 	case http.MethodGet:
 		var val []byte
-		err = GetStore().Get(ctx, req.Key, &val)
+		err = storer.Get(ctx, req.Key, &val)
 		if err != nil {
 			return ctx.JSON(data.SetError(err))
 		}
 		data.SetData(string(val))
 	case http.MethodDelete:
-		err = GetStore().Delete(ctx, req.Key)
+		err = storer.Delete(ctx, req.Key)
 	case http.MethodPost:
-		err = GetStore().Put(ctx, req.Key, req.Val, req.Timeout)
+		err = storer.Put(ctx, req.Key, req.Val, req.Timeout)
 	}
 	if err != nil {
 		return ctx.JSON(data.SetError(err))

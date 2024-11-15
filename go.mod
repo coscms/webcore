@@ -52,7 +52,7 @@ require (
 	github.com/admpub/web-terminal v0.2.1
 	github.com/aws/aws-sdk-go v1.55.5
 	github.com/caddy-plugins/webdav v1.2.10
-	github.com/coscms/captcha v0.0.1
+	github.com/coscms/captcha v0.1.0
 	github.com/coscms/forms v1.12.2
 	github.com/coscms/go-imgparse v0.0.1
 	github.com/coscms/oauth2s v0.4.1

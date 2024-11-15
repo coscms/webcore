@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/coscms/captcha"
+	"github.com/coscms/captcha/driver"
 	"github.com/webx-top/echo"
 )
 
@@ -15,7 +16,7 @@ func RegisterRoute(g echo.RouteRegister) {
 
 func CaptchaGoData(ctx echo.Context) error {
 	resp := captcha.APIResponse{}
-	c, err := captcha.GetInstance(ctx.Param(`driver`), ctx.Param(`type`))
+	c, err := driver.Singleton(ctx.Param(`driver`), ctx.Param(`type`), GetStorer)
 	if err != nil {
 		return ctx.JSON(resp.SetError(err.Error()))
 	}
@@ -28,7 +29,7 @@ func CaptchaGoData(ctx echo.Context) error {
 
 func CaptchaGoVerify(ctx echo.Context) error {
 	resp := captcha.APIResponse{}
-	c, err := captcha.GetInstance(ctx.Param(`driver`), ctx.Param(`type`))
+	c, err := driver.Singleton(ctx.Param(`driver`), ctx.Param(`type`), GetStorer)
 	if err != nil {
 		return ctx.JSON(resp.SetError(err.Error()))
 	}
