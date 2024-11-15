@@ -92,13 +92,17 @@ var (
 	onGroupSetSettings = map[string][]func(Diffs) error{}
 )
 
-func OnGroupSetSettings(groupAndKey string, fn func(Diffs) error) {
-	if _, ok := onGroupSetSettings[groupAndKey]; !ok {
-		onGroupSetSettings[groupAndKey] = []func(Diffs) error{}
+// OnGroupSetSettings 注册配置组的变动事件
+// OnGroupSetSettings(`base`,fn)
+func OnGroupSetSettings(group string, fn func(Diffs) error) {
+	if _, ok := onGroupSetSettings[group]; !ok {
+		onGroupSetSettings[group] = []func(Diffs) error{}
 	}
-	onGroupSetSettings[groupAndKey] = append(onGroupSetSettings[groupAndKey], fn)
+	onGroupSetSettings[group] = append(onGroupSetSettings[group], fn)
 }
 
+// OnKeySetSettings 注册配置组中某个配置的变动事件
+// OnKeySetSettings(`base.debug`,fn)
 func OnKeySetSettings(groupAndKey string, fn func(Diff) error) {
 	if _, ok := onKeySetSettings[groupAndKey]; !ok {
 		onKeySetSettings[groupAndKey] = []func(Diff) error{}
