@@ -35,11 +35,11 @@ func CaptchaGoVerify(ctx echo.Context) error {
 	}
 	key := ctx.Form(`key`)
 	err = c.Verify(ctx, key, ctx.Form(`response`))
+	c.Storer().Delete(ctx, key)
 	if err != nil {
 		return ctx.JSON(resp.SetError(err.Error()))
 	}
 	captchaGoSetSuccessKey(ctx, key)
-	c.Storer().Delete(ctx, key)
 	return ctx.JSON(resp.SetSuccess())
 }
 
