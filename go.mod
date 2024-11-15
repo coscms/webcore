@@ -77,7 +77,7 @@ require (
 	github.com/webx-top/codec v0.3.0
 	github.com/webx-top/com v1.3.17
 	github.com/webx-top/db v1.28.0
-	github.com/webx-top/echo v1.12.9
+	github.com/webx-top/echo v1.12.10
 	github.com/webx-top/image v0.1.1
 	github.com/webx-top/restyclient v0.0.5
 	github.com/webx-top/validation v0.0.3
@@ -85,6 +85,7 @@ require (
 	golang.org/x/crypto v0.29.0
 	golang.org/x/net v0.31.0
 	golang.org/x/oauth2 v0.24.0
+	golang.org/x/sync v0.9.0
 	golang.org/x/text v0.20.0
 	gopkg.in/yaml.v3 v3.0.1
 )
@@ -222,7 +223,6 @@ require (
 	golang.org/x/exp v0.0.0-20241108190413-2d47ceb2692f // indirect
 	golang.org/x/image v0.22.0 // indirect
 	golang.org/x/mod v0.22.0 // indirect
-	golang.org/x/sync v0.9.0 // indirect
 	golang.org/x/sys v0.27.0 // indirect
 	golang.org/x/tools v0.27.0 // indirect
 	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da // indirect
