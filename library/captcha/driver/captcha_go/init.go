@@ -66,6 +66,7 @@ func GetStorer() (captcha.Storer, error) {
 	if err != nil {
 		return nil, err
 	}
+	log.Okayf(`captchaGo uses storage engine: %T`, store)
 	usedStorer.Store(store)
 	return store, nil
 }
