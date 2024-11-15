@@ -1,6 +1,7 @@
 package captcha_go
 
 import (
+	"errors"
 	"time"
 
 	"github.com/coscms/captcha"
@@ -35,10 +36,13 @@ func CaptchaGoVerify(ctx echo.Context) error {
 	}
 	key := ctx.Form(`key`)
 	err = c.Verify(ctx, key, ctx.Form(`response`))
-	c.Storer().Delete(ctx, key)
 	if err != nil {
+		if errors.Is(err, captcha.ErrInvalidResponse) {
+			c.Storer().Delete(ctx, key)
+		}
 		return ctx.JSON(resp.SetError(err.Error()))
 	}
+	c.Storer().Delete(ctx, key)
 	captchaGoSetSuccessKey(ctx, key)
 	return ctx.JSON(resp.SetSuccess())
 }
