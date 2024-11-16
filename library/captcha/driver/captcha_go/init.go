@@ -6,15 +6,19 @@ import (
 
 	"github.com/admpub/log"
 	"github.com/coscms/captcha"
-	"github.com/coscms/webcore/cmd/bootconfig"
-	captchaLib "github.com/coscms/webcore/library/captcha"
-	"github.com/coscms/webcore/library/config"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/param"
 	"golang.org/x/sync/singleflight"
+
+	goCaptchaLogger "github.com/admpub/go-captcha/v2/base/logger"
+
+	"github.com/coscms/webcore/cmd/bootconfig"
+	captchaLib "github.com/coscms/webcore/library/captcha"
+	"github.com/coscms/webcore/library/config"
 )
 
 func init() {
+	goCaptchaLogger.SetDefault(log.DefaultLog)
 	captchaLib.Register(captchaLib.TypeGo, newCaptchaGo)
 	bootconfig.OnStart(-1, func() {
 		config.OnKeySetSettings(`captcha.go`, func(d config.Diff) error {
