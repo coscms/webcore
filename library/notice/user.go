@@ -119,3 +119,22 @@ func (o *OnlineUsers) Clear() {
 	o.user = map[string]IOnlineUser{}
 	o.lock.Unlock()
 }
+
+// Count 在线用户人数
+func (o *OnlineUsers) Count() int {
+	o.lock.RLock()
+	n := len(o.user)
+	o.lock.RUnlock()
+	return n
+}
+
+// UserList 在线用户列表
+func (o *OnlineUsers) UserList() []string {
+	o.lock.RLock()
+	r := make([]string, 0, len(o.user))
+	for user := range o.user {
+		r = append(r, user)
+	}
+	o.lock.RUnlock()
+	return r
+}
