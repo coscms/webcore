@@ -57,6 +57,7 @@ func BackendFuncMap() echo.MiddlewareFunc {
 			if user != nil {
 				c.Set(`user`, user)
 				c.SetFunc(`Username`, func() string { return user.Username })
+				c.SetFunc(`IsFounder`, func() bool { return role.IsFounder(user) })
 				c.Set(`roleList`, roleutils.UserRoles(c))
 			}
 			c.SetFunc(`ProjectIdent`, func() string {
