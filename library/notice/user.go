@@ -128,12 +128,22 @@ func (o *OnlineUsers) Count() int {
 	return n
 }
 
-// UserList 在线用户列表
-func (o *OnlineUsers) UserList() []string {
+// UserList 在线用户列表 limit=-1时为获取全部用户
+func (o *OnlineUsers) UserList(limit int) []string {
+	if limit == 0 {
+		return []string{}
+	}
 	o.lock.RLock()
-	r := make([]string, 0, len(o.user))
+	l := len(o.user)
+	if limit > 0 {
+		l = limit
+	}
+	r := make([]string, 0, l)
 	for user := range o.user {
 		r = append(r, user)
+		if limit > 0 && len(r) >= limit {
+			break
+		}
 	}
 	o.lock.RUnlock()
 	return r

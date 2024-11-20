@@ -78,6 +78,14 @@ func OnlineStatus(users ...string) map[string]bool {
 	return Default().OnlineStatus(users...)
 }
 
+func OnlineUserCount() int {
+	return Default().Count()
+}
+
+func OnlineUserList(limit int) []string {
+	return Default().UserList(limit)
+}
+
 func OpenClient(user string) (oUser IOnlineUser, clientID string) {
 	return Default().OpenClient(user)
 }

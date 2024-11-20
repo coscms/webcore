@@ -19,6 +19,7 @@ require (
 	github.com/admpub/errors v0.8.2
 	github.com/admpub/events v1.3.6
 	github.com/admpub/go-bindata-assetfs v0.0.0-20170428090253-36eaa4c19588
+	github.com/admpub/go-captcha/v2 v2.0.4
 	github.com/admpub/go-download/v2 v2.1.15
 	github.com/admpub/go-figure v0.0.0-20180619031829-18b2b544842c
 	github.com/admpub/go-isatty v0.0.11
@@ -58,7 +59,7 @@ require (
 	github.com/coscms/oauth2s v0.4.1
 	github.com/dsoprea/go-logging v0.0.0-20200710184922-b02d349568dd
 	github.com/fynelabs/selfupdate v0.2.0
-	github.com/go-playground/validator/v10 v10.22.1
+	github.com/go-playground/validator/v10 v10.23.0
 	github.com/hirochachacha/go-smb2 v1.1.0
 	github.com/jlaffaye/ftp v0.2.0
 	github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0
@@ -75,9 +76,9 @@ require (
 	github.com/webx-top/chardet v0.0.2
 	github.com/webx-top/client v0.9.5
 	github.com/webx-top/codec v0.3.0
-	github.com/webx-top/com v1.3.17
+	github.com/webx-top/com v1.3.19
 	github.com/webx-top/db v1.28.0
-	github.com/webx-top/echo v1.12.10
+	github.com/webx-top/echo v1.12.11
 	github.com/webx-top/image v0.1.1
 	github.com/webx-top/restyclient v0.0.5
 	github.com/webx-top/validation v0.0.3
@@ -97,7 +98,6 @@ require (
 	github.com/admpub/fasthttp v0.0.5 // indirect
 	github.com/admpub/fsnotify v1.7.0 // indirect
 	github.com/admpub/gifresize v1.0.2 // indirect
-	github.com/admpub/go-captcha/v2 v2.0.4 // indirect
 	github.com/admpub/go-reuseport v0.0.4 // indirect
 	github.com/admpub/go-utility v0.0.1 // indirect
 	github.com/admpub/gohttp v0.0.0-20190322032039-b55c707b8f1e // indirect
@@ -229,9 +229,9 @@ require (
 	google.golang.org/protobuf v1.35.2 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
-	modernc.org/libc v1.61.0 // indirect
+	modernc.org/libc v1.61.2 // indirect
 	modernc.org/mathutil v1.6.0 // indirect
 	modernc.org/memory v1.8.0 // indirect
-	modernc.org/sqlite v1.33.1 // indirect
+	modernc.org/sqlite v1.34.1 // indirect
 	rsc.io/qr v0.2.0 // indirect
 )

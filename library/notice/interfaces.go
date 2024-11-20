@@ -44,6 +44,8 @@ type IOnlineUsers interface {
 	Set(user string, oUser IOnlineUser)
 	Delete(user string)
 	Clear()
+	Count() int
+	UserList(limit int) []string
 }
 
 type NoticeMessager interface {

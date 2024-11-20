@@ -220,3 +220,11 @@ func (u *userNotices) OpenMessage(user string, types ...string) {
 func (u *userNotices) Clear() {
 	u.users.Clear()
 }
+
+func (u *userNotices) Count() int {
+	return u.users.Count()
+}
+
+func (u *userNotices) UserList(limit int) []string {
+	return u.users.UserList(limit)
+}
