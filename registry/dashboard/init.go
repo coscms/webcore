@@ -7,6 +7,7 @@ import (
 	"github.com/coscms/webcore/library/dashboard"
 	"github.com/coscms/webcore/library/httpserver"
 	"github.com/coscms/webcore/library/notice"
+	"github.com/coscms/webcore/library/role"
 	"github.com/coscms/webcore/model"
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
@@ -23,9 +24,12 @@ func init() {
 		//用户统计
 		userMdl := model.NewUser(ctx)
 		userCount, _ := userMdl.Count(nil)
-		onlineUsers := notice.OnlineUserCount()
 		user := backend.User(ctx)
-		if user != nil && !notice.IsOnline(user.Username) {
+		if user == nil || !role.IsFounder(user) {
+			return userCount
+		}
+		onlineUsers := notice.OnlineUserCount()
+		if !notice.IsOnline(user.Username) {
 			onlineUsers++
 		}
 		return template.HTML(com.String(userCount) + ` <a class="label label-success" href="` + backend.URLFor(`/manager/user`) + `?online=Y">` + ctx.T(`在线`) + `:` + com.String(onlineUsers) + `</a>`)
