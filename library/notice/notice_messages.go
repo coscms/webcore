@@ -40,13 +40,16 @@ func (n *noticeMessages) Size() int {
 	return size
 }
 
-func (n *noticeMessages) Delete(clientID string) {
+func (n *noticeMessages) Delete(clientID string) int {
 	n.lock.Lock()
+	size := len(n.messages)
 	if msg, ok := n.messages[clientID]; ok {
 		close(msg)
 		delete(n.messages, clientID)
+		size--
 	}
 	n.lock.Unlock()
+	return size
 }
 
 func (n *noticeMessages) Clear() {

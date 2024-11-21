@@ -27,8 +27,8 @@ func (a *Notice) CountClient() int {
 	return a.messages.Size()
 }
 
-func (a *Notice) CloseClient(clientID string) {
-	a.messages.Delete(clientID)
+func (a *Notice) CloseClient(clientID string) int {
+	return a.messages.Delete(clientID)
 }
 
 func (a *Notice) OpenClient(clientID string) {

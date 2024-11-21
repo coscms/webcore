@@ -100,11 +100,11 @@ func (u *userNotices) CloseClient(user string, clientID string) bool {
 	if !exists {
 		return true
 	}
-	oUser.CloseClient(clientID)
+	remains := oUser.CloseClient(clientID)
 	if u.Debug() {
 		msgbox.Info(`[NOTICE]`, `[CloseClient][ClientID]: `+clientID)
 	}
-	if oUser.CountClient() < 1 {
+	if remains < 1 {
 		oUser.ClearMessage()
 		u.users.Delete(user)
 		for _, fn := range u.onClose {

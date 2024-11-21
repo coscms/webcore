@@ -34,7 +34,7 @@ type IOnlineUser interface {
 	OpenMessageType(types ...string)
 	CountType() int
 	CountClient() int
-	CloseClient(clientID string)
+	CloseClient(clientID string) int
 	OpenClient(clientID string)
 }
 
@@ -50,7 +50,7 @@ type IOnlineUsers interface {
 
 type NoticeMessager interface {
 	Size() int
-	Delete(clientID string)
+	Delete(clientID string) int
 	Clear()
 	Add(clientID string)
 	Send(message *Message) error
