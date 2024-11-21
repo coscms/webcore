@@ -26,7 +26,7 @@ import (
 )
 
 var (
-	defaultUserNotices *userNotices
+	defaultUserNotices UserMessageSystem
 	once               sync.Once
 )
 
@@ -41,7 +41,7 @@ func onLogout(e events.Event) error {
 	return nil
 }
 
-func Default() *userNotices {
+func Default() UserMessageSystem {
 	once.Do(Initialize)
 	return defaultUserNotices
 }
@@ -50,11 +50,11 @@ func SetDebug(on bool) {
 	Default().SetDebug(on)
 }
 
-func OnClose(fn ...func(user string)) *userNotices {
+func OnClose(fn ...func(user string)) UserMessageSystem {
 	return Default().OnClose(fn...)
 }
 
-func OnOpen(fn ...func(user string)) *userNotices {
+func OnOpen(fn ...func(user string)) UserMessageSystem {
 	return Default().OnOpen(fn...)
 }
 

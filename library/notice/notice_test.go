@@ -32,7 +32,7 @@ func init() {
 
 func TestOpenMessage(t *testing.T) {
 	OpenMessage(`testUser`, `testType`)
-	user, _ := Default().users.GetOk(`testUser`)
+	user, _ := Default().(*userNotices).users.GetOk(`testUser`)
 	assert.Equal(t, 1, user.CountType())
 	assert.True(t, user.HasMessageType(`testType`))
 

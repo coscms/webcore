@@ -102,6 +102,13 @@ func (o *OnlineUsers) OnlineStatus(users ...string) map[string]bool {
 	return r
 }
 
+func (o *OnlineUsers) IsOnline(user string) bool {
+	o.lock.RLock()
+	_, ok := o.user[user]
+	o.lock.RUnlock()
+	return ok
+}
+
 func (o *OnlineUsers) Set(user string, oUser IOnlineUser) {
 	o.lock.Lock()
 	o.user[user] = oUser

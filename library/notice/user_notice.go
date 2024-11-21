@@ -40,7 +40,7 @@ func Stdout(message *Message) {
 	message.Release()
 }
 
-func (u *userNotices) SetDebug(on bool) *userNotices {
+func (u *userNotices) SetDebug(on bool) UserMessageSystem {
 	u.debug.Store(on)
 	return u
 }
@@ -49,12 +49,12 @@ func (u *userNotices) Debug() bool {
 	return u.debug.Load()
 }
 
-func (u *userNotices) OnClose(fn ...func(user string)) *userNotices {
+func (u *userNotices) OnClose(fn ...func(user string)) UserMessageSystem {
 	u.onClose = append(u.onClose, fn...)
 	return u
 }
 
-func (u *userNotices) OnOpen(fn ...func(user string)) *userNotices {
+func (u *userNotices) OnOpen(fn ...func(user string)) UserMessageSystem {
 	u.onOpen = append(u.onOpen, fn...)
 	return u
 }
@@ -116,7 +116,7 @@ func (u *userNotices) CloseClient(user string, clientID string) bool {
 }
 
 func (u *userNotices) IsOnline(user string) bool {
-	return u.users.OnlineStatus(user)[user]
+	return u.users.IsOnline(user)
 }
 
 func (u *userNotices) OnlineStatus(users ...string) map[string]bool {

@@ -126,7 +126,7 @@ require (
 	github.com/flynn/go-shlex v0.0.0-20150515145356-3f9db97f8568 // indirect
 	github.com/francoispqt/gojay v1.2.13 // indirect
 	github.com/friendsofgo/errors v0.9.2 // indirect
-	github.com/gabriel-vasile/mimetype v1.4.6 // indirect
+	github.com/gabriel-vasile/mimetype v1.4.7 // indirect
 	github.com/garyburd/redigo v1.6.4 // indirect
 	github.com/geoffgarside/ber v1.1.0 // indirect
 	github.com/glebarez/go-sqlite v1.22.0 // indirect
@@ -180,7 +180,7 @@ require (
 	github.com/ncruces/go-strftime v0.1.9 // indirect
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646 // indirect
 	github.com/nxadm/tail v1.4.11 // indirect
-	github.com/onsi/ginkgo/v2 v2.21.0 // indirect
+	github.com/onsi/ginkgo/v2 v2.22.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect
