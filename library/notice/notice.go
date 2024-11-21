@@ -228,3 +228,17 @@ func (u *userNotices) Count() int {
 func (u *userNotices) UserList(limit int) []string {
 	return u.users.UserList(limit)
 }
+
+func (u *userNotices) MakeMessageGetter(username string) (func(), <-chan *Message, error) {
+	oUser, clientID := u.OpenClient(username)
+	oUser.OpenMessageType(`clientID`)
+	msg := NewMessage().SetMode(`-`).SetType(`clientID`).SetClientID(clientID)
+	err := oUser.Send(msg)
+	if err != nil {
+		return nil, nil, err
+	}
+	msgChan := oUser.Recv(clientID)
+	return func() {
+		u.CloseClient(username, clientID)
+	}, msgChan, err
+}
