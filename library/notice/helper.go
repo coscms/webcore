@@ -74,3 +74,19 @@ func New(eCtx echo.Context, noticeType string, user string, ctx context.Context,
 	}
 	return noticer
 }
+
+func MakeMessageGetter(notify *userNotices) func(ctx context.Context, username string) (func(), <-chan *Message, error) {
+	return func(ctx context.Context, username string) (func(), <-chan *Message, error) {
+		oUser, clientID := notify.OpenClient(username)
+		oUser.OpenMessageType(`clientID`)
+		msg := NewMessage().SetMode(`-`).SetType(`clientID`).SetClientID(clientID)
+		err := oUser.Send(msg)
+		if err != nil {
+			return nil, nil, err
+		}
+		msgChan := oUser.Recv(clientID)
+		return func() {
+			notify.CloseClient(username, clientID)
+		}, msgChan, err
+	}
+}
