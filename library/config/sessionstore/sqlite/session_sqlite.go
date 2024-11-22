@@ -1,7 +1,6 @@
 package sqlite
 
 import (
-	"os"
 	"path/filepath"
 	"reflect"
 	"strings"
@@ -43,7 +42,6 @@ func initSessionStoreMySQL(c *config.Config, cookieOptions *cookie.CookieOptions
 	} else if strings.HasSuffix(sqliteOptions.Path, echo.FilePathSeparator) {
 		sqliteOptions.Path = filepath.Join(sqliteOptions.Path, `sessions.db`)
 	}
-	com.MkdirAll(filepath.Dir(sqliteOptions.Path), os.ModePerm)
 	if len(sqliteOptions.Table) == 0 {
 		sqliteOptions.Table = `sessions`
 	}

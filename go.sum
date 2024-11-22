@@ -891,8 +891,8 @@ github.com/coscms/session-mysqlstore v0.0.0-20241122060432-e4161cb8f12f h1:C7bP4
 github.com/coscms/session-mysqlstore v0.0.0-20241122060432-e4161cb8f12f/go.mod h1:QBwrP3kiypbsVL1qK4Fc0qedtjJ0V31+rwNx67qKUXU=
 github.com/coscms/session-redisstore v0.0.0-20241122060113-0376b64193ac h1:Z8d3PwcCT4GrhnYUuXfUXUTzLMckvoGw306YFEJEJX0=
 github.com/coscms/session-redisstore v0.0.0-20241122060113-0376b64193ac/go.mod h1:Xsx2G/5bFv/BDNQFKCfUrpJpASzqVwFzR/3PTzntvHE=
-github.com/coscms/session-sqlitestore v0.0.2 h1:kMXal3coV3iXKo+IGPmvwfFQoOOcRqXDOELMRl8XU14=
-github.com/coscms/session-sqlitestore v0.0.2/go.mod h1:VxGlOZDbiHOErYHC4SxqH0FDmrfds10DhjqzD9f238Y=
+github.com/coscms/session-sqlitestore v0.0.3 h1:NV8rYnE43uNMwxqsuxGsWQtzJob5qFfVhtssTlUMWTM=
+github.com/coscms/session-sqlitestore v0.0.3/go.mod h1:VxGlOZDbiHOErYHC4SxqH0FDmrfds10DhjqzD9f238Y=
 github.com/coscms/session-sqlstore v0.0.0-20241122060049-76e1eb3fbdc2 h1:6hBWArNFTFMoGlYLj3fgvZ0fDP4vgShiQMmRzfIGpBE=
 github.com/coscms/session-sqlstore v0.0.0-20241122060049-76e1eb3fbdc2/go.mod h1:61328y9rBexpiQnTv2YjkEES2FAGJot+cHOKPyvJbNk=
 github.com/cpu/goacmedns v0.1.1/go.mod h1:MuaouqEhPAHxsbqjgnck5zeghuwBP1dLnPoobeGqugQ=

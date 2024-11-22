@@ -60,7 +60,7 @@ require (
 	github.com/coscms/session-boltstore v0.0.0-20241122060137-861b57ff0116
 	github.com/coscms/session-mysqlstore v0.0.0-20241122060432-e4161cb8f12f
 	github.com/coscms/session-redisstore v0.0.0-20241122060113-0376b64193ac
-	github.com/coscms/session-sqlitestore v0.0.2
+	github.com/coscms/session-sqlitestore v0.0.3
 	github.com/coscms/session-sqlstore v0.0.0-20241122060049-76e1eb3fbdc2
 	github.com/dsoprea/go-logging v0.0.0-20200710184922-b02d349568dd
 	github.com/fynelabs/selfupdate v0.2.0
