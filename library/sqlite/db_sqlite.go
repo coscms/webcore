@@ -1,5 +1,5 @@
-//go:build sqlite
-// +build sqlite
+//go:build db_sqlite
+// +build db_sqlite
 
 /*
    Nging is a toolbox for webmasters
@@ -36,7 +36,7 @@ import (
 	"github.com/webx-top/echo"
 )
 
-func register() {
+func init() {
 	config.DBCreaters[`sqlite`] = CreaterSQLite
 	config.DBConnecters[`sqlite`] = ConnectSQLite
 	config.DBInstallers[`sqlite`] = ExecSQL
