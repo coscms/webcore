@@ -30,6 +30,7 @@ import (
 	"github.com/admpub/mysql-schema-sync/sync"
 	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webcore/library/config/subconfig/sdb"
+	"github.com/coscms/webcore/library/sqlite/sqliteutils"
 	"github.com/webx-top/com"
 	"github.com/webx-top/db/lib/sqlbuilder"
 	"github.com/webx-top/db/sqlite"
@@ -39,7 +40,7 @@ import (
 func init() {
 	config.DBCreaters[`sqlite`] = CreaterSQLite
 	config.DBConnecters[`sqlite`] = ConnectSQLite
-	config.DBInstallers[`sqlite`] = ExecSQL
+	config.DBInstallers[`sqlite`] = sqliteutils.ExecSQL
 	config.DBUpgraders[`sqlite`] = UpgradeSQLite
 	config.DBEngines.Add(`sqlite`, `SQLite`)
 }
@@ -71,7 +72,7 @@ func UpgradeSQLite(schema string, syncConfig *sync.Config, cfg sdb.DB) (config.D
 	syncConfig.DestDSN = cfg.Database
 	syncConfig.Comparer = syncSQLite.NewCompare()
 	var err error
-	schema, err = ConvertMySQL(schema)
+	schema, err = sqliteutils.ConvertMySQL(schema)
 	return config.DBOperators{
 		Source:      syncSQLite.NewSchemaData(schema, `source`),
 		Destination: syncSQLite.New(cfg.Database, `dest`),
