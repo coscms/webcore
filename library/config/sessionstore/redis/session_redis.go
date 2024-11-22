@@ -3,10 +3,10 @@ package redis
 import (
 	"reflect"
 
+	redisstore "github.com/coscms/session-redisstore"
 	"github.com/coscms/webcore/library/config"
 	"github.com/webx-top/echo/middleware/session/engine"
 	"github.com/webx-top/echo/middleware/session/engine/cookie"
-	"github.com/webx-top/echo/middleware/session/engine/redis"
 	"github.com/webx-top/echo/param"
 )
 
@@ -14,10 +14,10 @@ func init() {
 	config.RegisterSessionStore(`redis`, `Redis存储`, initSessionStoreRedis)
 }
 
-var sessionStoreRedisOptions *redis.RedisOptions
+var sessionStoreRedisOptions *redisstore.RedisOptions
 
 func initSessionStoreRedis(_ *config.Config, cookieOptions *cookie.CookieOptions, sessionConfig param.Store) (changed bool, err error) {
-	redisOptions := &redis.RedisOptions{
+	redisOptions := &redisstore.RedisOptions{
 		Size:         sessionConfig.Int(`maxIdle`),
 		Network:      sessionConfig.String(`network`),
 		Address:      sessionConfig.String(`address`),
@@ -40,7 +40,7 @@ func initSessionStoreRedis(_ *config.Config, cookieOptions *cookie.CookieOptions
 		redisOptions.MaxReconnect = 30
 	}
 	if sessionStoreRedisOptions == nil || !engine.Exists(`redis`) || !reflect.DeepEqual(redisOptions, sessionStoreRedisOptions) {
-		redis.RegWithOptions(redisOptions)
+		redisstore.RegWithOptions(redisOptions)
 		sessionStoreRedisOptions = redisOptions
 		changed = true
 	}

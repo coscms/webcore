@@ -57,6 +57,11 @@ require (
 	github.com/coscms/forms v1.12.2
 	github.com/coscms/go-imgparse v0.0.1
 	github.com/coscms/oauth2s v0.4.1
+	github.com/coscms/session-boltstore v0.0.0-20241122060137-861b57ff0116
+	github.com/coscms/session-mysqlstore v0.0.0-20241122060432-e4161cb8f12f
+	github.com/coscms/session-redisstore v0.0.0-20241122060113-0376b64193ac
+	github.com/coscms/session-sqlitestore v0.0.1
+	github.com/coscms/session-sqlstore v0.0.0-20241122060049-76e1eb3fbdc2
 	github.com/dsoprea/go-logging v0.0.0-20200710184922-b02d349568dd
 	github.com/fynelabs/selfupdate v0.2.0
 	github.com/go-playground/validator/v10 v10.23.0
@@ -78,7 +83,7 @@ require (
 	github.com/webx-top/codec v0.3.0
 	github.com/webx-top/com v1.3.19
 	github.com/webx-top/db v1.28.0
-	github.com/webx-top/echo v1.12.12
+	github.com/webx-top/echo v1.13.0
 	github.com/webx-top/image v0.1.1
 	github.com/webx-top/restyclient v0.0.5
 	github.com/webx-top/validation v0.0.3

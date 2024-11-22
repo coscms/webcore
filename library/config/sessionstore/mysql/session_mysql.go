@@ -4,12 +4,13 @@ import (
 	"reflect"
 	"time"
 
+	mysqlstore "github.com/coscms/session-mysqlstore"
+	sqlstore "github.com/coscms/session-sqlstore"
 	"github.com/coscms/webcore/library/config"
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo/encoding/dbconfig"
 	"github.com/webx-top/echo/middleware/session/engine"
 	"github.com/webx-top/echo/middleware/session/engine/cookie"
-	"github.com/webx-top/echo/middleware/session/engine/mysql"
 	"github.com/webx-top/echo/param"
 )
 
@@ -17,10 +18,10 @@ func init() {
 	config.RegisterSessionStore(`mysql`, `MySQL存储`, initSessionStoreMySQL)
 }
 
-var sessionStoreMySQLOptions *mysql.Options
+var sessionStoreMySQLOptions *mysqlstore.Options
 
 func initSessionStoreMySQL(c *config.Config, cookieOptions *cookie.CookieOptions, sessionConfig param.Store) (changed bool, err error) {
-	mysqlOptions := &mysql.Options{
+	mysqlOptions := &mysqlstore.Options{
 		Config: dbconfig.Config{
 			User:    sessionConfig.String(`user`),
 			Pass:    sessionConfig.String(`password`),
@@ -31,12 +32,14 @@ func initSessionStoreMySQL(c *config.Config, cookieOptions *cookie.CookieOptions
 			Prefix:  sessionConfig.String(`prefix`),
 			Options: map[string]string{},
 		},
-		Table:         sessionConfig.String(`table`),
-		KeyPairs:      cookieOptions.KeyPairs,
-		MaxAge:        sessionConfig.Int(`maxAge`),
-		MaxLength:     sessionConfig.Int(`maxLength`),
-		CheckInterval: time.Duration(sessionConfig.Int64(`checkInterval`)) * time.Second,
-		MaxReconnect:  sessionConfig.Int(`maxReconnect`),
+		Options: sqlstore.Options{
+			Table:         sessionConfig.String(`table`),
+			KeyPairs:      cookieOptions.KeyPairs,
+			MaxAge:        sessionConfig.Int(`maxAge`),
+			MaxLength:     sessionConfig.Int(`maxLength`),
+			CheckInterval: time.Duration(sessionConfig.Int64(`checkInterval`)) * time.Second,
+			MaxReconnect:  sessionConfig.Int(`maxReconnect`),
+		},
 	}
 	for k, v := range c.DB.Options {
 		mysqlOptions.Config.Options[k] = v
@@ -75,7 +78,7 @@ func initSessionStoreMySQL(c *config.Config, cookieOptions *cookie.CookieOptions
 		mysqlOptions.MaxReconnect = 30
 	}
 	if sessionStoreMySQLOptions == nil || !engine.Exists(`mysql`) || !reflect.DeepEqual(mysqlOptions, sessionStoreMySQLOptions) {
-		mysql.RegWithOptions(mysqlOptions)
+		mysqlstore.RegWithOptions(mysqlOptions)
 		sessionStoreMySQLOptions = mysqlOptions
 		changed = true
 	}

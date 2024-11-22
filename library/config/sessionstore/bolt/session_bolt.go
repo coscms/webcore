@@ -5,11 +5,11 @@ import (
 	"reflect"
 	"time"
 
+	boltstore "github.com/coscms/session-boltstore"
 	"github.com/coscms/webcore/library/config"
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/middleware/session/engine"
-	"github.com/webx-top/echo/middleware/session/engine/bolt"
 	"github.com/webx-top/echo/middleware/session/engine/cookie"
 	"github.com/webx-top/echo/param"
 )
@@ -18,10 +18,10 @@ func init() {
 	config.RegisterSessionStore(`bolt`, `BoltDB存储`, initSessionStoreBolt)
 }
 
-var sessionStoreBoltOptions *bolt.BoltOptions
+var sessionStoreBoltOptions *boltstore.BoltOptions
 
 func initSessionStoreBolt(_ *config.Config, cookieOptions *cookie.CookieOptions, sessionConfig param.Store) (changed bool, err error) {
-	boltOptions := &bolt.BoltOptions{
+	boltOptions := &boltstore.BoltOptions{
 		File:          sessionConfig.String(`savePath`),
 		KeyPairs:      cookieOptions.KeyPairs,
 		BucketName:    sessionConfig.String(`bucketName`),
@@ -38,7 +38,7 @@ func initSessionStoreBolt(_ *config.Config, cookieOptions *cookie.CookieOptions,
 		boltOptions.File = filepath.Join(boltOptions.File, `bolt`)
 	}
 	if sessionStoreBoltOptions == nil || !engine.Exists(`bolt`) || !reflect.DeepEqual(boltOptions, sessionStoreBoltOptions) {
-		bolt.RegWithOptions(boltOptions)
+		boltstore.RegWithOptions(boltOptions)
 		sessionStoreBoltOptions = boltOptions
 		changed = true
 	}
