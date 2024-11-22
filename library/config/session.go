@@ -113,6 +113,7 @@ func InitSessionOptions(c *Config) {
 		log.Error(err)
 		return
 	}
+	log.Okayf(`session uses store engine: %s`, sessionEngine)
 	if changed {
 		for _, v := range SessionStores.Slice() {
 			if v.K != sessionEngine {
