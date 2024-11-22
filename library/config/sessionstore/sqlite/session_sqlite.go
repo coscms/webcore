@@ -26,7 +26,7 @@ var sessionStoreSQLiteOptions *sqlitestore.Options
 
 func initSessionStoreMySQL(c *config.Config, cookieOptions *cookie.CookieOptions, sessionConfig param.Store) (changed bool, err error) {
 	sqliteOptions := &sqlitestore.Options{
-		Path: sessionConfig.String(`path`),
+		Path: sessionConfig.String(`path`, sessionConfig.String(`savePath`)),
 		Options: sqlstore.Options{
 			Table:         sessionConfig.String(`table`),
 			KeyPairs:      cookieOptions.KeyPairs,
