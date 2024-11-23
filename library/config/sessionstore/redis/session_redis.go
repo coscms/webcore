@@ -25,6 +25,7 @@ func initSessionStoreRedis(_ *config.Config, cookieOptions *cookie.CookieOptions
 		DB:           sessionConfig.Uint(`db`),
 		KeyPairs:     cookieOptions.KeyPairs,
 		MaxAge:       sessionConfig.Int(`maxAge`),
+		EmptyDataAge: sessionConfig.Int(`emptyDataAge`),
 		MaxReconnect: sessionConfig.Int(`maxReconnect`),
 	}
 	if redisOptions.Size <= 0 {

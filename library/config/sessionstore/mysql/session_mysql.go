@@ -36,6 +36,7 @@ func initSessionStoreMySQL(c *config.Config, cookieOptions *cookie.CookieOptions
 			Table:         sessionConfig.String(`table`),
 			KeyPairs:      cookieOptions.KeyPairs,
 			MaxAge:        sessionConfig.Int(`maxAge`),
+			EmptyDataAge:  sessionConfig.Int(`emptyDataAge`),
 			MaxLength:     sessionConfig.Int(`maxLength`),
 			CheckInterval: time.Duration(sessionConfig.Int64(`checkInterval`)) * time.Second,
 			MaxReconnect:  sessionConfig.Int(`maxReconnect`),

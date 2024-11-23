@@ -24,6 +24,7 @@ func initSessionStoreFile(_ *config.Config, cookieOptions *cookie.CookieOptions,
 		SavePath:      sessionConfig.String(`savePath`),
 		KeyPairs:      cookieOptions.KeyPairs,
 		MaxAge:        sessionConfig.Int(`maxAge`),
+		EmptyDataAge:  sessionConfig.Int(`emptyDataAge`),
 		MaxLength:     sessionConfig.Int(`maxLength`),
 		CheckInterval: time.Duration(sessionConfig.Int64(`checkInterval`)) * time.Second,
 	}

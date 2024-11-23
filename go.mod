@@ -57,11 +57,11 @@ require (
 	github.com/coscms/forms v1.12.2
 	github.com/coscms/go-imgparse v0.0.1
 	github.com/coscms/oauth2s v0.4.1
-	github.com/coscms/session-boltstore v0.0.0-20241122060137-861b57ff0116
+	github.com/coscms/session-boltstore v0.0.0-20241123103427-f7a05e3c6d60
 	github.com/coscms/session-mysqlstore v0.0.0-20241122060432-e4161cb8f12f
-	github.com/coscms/session-redisstore v0.0.0-20241122060113-0376b64193ac
+	github.com/coscms/session-redisstore v0.0.0-20241123110057-3c697bf14511
 	github.com/coscms/session-sqlitestore v0.0.3
-	github.com/coscms/session-sqlstore v0.0.0-20241122060049-76e1eb3fbdc2
+	github.com/coscms/session-sqlstore v0.0.0-20241123103622-54cef6a2850b
 	github.com/dsoprea/go-logging v0.0.0-20200710184922-b02d349568dd
 	github.com/fynelabs/selfupdate v0.2.0
 	github.com/go-playground/validator/v10 v10.23.0
@@ -83,7 +83,7 @@ require (
 	github.com/webx-top/codec v0.3.0
 	github.com/webx-top/com v1.3.19
 	github.com/webx-top/db v1.28.1
-	github.com/webx-top/echo v1.13.1
+	github.com/webx-top/echo v1.13.2
 	github.com/webx-top/image v0.1.1
 	github.com/webx-top/restyclient v0.0.5
 	github.com/webx-top/validation v0.0.3
@@ -98,7 +98,7 @@ require (
 
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
-	github.com/admpub/boltstore v1.1.2 // indirect
+	github.com/admpub/boltstore v1.2.0 // indirect
 	github.com/admpub/caddy v1.2.7 // indirect
 	github.com/admpub/fasthttp v0.0.5 // indirect
 	github.com/admpub/fsnotify v1.7.0 // indirect
@@ -113,10 +113,10 @@ require (
 	github.com/admpub/json5 v0.0.1 // indirect
 	github.com/admpub/pester v0.0.0-20200411024648-005672a2bd48 // indirect
 	github.com/admpub/randomize v0.0.2 // indirect
-	github.com/admpub/redistore v1.2.1 // indirect
+	github.com/admpub/redistore v1.2.2 // indirect
 	github.com/admpub/resty/v2 v2.7.1 // indirect
 	github.com/admpub/safesvg v0.0.8 // indirect
-	github.com/admpub/sessions v0.2.1 // indirect
+	github.com/admpub/sessions v0.2.3 // indirect
 	github.com/admpub/webdav/v4 v4.1.3 // indirect
 	github.com/admpub/websocket v1.0.4 // indirect
 	github.com/andybalholm/brotli v1.1.1 // indirect
@@ -132,7 +132,6 @@ require (
 	github.com/francoispqt/gojay v1.2.13 // indirect
 	github.com/friendsofgo/errors v0.9.2 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.7 // indirect
-	github.com/garyburd/redigo v1.6.4 // indirect
 	github.com/geoffgarside/ber v1.1.0 // indirect
 	github.com/glebarez/go-sqlite v1.22.0 // indirect
 	github.com/go-acme/lego/v4 v4.20.2 // indirect
@@ -150,6 +149,7 @@ require (
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
+	github.com/gomodule/redigo v2.0.0+incompatible // indirect
 	github.com/google/pprof v0.0.0-20241101162523-b92577c0c142 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20210202160940-bed99a852dfe // indirect

@@ -26,6 +26,7 @@ func initSessionStoreBolt(_ *config.Config, cookieOptions *cookie.CookieOptions,
 		KeyPairs:      cookieOptions.KeyPairs,
 		BucketName:    sessionConfig.String(`bucketName`),
 		MaxLength:     sessionConfig.Int(`maxLength`),
+		EmptyDataAge:  sessionConfig.Int(`emptyDataAge`),
 		CheckInterval: time.Duration(sessionConfig.Int64(`checkInterval`)) * time.Second,
 	}
 	if len(boltOptions.BucketName) == 0 {
