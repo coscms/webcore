@@ -66,6 +66,9 @@ func (s *SettingForm) AddHookPost(hook func(echo.Context) error) *SettingForm {
 }
 
 func (s *SettingForm) SetFormConfig(formcfg *formsconfig.Config) *SettingForm {
+	if len(formcfg.Theme) == 0 {
+		formcfg.Theme = `bootstrap3`
+	}
 	s.config = formcfg
 	return s
 }
