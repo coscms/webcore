@@ -728,6 +728,8 @@ github.com/admpub/mahonia v0.0.0-20151019004008-c528b747d92d h1:9QaiQwHoN3e+ImMx
 github.com/admpub/mahonia v0.0.0-20151019004008-c528b747d92d/go.mod h1:vgwHdVKJ65SPQqItXbsoY+FFZqGwgo07DzO/0sXAyHk=
 github.com/admpub/mail v0.0.0-20170408110349-d63147b0317b h1:PX+gB0uvxOx1scR8WWr8tC5QIEjxwyfNlM1jmW69FBs=
 github.com/admpub/mail v0.0.0-20170408110349-d63147b0317b/go.mod h1:uzZ665vldasVbB/L2jX1ZamV9yt/L0LlF6eu2Xju5kk=
+github.com/admpub/map2struct v0.1.2 h1:ZiC4q8zw9nFXRrcXJxAVXAb/v1sne58usdHhvP/+u4s=
+github.com/admpub/map2struct v0.1.2/go.mod h1:O0AKwHrlHWpf+lvTAvgUvjcTV/mjzNtWDTyINuAjw5c=
 github.com/admpub/marmot v0.0.0-20200702042226-2170d9ff59f5 h1:N9+M16t6Pa0zNjy2g3GHCLmxaw3tHR2bHs0+Ic0VLR0=
 github.com/admpub/marmot v0.0.0-20200702042226-2170d9ff59f5/go.mod h1:Aim7aOlr/P9OkX0ucuhrzMEUcKOJXErCMS3MDGTBGJc=
 github.com/admpub/mysql-schema-sync v0.2.6 h1:BaL7J2gWguEe9ADQkhp4olnkdBGeePwcCT+lnxxjoC0=

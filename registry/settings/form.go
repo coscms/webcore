@@ -1,8 +1,11 @@
 package settings
 
 import (
+	"fmt"
 	"html/template"
+	"reflect"
 
+	"github.com/admpub/map2struct"
 	"github.com/coscms/forms"
 	formsconfig "github.com/coscms/forms/config"
 	"github.com/coscms/webcore/dbschema"
@@ -86,6 +89,20 @@ func (s *SettingForm) SetDataTransfer(name string, dataDecoder DataDecoder, data
 		s.dataEncoders[name] = dataEncoder
 	}
 	return s
+}
+
+func (s *SettingForm) SetTransferType(name string, dest interface{}) *SettingForm {
+	rType := GetReflectType(dest)
+	if rType.Kind() != reflect.Struct {
+		panic(fmt.Sprintf(`non-struct type is unsupported: %s`, rType.Kind().String()))
+	}
+	return s.SetDataTransfer(name, func(v *dbschema.NgingConfig) (interface{}, error) {
+		return reflect.New(rType).Interface(), nil
+	}, func(v *dbschema.NgingConfig, r echo.H) (interface{}, error) {
+		cfg := reflect.New(rType).Interface()
+		err := map2struct.Scan(cfg, r, `json`)
+		return cfg, err
+	})
 }
 
 func (s *SettingForm) AddConfig(configs ...*dbschema.NgingConfig) *SettingForm {
