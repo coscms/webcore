@@ -10,10 +10,10 @@ import (
 	"github.com/coscms/forms"
 	formsconfig "github.com/coscms/forms/config"
 	"github.com/coscms/webcore/dbschema"
-	"github.com/coscms/webcore/library/common"
 	"github.com/coscms/webcore/library/errorslice"
 	_ "github.com/coscms/webcore/library/formbuilder"
 	"github.com/webx-top/echo"
+	"github.com/webx-top/echo/param"
 )
 
 func NewForm(group string, short string, label string, opts ...FormSetter) *SettingForm {
@@ -140,6 +140,18 @@ func StructFieldConvert(s string) string {
 	return s
 }
 
+func FormStoreToMap(d echo.H) echo.H {
+	m := echo.H{}
+	for k, v := range d {
+		// api.ValueObject
+		vo := param.AsStore(v).Get(`ValueObject`)
+		if vo != nil {
+			m[k] = vo
+		}
+	}
+	return m
+}
+
 func (s *SettingForm) Render(ctx echo.Context) template.HTML {
 	if s.renderer != nil {
 		return s.renderer(ctx)
@@ -148,8 +160,10 @@ func (s *SettingForm) Render(ctx echo.Context) template.HTML {
 		if s.form == nil {
 			s.form = forms.NewForms(forms.NewWithConfig(s.config))
 			s.form.SetStructFieldConverter(StructFieldConvert)
-			m := echo.GetStore(common.SettingName).GetStore(s.Group)
-			s.form.SetModel(m)
+			if d, y := ctx.Get(s.Group).(echo.H); y {
+				m := FormStoreToMap(d)
+				s.form.SetModel(m)
+			}
 			s.form.ParseFromConfig(true)
 		}
 		return s.form.Render()
