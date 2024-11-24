@@ -4,7 +4,7 @@
 	{{- if .label }}
 	<label class="col-sm-{{if gt .labelCols 0}}{{.labelCols}}{{else}}2{{end}} control-label{{if or (.params.Exists `data-parsley-mincheck`) (.params.Exists `data-parsley-check`)}} required{{end}}{{ if $p.labelClasses }} {{$p.labelClasses}}{{end}}">{{.label}}</label>
 	{{- end }}
-	<div class="col-sm-{{if gt .fieldCols 0}}{{.fieldCols}}{{else if eq .container "fieldset"}}10{{else}}8{{end}}">
+	<div class="col-sm-{{if gt .fieldCols 0}}{{.fieldCols}}{{else if eq .container `fieldset`}}10{{else}}8{{end}}">
 		{{- range .choices }}
 		<label class="control-label{{ if $p.labelClasses }} {{$p.labelClasses}}{{end}}">
 			<input type="checkbox" name="{{$p.name}}" class="webx{{if $p.classes}} {{$p.classes}}{{end}}" value="{{.ID}}"{{if $p.params}}{{range $k2, $v2 := $p.params}} {{$k2}}="{{$v2}}"{{end}}{{end}}{{if $p.css}} style="{{range $k2, $v2 := .css}}{{$k2}}: {{$v2}}; {{end}}"{{end}}{{if .Checked}} checked="checked"{{end}}{{range $p.tags}} {{.}}{{end}} data-parsley-errors-container="#parsley-error-{{$p.name}}">
