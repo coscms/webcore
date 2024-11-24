@@ -11,6 +11,7 @@ import (
 	"github.com/coscms/webcore/dbschema"
 	"github.com/coscms/webcore/library/common"
 	"github.com/coscms/webcore/library/errorslice"
+	_ "github.com/coscms/webcore/library/formbuilder"
 	"github.com/webx-top/echo"
 )
 
