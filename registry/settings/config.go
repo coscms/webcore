@@ -10,8 +10,39 @@ type Config struct {
 	Decoder Decoder
 }
 
-func NewConfig() *Config {
-	return &Config{}
+func NewConfig(group string) *Config {
+	return &Config{
+		Group: group,
+		Items: map[string]*dbschema.NgingConfig{},
+	}
+}
+
+func (c *Config) AddItem(item *dbschema.NgingConfig) *Config {
+	item.Group = c.Group
+	c.Items[item.Key] = item
+	return c
+}
+
+func (c *Config) AddForm(cfgs ...*SettingForm) *Config {
+	c.Forms = append(c.Forms, cfgs...)
+	return c
+}
+
+func (c *Config) SetTransferType(dest interface{}) *Config {
+	rType := GetReflectType(dest)
+	c.Encoder = MakeEncoder(rType)
+	c.Decoder = MakeDecoder(rType)
+	return c
+}
+
+func (c *Config) SetEncoder(encoder Encoder) *Config {
+	c.Encoder = encoder
+	return c
+}
+
+func (c *Config) SetDecoder(decoder Decoder) *Config {
+	c.Decoder = decoder
+	return c
 }
 
 func (c *Config) Apply() {

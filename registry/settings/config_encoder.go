@@ -38,8 +38,7 @@ func Encoders() map[string]Encoder {
 }
 
 func GetEncoder(group string) Encoder {
-	ps, _ := encoders[group]
-	return ps
+	return encoders[group]
 }
 
 // RegisterEncoder 注册配置值编码器（用于客户端提交表单数据之后的编码操作，编码结果保存到数据库）

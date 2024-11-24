@@ -36,8 +36,7 @@ func Decoders() map[string]Decoder {
 }
 
 func GetDecoder(group string) Decoder {
-	ps, _ := decoders[group]
-	return ps
+	return decoders[group]
 }
 
 type Codec interface {
