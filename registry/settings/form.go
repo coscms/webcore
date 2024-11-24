@@ -41,7 +41,6 @@ type SettingForm struct {
 	hookGet      []func(echo.Context) error       //数据读取逻辑处理
 	renderer     func(echo.Context) template.HTML
 	config       *formsconfig.Config
-	form         *forms.Forms
 	dataDecoders DataDecoders //Decoder: table => form
 	dataEncoders DataEncoders //Encoder: form => table
 }
@@ -68,9 +67,6 @@ func (s *SettingForm) AddHookPost(hook func(echo.Context) error) *SettingForm {
 
 func (s *SettingForm) SetFormConfig(formcfg *formsconfig.Config) *SettingForm {
 	s.config = formcfg
-	if s.form != nil {
-		s.form = nil
-	}
 	return s
 }
 
@@ -157,16 +153,14 @@ func (s *SettingForm) Render(ctx echo.Context) template.HTML {
 		return s.renderer(ctx)
 	}
 	if s.config != nil {
-		if s.form == nil {
-			s.form = forms.NewForms(forms.NewWithConfig(s.config))
-			s.form.SetStructFieldConverter(StructFieldConvert)
-			if d, y := ctx.Get(s.Group).(echo.H); y {
-				m := FormStoreToMap(d)
-				s.form.SetModel(m)
-			}
-			s.form.ParseFromConfig(true)
+		form := forms.NewForms(forms.NewWithConfig(s.config))
+		form.SetStructFieldConverter(StructFieldConvert)
+		if d, y := ctx.Get(s.Group).(echo.H); y {
+			m := FormStoreToMap(d)
+			form.SetModel(m)
 		}
-		return s.form.Render()
+		form.ParseFromConfig(true)
+		return form.Render()
 	}
 	var htmlContent string
 	var stored echo.Store

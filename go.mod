@@ -55,7 +55,7 @@ require (
 	github.com/aws/aws-sdk-go v1.55.5
 	github.com/caddy-plugins/webdav v1.2.10
 	github.com/coscms/captcha v0.1.2
-	github.com/coscms/forms v1.13.1
+	github.com/coscms/forms v1.13.2
 	github.com/coscms/go-imgparse v0.0.1
 	github.com/coscms/oauth2s v0.4.1
 	github.com/coscms/session-boltstore v0.0.0-20241123103427-f7a05e3c6d60
