@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"html/template"
 	"reflect"
+	"strings"
 
 	"github.com/admpub/map2struct"
 	"github.com/coscms/forms"
@@ -124,6 +125,21 @@ func (s *SettingForm) SetRenderer(renderer func(echo.Context) template.HTML) *Se
 	return s
 }
 
+func StructFieldConvert(s string) string {
+	// group[key][value][objkey]
+	p := strings.Index(s, `[`)
+	if p < 0 {
+		return s
+	}
+	s = s[p:]
+	p = strings.Index(s, `[value]`)
+	if p < 0 {
+		return s
+	}
+	s = s[:p] + s[p+len(`[value]`):]
+	return s
+}
+
 func (s *SettingForm) Render(ctx echo.Context) template.HTML {
 	if s.renderer != nil {
 		return s.renderer(ctx)
@@ -131,6 +147,7 @@ func (s *SettingForm) Render(ctx echo.Context) template.HTML {
 	if s.config != nil {
 		if s.form == nil {
 			s.form = forms.NewForms(forms.NewWithConfig(s.config))
+			s.form.SetStructFieldConverter(StructFieldConvert)
 			m := echo.GetStore(common.SettingName).GetStore(s.Group)
 			s.form.SetModel(m)
 			s.form.ParseFromConfig(true)
