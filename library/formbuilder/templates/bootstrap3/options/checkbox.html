@@ -1,6 +1,5 @@
 {{- define "main" }}
 {{- $p := . }}
-{{- if not .noFormGroup }}<div class="form-group">{{ end }}
 	{{- if .label }}
 	<label class="col-sm-{{if gt .labelCols 0}}{{.labelCols}}{{else}}2{{end}} control-label{{if or (.params.Exists `data-parsley-mincheck`) (.params.Exists `data-parsley-check`)}} required{{end}}{{ if $p.labelClasses }} {{$p.labelClasses}}{{end}}">{{.label}}</label>
 	{{- end }}
@@ -26,5 +25,4 @@
 		{{- end }}
 		<div id='parsley-error-{{$p.name}}'></div>
 	</div>
-{{ if not .noFormGroup }}</div>{{ end }}
 {{- end }}

@@ -1,5 +1,5 @@
-{{- if not .noFormGroup }}<div class="form-group">{{ end }}
+<div class="form-group">
 	{{- range $k, $v := .fields }}
 	{{- .Render }}
 	{{- end }}
-{{ if not .noFormGroup }}</div>{{ end }}
+</div>

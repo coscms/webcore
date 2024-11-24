@@ -1,5 +1,4 @@
 {{- $langset := . }}
-{{- if not .noFormGroup }}<div class="form-group">{{ end }}
 	<div{{if $langset.params}}{{range $k,$v := $langset.params}} {{$k}}="{{$v}}"{{end}}{{end}}{{range $langset.tags}} {{.}}{{end}}>
 		<div class="col-md-12 tabbable langset">
   			<ul class="nav nav-tabs">
@@ -16,12 +15,15 @@
 			<div class="tab-content">
       		{{- range $k,$v := .langs }}
 				<div class="tab-pane fade{{if eq $k 0}} active in{{end}}" id="langset_{{$langset.name}}_{{$v.ID}}">
-					{{- range $v.Fields }}
-					{{- .Render }}
+					{{- range $k, $g := $v.Groups }}
+					<div class="form-group{{if $g.HasError}} has-error{{end}}">
+					{{- range $g.Elements }}
+					{{ .Render }}
+					{{- end }}
+					</div>
 					{{- end }}
 				</div>
       		{{- end }}
 			</div>
 		</div>
 	</div>
-{{ if not .noFormGroup }}</div>{{ end }}
