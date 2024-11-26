@@ -26,6 +26,7 @@ import (
 
 	"github.com/webx-top/client/upload/watermark"
 	"github.com/webx-top/echo/param"
+	"github.com/webx-top/image"
 
 	"github.com/admpub/checksum"
 	"github.com/admpub/errors"
@@ -55,7 +56,10 @@ func (t *Thumb) Crop(opt *CropOptions) error {
 		}
 		b, err = watermark.Bytes(thumb, extension, opt.WatermarkOptions)
 		if err != nil {
-			return errors.WithMessage(err, `Thumb.Crop.Bytes`)
+			if !errors.Is(err, image.ErrUnsupportedWatermarkType) {
+				return errors.WithMessage(err, `Thumb.Crop.Bytes`)
+			}
+			b = thumb
 		}
 	} else {
 		b = thumb
