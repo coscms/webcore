@@ -27,11 +27,11 @@ import (
 
 	"github.com/coscms/webcore/library/backend"
 	"github.com/coscms/webcore/library/config"
+	"github.com/coscms/webcore/library/httpserver"
 	"github.com/coscms/webcore/library/license"
 	"github.com/coscms/webcore/library/nerrors"
 	"github.com/coscms/webcore/library/role"
 	"github.com/coscms/webcore/model"
-	"github.com/coscms/webcore/registry/route"
 )
 
 func TwoFactorAuth(c echo.Context, before func() error) (need bool, err error) {
@@ -65,7 +65,7 @@ func AuthCheck(h echo.Handler) echo.HandlerFunc {
 			return c.Redirect(backend.URLFor(`/license`))
 		}
 		handlerPermission := c.Route().String(`permission`)
-		if handlerPermission == route.PermissionGuest {
+		if handlerPermission == httpserver.PermissionGuest {
 			return h.Handle(c)
 		}
 		user := backend.User(c)
@@ -92,7 +92,7 @@ func AuthCheck(h echo.Handler) echo.HandlerFunc {
 			}
 			return nil
 		})
-		if handlerPermission == route.PermissionPublic {
+		if handlerPermission == httpserver.PermissionPublic {
 			return h.Handle(c)
 		}
 		var (

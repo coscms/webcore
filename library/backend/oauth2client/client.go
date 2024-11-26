@@ -8,8 +8,8 @@ import (
 	"github.com/coscms/webcore/library/backend/oauth2nging"
 	"github.com/coscms/webcore/library/common"
 	"github.com/coscms/webcore/library/config"
+	"github.com/coscms/webcore/library/httpserver"
 	"github.com/coscms/webcore/model"
-	"github.com/coscms/webcore/registry/route"
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/code"
@@ -146,7 +146,7 @@ func InitOauth(e *echo.Echo, middlewares ...interface{}) {
 	defaultOAuth = oauth2.New(host, oauth2Config)
 	defaultOAuth.SetSuccessHandler(SuccessHandler)
 	defaultOAuth.SetBeginAuthHandler(BeginAuthHandler)
-	e.Group(defaultOAuth.Config.Path).SetMetaKV(route.PermGuestKV())
+	e.Group(defaultOAuth.Config.Path).SetMetaKV(httpserver.PermGuestKV())
 	defaultOAuth.Wrapper(e, middlewares...)
 }
 

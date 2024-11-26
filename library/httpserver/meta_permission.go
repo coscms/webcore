@@ -16,9 +16,12 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-package route
+package httpserver
 
-import "github.com/webx-top/echo"
+import (
+	"github.com/coscms/webcore/library/route"
+	"github.com/webx-top/echo"
+)
 
 const (
 	MetaKeyPermission = `permission`
@@ -58,7 +61,7 @@ func SetGroupMetaPermissionGuest(s GroupSetMetaKV) *echo.Group {
 	return s.SetMetaKV(PermGuestKV())
 }
 
-func PublicHandler(h interface{}, meta ...echo.H) echo.Handler {
+func PublicHandler(r route.IRegister, h interface{}, meta ...echo.H) echo.Handler {
 	var m echo.H
 	if len(meta) > 0 && meta[0] != nil {
 		m = meta[0]
@@ -66,10 +69,10 @@ func PublicHandler(h interface{}, meta ...echo.H) echo.Handler {
 		m = echo.H{}
 	}
 	m.Set(PermPublicKV())
-	return IRegister().MetaHandler(m, h)
+	return r.MetaHandler(m, h)
 }
 
-func GuestHandler(h interface{}, meta ...echo.H) echo.Handler {
+func GuestHandler(r route.IRegister, h interface{}, meta ...echo.H) echo.Handler {
 	var m echo.H
 	if len(meta) > 0 && meta[0] != nil {
 		m = meta[0]
@@ -77,5 +80,5 @@ func GuestHandler(h interface{}, meta ...echo.H) echo.Handler {
 		m = echo.H{}
 	}
 	m.Set(PermGuestKV())
-	return IRegister().MetaHandler(m, h)
+	return r.MetaHandler(m, h)
 }

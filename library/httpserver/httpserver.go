@@ -148,6 +148,14 @@ func (h *HTTPServer) GetStaticMW() echo.MiddlewareFunc {
 	return h.StaticMW
 }
 
+func (h *HTTPServer) PublicHandler(handler interface{}, meta ...echo.H) echo.Handler {
+	return PublicHandler(h.Router, handler, meta...)
+}
+
+func (h *HTTPServer) GuestHandler(handler interface{}, meta ...echo.H) echo.Handler {
+	return GuestHandler(h.Router, handler, meta...)
+}
+
 func (h *HTTPServer) Apply() {
 	e := h.Router.Echo()
 	//e.SetRenderDataWrapper(echo.DefaultRenderDataWrapper)

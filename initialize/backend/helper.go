@@ -30,6 +30,7 @@ import (
 	"github.com/coscms/webcore/library/captcha/captchabiz"
 	"github.com/coscms/webcore/library/captcha/driver/captcha_go"
 	"github.com/coscms/webcore/library/config"
+	"github.com/coscms/webcore/library/httpserver"
 	"github.com/coscms/webcore/library/nerrors"
 	"github.com/coscms/webcore/library/nretry"
 	"github.com/coscms/webcore/middleware"
@@ -92,9 +93,9 @@ func DefaultConfigWatcher(mustOk bool) {
 }
 
 func addRouter() {
-	captcha.New(``).Wrapper(route.IRegister().Echo()).SetMetaKV(route.PermGuestKV())
+	captcha.New(``).Wrapper(route.IRegister().Echo()).SetMetaKV(httpserver.PermGuestKV())
 
-	captchaGoG := route.IRegister().Echo().Group(`/captchago`, captchabiz.CheckEnable(captchaLib.TypeGo)).SetMetaKV(route.PermGuestKV())
+	captchaGoG := route.IRegister().Echo().Group(`/captchago`, captchabiz.CheckEnable(captchaLib.TypeGo)).SetMetaKV(httpserver.PermGuestKV())
 	captcha_go.RegisterRoute(captchaGoG)
 
 	route.UseToGroup(`*`, middleware.AuthCheck) //应用中间件到所有子组
