@@ -69,6 +69,36 @@ func init() {
 	tplfunc.TplFuncMap[`CmdHasGroup`] = cmdHasGroup
 	tplfunc.TplFuncMap[`CmdExists`] = cmdExists
 	tplfunc.TplFuncMap[`HasService`] = hasService
+	tplfunc.TplFuncMap[`HasImplemented`] = func(v interface{}, interfaceName string) bool {
+		detector, ok := implementDetectors[interfaceName]
+		if !ok {
+			return false
+		}
+		return detector(v)
+	}
+}
+
+var implementDetectors = map[string]func(v interface{}) bool{
+	`IsHiddenContext`: func(v interface{}) bool {
+		_, ok := v.(echo.IsHiddenContext)
+		return ok
+	},
+	`IsValidContext`: func(v interface{}) bool {
+		_, ok := v.(echo.IsValidContext)
+		return ok
+	},
+	`RenderContext`: func(v interface{}) bool {
+		_, ok := v.(echo.RenderContext)
+		return ok
+	},
+	`RenderContextWithData`: func(v interface{}) bool {
+		_, ok := v.(echo.RenderContextWithData)
+		return ok
+	},
+}
+
+func RegisterImplementDetector(name string, detector func(v interface{}) bool) {
+	implementDetectors[name] = detector
 }
 
 func getFileTypeIcon(typ string) string {
