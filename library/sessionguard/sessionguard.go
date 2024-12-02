@@ -73,8 +73,12 @@ func Validate(ctx echo.Context, lastIP string, ownerType string, ownerId uint64)
 	})
 }
 
+func IgnoreBrowserUA(ctx echo.Context) {
+	ctx.Internal().Set(`ignoreBrowserUA`, true)
+}
+
 func validateEnv(ctx echo.Context, ownerType string, ownerId uint64, lastIP string, oldUserAgent string, oldLocationGetter func() *ip2regionparser.IpInfo) bool {
-	if oldUserAgent != ctx.Request().UserAgent() {
+	if !ctx.Internal().Bool(`ignoreBrowserUA`) && oldUserAgent != ctx.Request().UserAgent() {
 		log.Warnf(`[%s:%d]userAgent mismatched: %q != %q`, ownerType, ownerId, oldUserAgent, ctx.Request().UserAgent())
 		return false
 	}
