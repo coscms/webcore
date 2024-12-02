@@ -10,8 +10,8 @@ import (
 )
 
 type Environment struct {
-	UserAgent string
-	Location  ip2regionparser.IpInfo
+	UserAgent string                 `json:"ua"`
+	Location  ip2regionparser.IpInfo `json:"loc"`
 }
 
 func init() {
