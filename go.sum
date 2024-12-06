@@ -895,8 +895,8 @@ github.com/coscms/session-redisstore v0.0.0-20241123110057-3c697bf14511 h1:jrmoK
 github.com/coscms/session-redisstore v0.0.0-20241123110057-3c697bf14511/go.mod h1:l3chr1gBdBYpcawXcoBBwGBO67dKTiuArSdiOXG/nfg=
 github.com/coscms/session-sqlitestore v0.0.3 h1:NV8rYnE43uNMwxqsuxGsWQtzJob5qFfVhtssTlUMWTM=
 github.com/coscms/session-sqlitestore v0.0.3/go.mod h1:VxGlOZDbiHOErYHC4SxqH0FDmrfds10DhjqzD9f238Y=
-github.com/coscms/session-sqlstore v0.0.0-20241123103622-54cef6a2850b h1:PoyLDTSl8GH38s7ozSnCjRHwj0kUkLzoscSru7DvSbY=
-github.com/coscms/session-sqlstore v0.0.0-20241123103622-54cef6a2850b/go.mod h1:fkbU1N2At0fP38do0UvwcPN/6RXBlxoMQ2agI5JXVkk=
+github.com/coscms/session-sqlstore v0.0.0-20241206070659-19aaf21e7876 h1:THLILM0F0fjUFYBVF7xnpwtoEYgDtYaTAUoSI6eM+2I=
+github.com/coscms/session-sqlstore v0.0.0-20241206070659-19aaf21e7876/go.mod h1:fkbU1N2At0fP38do0UvwcPN/6RXBlxoMQ2agI5JXVkk=
 github.com/cpu/goacmedns v0.1.1/go.mod h1:MuaouqEhPAHxsbqjgnck5zeghuwBP1dLnPoobeGqugQ=
 github.com/cpuguy83/go-md2man/v2 v2.0.0-20190314233015-f79a8a8ca69d/go.mod h1:maD7wRr/U5Z6m/iR4s+kqSMx2CaBsrgA7czyZG/E6dU=
 github.com/cpuguy83/go-md2man/v2 v2.0.0/go.mod h1:maD7wRr/U5Z6m/iR4s+kqSMx2CaBsrgA7czyZG/E6dU=

@@ -62,7 +62,7 @@ require (
 	github.com/coscms/session-mysqlstore v0.0.0-20241122060432-e4161cb8f12f
 	github.com/coscms/session-redisstore v0.0.0-20241123110057-3c697bf14511
 	github.com/coscms/session-sqlitestore v0.0.3
-	github.com/coscms/session-sqlstore v0.0.0-20241123103622-54cef6a2850b
+	github.com/coscms/session-sqlstore v0.0.0-20241206070659-19aaf21e7876
 	github.com/dsoprea/go-logging v0.0.0-20200710184922-b02d349568dd
 	github.com/fynelabs/selfupdate v0.2.0
 	github.com/go-playground/validator/v10 v10.23.0
