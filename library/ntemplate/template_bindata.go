@@ -57,12 +57,14 @@ func (p *PathFixers) Fix(ctx echo.Context, fs http.FileSystem, t *Template, them
 }
 
 func fsFileExists(fs http.FileSystem, tmplDir, dirName, subDir, tmpl string) (string, bool) {
+	// step 1. 检查磁盘上是否存在模板文件，有则优先采用
 	_tmpl := filepath.Join(tmplDir, subDir, tmpl)
 	fi, err := os.Stat(_tmpl)
 	if err == nil && !fi.IsDir() {
 		_tmpl = path.Join(dirName, subDir, tmpl)
 		return _tmpl, true
 	}
+	// step 2. 使用 http.FileSystem 内的文件
 	_tmpl = path.Join(dirName, subDir, tmpl)
 	file, err := fs.Open(_tmpl)
 	if err == nil {
