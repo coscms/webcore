@@ -25,7 +25,8 @@ func CaptchaGoData(ctx echo.Context) error {
 	if err != nil {
 		return ctx.JSON(resp.SetError(err.Error()))
 	}
-	return ctx.JSON(resp.SetData(data))
+	resp.SetData(data)
+	return ctx.JSON(resp)
 }
 
 func CaptchaGoVerify(ctx echo.Context) error {
