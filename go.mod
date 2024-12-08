@@ -30,7 +30,7 @@ require (
 	github.com/admpub/goseaweedfs v0.1.2
 	github.com/admpub/goth v0.0.4
 	github.com/admpub/httpscerts v0.0.0-20180907121630-a2990e2af45c
-	github.com/admpub/imageproxy v0.9.2
+	github.com/admpub/imageproxy v0.10.0
 	github.com/admpub/ip2region/v2 v2.0.1
 	github.com/admpub/license_gen v0.1.1
 	github.com/admpub/log v1.3.6
@@ -127,8 +127,8 @@ require (
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
-	github.com/disintegration/imaging v1.6.2 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
+	github.com/fcjr/aia-transport-go v1.2.2 // indirect
 	github.com/flynn/go-shlex v0.0.0-20150515145356-3f9db97f8568 // indirect
 	github.com/francoispqt/gojay v1.2.13 // indirect
 	github.com/friendsofgo/errors v0.9.2 // indirect
@@ -150,7 +150,7 @@ require (
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
-	github.com/gomodule/redigo v1.9.2 // indirect
+	github.com/gomodule/redigo v2.0.0+incompatible // indirect
 	github.com/google/pprof v0.0.0-20241206021119-61a79c692802 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20210202160940-bed99a852dfe // indirect
