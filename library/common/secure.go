@@ -347,6 +347,12 @@ func MarkdownRestorePickout(repl []string, content string) string {
 	return content
 }
 
+var (
+	idCleanRegexp        = regexp.MustCompile(`[^\d]`)
+	ufloatCleanRegexp    = regexp.MustCompile(`[^\d\.]`)
+	noneFloatCleanRegexp = regexp.MustCompile(`[^\d\.-]`)
+)
+
 func ContentEncode(content string, contypes ...string) string {
 	if len(content) == 0 {
 		return content
@@ -359,8 +365,34 @@ func ContentEncode(content string, contypes ...string) string {
 	case `html`:
 		content = RemoveXSS(content)
 
-	case `url`, `image`, `video`, `audio`, `file`, `id`:
+	case `url`, `image`, `video`, `audio`, `file`:
 		content = MyCleanText(content)
+
+	case `id`, `uint`:
+		content = idCleanRegexp.ReplaceAllString(content, ``)
+
+	case `number`, `int`:
+		content = noneFloatCleanRegexp.ReplaceAllString(content, ``)
+		if len(content) > 0 {
+			if content[0] == '-' {
+				content = `-` + idCleanRegexp.ReplaceAllString(content[1:], ``)
+			} else {
+				content = idCleanRegexp.ReplaceAllString(content, ``)
+			}
+		}
+
+	case `ufloat`:
+		content = ufloatCleanRegexp.ReplaceAllString(content, ``)
+
+	case `float`, `decimal`, `double`:
+		content = noneFloatCleanRegexp.ReplaceAllString(content, ``)
+		if len(content) > 0 {
+			if content[0] == '-' {
+				content = `-` + ufloatCleanRegexp.ReplaceAllString(content[1:], ``)
+			} else {
+				content = ufloatCleanRegexp.ReplaceAllString(content, ``)
+			}
+		}
 
 	case `json`:
 		// pass

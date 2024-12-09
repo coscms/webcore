@@ -89,3 +89,20 @@ func TestPickCodeblock(t *testing.T) {
 	test.Eq(t, "> 123", content)
 
 }
+
+func TestContentEncodeNumber(t *testing.T) {
+	content := ContentEncode("&gt; 123", `id`)
+	test.Eq(t, "123", content)
+
+	content = ContentEncode("&gt; -123", `number`)
+	test.Eq(t, "-123", content)
+
+	content = ContentEncode("&gt; -123", `uint`)
+	test.Eq(t, "123", content)
+
+	content = ContentEncode("&gt; -12.3", `float`)
+	test.Eq(t, "-12.3", content)
+
+	content = ContentEncode("&gt; -12.3", `ufloat`)
+	test.Eq(t, "12.3", content)
+}
