@@ -18,6 +18,9 @@ func SQLLineParser(exec func(string) error, useCommentSQL ...bool) func(string) 
 	if len(useCommentSQL) > 0 {
 		useCmt = useCommentSQL[0]
 	}
+	resetSQL := func() {
+		sqlStr = ``
+	}
 	return func(line string) error {
 		if strings.HasPrefix(line, `--`) {
 			return nil
@@ -29,9 +32,7 @@ func SQLLineParser(exec func(string) error, useCommentSQL ...bool) func(string) 
 		}
 		sqlStr += line
 		if strings.HasSuffix(line, `;`) {
-			defer func() {
-				sqlStr = ``
-			}()
+			defer resetSQL()
 			//println(sqlStr)
 			if sqlStr == `;` {
 				return nil
