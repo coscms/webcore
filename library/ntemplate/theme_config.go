@@ -59,6 +59,15 @@ func (t ThemeColors) HasName(colorName string, notDefault ...bool) bool {
 	return false
 }
 
+func (t ThemeColors) GetColorByName(colorName string) string {
+	for _, ti := range t {
+		if ti.Name == colorName {
+			return ti.Color
+		}
+	}
+	return ``
+}
+
 type ThemeColor struct {
 	Name         string `json:"name,omitempty"`         // 颜色英文名(用于调用相应颜色的css文件)
 	Title        string `json:"title,omitempty"`        // 颜色中文标题
@@ -140,8 +149,20 @@ func (t *ThemeInfo) HasColorName(colorName string, notDefault ...bool) bool {
 	return t.Colors.HasName(colorName, notDefault...)
 }
 
+func (t *ThemeInfo) GetColorByName(colorName string) string {
+	return t.Colors.GetColorByName(colorName)
+}
+
+const Dark = `dark`
+
 func (t *ThemeInfo) IsColorName(colorName string) bool {
-	return t.ColorName() == colorName || t.CustomConfig.Bool(`dark`)
+	if t.ColorName() == colorName {
+		return true
+	}
+	if colorName == Dark && t.CustomConfig.Bool(colorName) {
+		return true
+	}
+	return false
 }
 
 func (t *ThemeInfo) ColorName() string {
