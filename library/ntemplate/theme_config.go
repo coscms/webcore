@@ -60,6 +60,9 @@ func (t ThemeColors) HasName(colorName string, notDefault ...bool) bool {
 }
 
 func (t ThemeColors) GetColorByName(colorName string) string {
+	if len(colorName) == 0 {
+		return ``
+	}
 	for _, ti := range t {
 		if ti.Name == colorName {
 			return ti.Color
@@ -151,6 +154,10 @@ func (t *ThemeInfo) HasColorName(colorName string, notDefault ...bool) bool {
 
 func (t *ThemeInfo) GetColorByName(colorName string) string {
 	return t.Colors.GetColorByName(colorName)
+}
+
+func (t *ThemeInfo) GetCurrentColor() string {
+	return t.Colors.GetColorByName(t.ColorName())
 }
 
 const Dark = `dark`
