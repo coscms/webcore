@@ -54,7 +54,7 @@ func Settings() []*SettingForm {
 }
 
 func Register(sf ...*SettingForm) {
-	settings = append(settings, sf...)
+	registerSettings(sf...)
 	for _, s := range sf {
 		if s.items != nil {
 			AddDefaultConfig(s.Group, s.items)
@@ -64,6 +64,17 @@ func Register(sf ...*SettingForm) {
 		}
 		if s.dataDecoders != nil {
 			s.dataDecoders.Register(s.Group)
+		}
+	}
+}
+
+func registerSettings(sf ...*SettingForm) {
+	for _, s := range sf {
+		index, setting := Get(s.Group)
+		if index == -1 {
+			settings = append(settings, s)
+		} else {
+			settings[index] = setting.Merge(s)
 		}
 	}
 }

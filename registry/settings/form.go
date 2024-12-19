@@ -45,6 +45,69 @@ type SettingForm struct {
 	dataEncoders DataEncoders //Encoder: form => table
 }
 
+func (s *SettingForm) Merge(source *SettingForm) *SettingForm {
+	if len(source.HeadTmpl) > 0 {
+		s.HeadTmpl = append(s.HeadTmpl, source.HeadTmpl...)
+	}
+	if len(source.Tmpl) > 0 {
+		s.Tmpl = append(s.Tmpl, source.Tmpl...)
+	}
+	if len(source.FootTmpl) > 0 {
+		s.FootTmpl = append(s.FootTmpl, source.FootTmpl...)
+	}
+	if len(source.Short) > 0 && len(s.Short) == 0 {
+		s.Short = source.Short
+	}
+	if len(source.Label) > 0 && len(s.Label) == 0 {
+		s.Label = source.Label
+	}
+	for k, v := range source.items {
+		s.items[k] = v
+	}
+	if len(source.hookPost) > 0 {
+		s.hookPost = append(s.hookPost, source.hookPost...)
+	}
+	if len(source.hookGet) > 0 {
+		s.hookGet = append(s.hookGet, source.hookGet...)
+	}
+	if source.renderer != nil {
+		if s.renderer == nil {
+			s.renderer = source.renderer
+		} else {
+			renderer := s.renderer
+			s.renderer = func(ctx echo.Context) template.HTML {
+				return renderer(ctx) + source.renderer(ctx)
+			}
+		}
+	}
+	if source.config != nil {
+		if s.config == nil {
+			s.config = source.config
+		} else {
+			s.config.Merge(source.config)
+		}
+	}
+	if source.dataDecoders != nil {
+		if s.dataDecoders == nil {
+			s.dataDecoders = source.dataDecoders
+		} else {
+			for k, v := range source.dataDecoders {
+				s.dataDecoders[k] = v
+			}
+		}
+	}
+	if source.dataEncoders != nil {
+		if s.dataEncoders == nil {
+			s.dataEncoders = source.dataEncoders
+		} else {
+			for k, v := range source.dataEncoders {
+				s.dataEncoders[k] = v
+			}
+		}
+	}
+	return s
+}
+
 func (s *SettingForm) AddTmpl(tmpl ...string) *SettingForm {
 	s.Tmpl = append(s.Tmpl, tmpl...)
 	return s
