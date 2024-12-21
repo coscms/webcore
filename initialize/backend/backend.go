@@ -135,7 +135,8 @@ func start() {
 		return nil
 	})
 	e.Get(`/favicon.ico`, bootconfig.FaviconHandler).SetMetaKV(httpserver.PermGuestKV())
-	httpserver.Backend.I18n().Handler(e, `App.i18n`)
+	i18nG := e.Group(`/i18n`).SetMetaKV(httpserver.PermGuestKV())
+	httpserver.Backend.I18n().Handler(i18nG, `App.i18n`)
 	debugG := e.Group(`/debug`, ngingMW.DebugPprof).SetMetaKV(httpserver.PermGuestKV())
 	pprof.RegisterRoute(debugG)
 	Initialize()
