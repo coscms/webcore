@@ -11,11 +11,11 @@ import (
 	"github.com/webx-top/echo/code"
 )
 
-func EnvKey(ctx echo.Context, dontCheckUA bool) string {
-	if !dontCheckUA {
-		dontCheckUA = ctx.Internal().Bool(`ignoreBrowserUA`)
+func EnvKey(ctx echo.Context, cfg SessionGuardConfig) string {
+	if cfg.IgnoreBrowserIP && cfg.IgnoreBrowserUA {
+		return `T` + strconv.FormatInt(time.Now().Unix(), 10)
 	}
-	if dontCheckUA {
+	if cfg.IgnoreBrowserIP {
 		return com.Md5(ctx.RealIP()) + `T` + strconv.FormatInt(time.Now().Unix(), 10)
 	}
 	return com.Md5(ctx.RealIP()+`|`+ctx.Request().UserAgent()) + `T` + strconv.FormatInt(time.Now().Unix(), 10)
@@ -35,6 +35,9 @@ func (cfg *SessionGuardConfig) VerifyEnvKey(ctx echo.Context, envKey string, don
 		if time.Now().Unix()-ts > 300 {
 			return ctx.NewError(code.DataHasExpired, `凭证已经过期，请刷新页面后重新操作`).SetZone(`envKey`)
 		}
+	}
+	if cfg.IgnoreBrowserUA && cfg.IgnoreBrowserIP {
+		return nil
 	}
 	if cfg.IgnoreBrowserUA {
 		if com.Md5(ctx.RealIP()) != envKey[0:pos] {

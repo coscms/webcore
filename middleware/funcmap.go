@@ -119,7 +119,7 @@ func BackendFuncMap() echo.MiddlewareFunc {
 				return permission.HasNavigate(c, navList)
 			})
 			c.SetFunc(`EnvKey`, func() string {
-				return sessionguard.EnvKey(c, sessionguard.GetConfig().IgnoreBrowserUA)
+				return sessionguard.EnvKey(c, sessionguard.GetConfig().SessionGuardConfig)
 			})
 			return h.Handle(c)
 		})
