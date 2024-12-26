@@ -6,7 +6,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/coscms/webcore/library/common"
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/code"
@@ -22,13 +21,13 @@ func EnvKey(ctx echo.Context, dontCheckUA bool) string {
 	return com.Md5(ctx.RealIP()+`|`+ctx.Request().UserAgent()) + `T` + strconv.FormatInt(time.Now().Unix(), 10)
 }
 
-func VerifyEnvKey(ctx echo.Context, envKey string, dontCheckTime bool, dontCheckUA bool) error {
+func (cfg *SessionGuardConfig) VerifyEnvKey(ctx echo.Context, envKey string, dontCheckTime bool) error {
 	pos := strings.LastIndex(envKey, `T`)
 	end := len(envKey) - 1
 	if pos < 1 || pos >= end {
 		return ctx.NewError(code.InvalidParameter, `凭证无效`).SetZone(`envKey`)
 	}
-	if dontCheckTime {
+	if !dontCheckTime {
 		ts, err := strconv.ParseInt(envKey[pos+1:], 10, 64)
 		if err != nil {
 			return ctx.NewError(code.DataFormatIncorrect, `凭证解析失败`).SetZone(`envKey`)
@@ -37,7 +36,7 @@ func VerifyEnvKey(ctx echo.Context, envKey string, dontCheckTime bool, dontCheck
 			return ctx.NewError(code.DataHasExpired, `凭证已经过期，请刷新页面后重新操作`).SetZone(`envKey`)
 		}
 	}
-	if dontCheckUA {
+	if cfg.IgnoreBrowserUA {
 		if com.Md5(ctx.RealIP()) != envKey[0:pos] {
 			return ctx.NewError(code.DataStatusIncorrect, `凭证来源不符合要求`).SetZone(`envKey`)
 		}
@@ -53,24 +52,26 @@ type PE struct {
 	Timestamp int64  `json:"t"`
 }
 
-func (p *PE) Verify(ctx echo.Context) error {
-	sessionGuardCfg := common.ExtendConfig().Children(`sessionGuard`)
-	encryptedPasswordExpires := sessionGuardCfg.Int64(`encryptedPasswordExpires`)
+func (p *PE) Verify(ctx echo.Context, isBackend bool) error {
+	cfg := GetConfig()
+	sessionGuardCfg := cfg.SessionGuardConfig
+	if !isBackend {
+		if cfg.Frontend == nil {
+			return nil
+		}
+		sessionGuardCfg = *cfg.Frontend
+	}
+	encryptedPasswordExpires := sessionGuardCfg.Expires
 	if encryptedPasswordExpires <= 0 {
 		encryptedPasswordExpires = 300
 	}
-	//fmt.Println(`encryptedPasswordExpires~~~~~~~~~~~~~~~~~~~~~~~~~>`, encryptedPasswordExpires)
 	if time.Now().Unix()-p.Timestamp > encryptedPasswordExpires {
 		return ctx.NewError(code.DataHasExpired, `凭证已经失效`).SetZone(`envKey`)
 	}
-	ignoreBrowserUA := sessionGuardCfg.Bool(`ignoreBrowserUA`)
-	if !ignoreBrowserUA {
-		ignoreBrowserUA = ctx.Internal().Bool(`ignoreBrowserUA`)
-	}
-	return VerifyEnvKey(ctx, p.EnvKey, true, ignoreBrowserUA)
+	return sessionGuardCfg.VerifyEnvKey(ctx, p.EnvKey, true)
 }
 
-func Unpack(ctx echo.Context, encrypted string) (password string, err error) {
+func Unpack(ctx echo.Context, encrypted string, isBackend bool) (password string, err error) {
 	if !strings.HasPrefix(encrypted, `{`) {
 		return encrypted, nil
 	}
@@ -80,5 +81,5 @@ func Unpack(ctx echo.Context, encrypted string) (password string, err error) {
 		err = ctx.NewError(code.DataFormatIncorrect, `密码拆包失败`)
 		return
 	}
-	return pe.Password, pe.Verify(ctx)
+	return pe.Password, pe.Verify(ctx, isBackend)
 }

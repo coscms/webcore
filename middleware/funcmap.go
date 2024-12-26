@@ -25,7 +25,6 @@ import (
 	"github.com/webx-top/echo"
 
 	"github.com/coscms/webcore/library/backend"
-	"github.com/coscms/webcore/library/common"
 	"github.com/coscms/webcore/library/dashboard"
 	"github.com/coscms/webcore/library/httpserver"
 	"github.com/coscms/webcore/library/modal"
@@ -120,7 +119,7 @@ func BackendFuncMap() echo.MiddlewareFunc {
 				return permission.HasNavigate(c, navList)
 			})
 			c.SetFunc(`EnvKey`, func() string {
-				return sessionguard.EnvKey(c, common.ExtendConfig().Children(`sessionGuard`).Bool(`ignoreBrowserUA`))
+				return sessionguard.EnvKey(c, sessionguard.GetConfig().IgnoreBrowserUA)
 			})
 			return h.Handle(c)
 		})

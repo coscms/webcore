@@ -13,6 +13,6 @@ func DecryptPassword(c echo.Context, pass string) (string, error) {
 	if err != nil {
 		return pass, err
 	}
-	pass, err = sessionguard.Unpack(c, pass)
+	pass, err = sessionguard.Unpack(c, pass, true)
 	return pass, err
 }
