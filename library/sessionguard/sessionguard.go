@@ -36,9 +36,17 @@ func Validate(ctx echo.Context, lastIP string, ownerType string, ownerId uint64)
 	if common.IsAnonymousMode(ownerType) {
 		return true
 	}
+	cfg := GetConfig()
+	sgCfg := cfg.SessionGuardConfig
+	if ownerType != `user` {
+		if cfg.Frontend == nil {
+			return true
+		}
+		sgCfg = *cfg.Frontend
+	}
 	env := GetEnvFromSession(ctx, ownerType)
 	if env != nil {
-		return validateEnv(ctx, ownerType, ownerId, lastIP, env.UserAgent, func() *ip2regionparser.IpInfo {
+		return sgCfg.validateEnv(ctx, ownerType, ownerId, lastIP, env.UserAgent, func() *ip2regionparser.IpInfo {
 			return &env.Location
 		})
 	}
@@ -53,7 +61,7 @@ func Validate(ctx echo.Context, lastIP string, ownerType string, ownerId uint64)
 	if len(lastIP) == 0 {
 		lastIP = info.IpAddress
 	}
-	return validateEnv(ctx, ownerType, ownerId, lastIP, info.UserAgent, func() *ip2regionparser.IpInfo {
+	return sgCfg.validateEnv(ctx, ownerType, ownerId, lastIP, info.UserAgent, func() *ip2regionparser.IpInfo {
 		if len(info.IpLocation) == 0 || !strings.HasPrefix(info.IpLocation, `{`) {
 			return nil
 		}
@@ -77,10 +85,13 @@ func IgnoreBrowserUA(ctx echo.Context) {
 	ctx.Internal().Set(`ignoreBrowserUA`, true)
 }
 
-func validateEnv(ctx echo.Context, ownerType string, ownerId uint64, lastIP string, oldUserAgent string, oldLocationGetter func() *ip2regionparser.IpInfo) bool {
-	if !ctx.Internal().Bool(`ignoreBrowserUA`) && oldUserAgent != ctx.Request().UserAgent() {
+func (c *SessionGuardConfig) validateEnv(ctx echo.Context, ownerType string, ownerId uint64, lastIP string, oldUserAgent string, oldLocationGetter func() *ip2regionparser.IpInfo) bool {
+	if !c.IgnoreBrowserUA && oldUserAgent != ctx.Request().UserAgent() {
 		log.Warnf(`[%s:%d]userAgent mismatched: %q != %q`, ownerType, ownerId, oldUserAgent, ctx.Request().UserAgent())
 		return false
+	}
+	if c.IgnoreBrowserIP {
+		return true
 	}
 	currentIP := ctx.RealIP()
 	if lastIP == currentIP {
