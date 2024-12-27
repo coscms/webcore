@@ -19,6 +19,7 @@ type QuickConfig struct {
 	OwnerType    string `validate:"required"`
 	Filename     string `validate:"required"`
 	SaveFilename string
+	result       *uploadClient.Result
 }
 
 func (qc QuickConfig) Validate(ctx echo.Context) error {
@@ -42,7 +43,7 @@ func (qc QuickConfig) Validate(ctx echo.Context) error {
 }
 
 // Save 快存
-func (qc QuickConfig) Save(ctx echo.Context, r io.ReadSeeker, size int64) error {
+func (qc *QuickConfig) Save(ctx echo.Context, r io.ReadSeeker, size int64) error {
 	if err := qc.Validate(ctx); err != nil {
 		return err
 	}
@@ -76,5 +77,10 @@ func (qc QuickConfig) Save(ctx echo.Context, r io.ReadSeeker, size int64) error 
 		return err
 	}
 	r.Seek(0, 0)
-	return DBSave(m, qc.Subdir, &result, r)
+	qc.result = &result
+	return DBSave(m, qc.Subdir, qc.result, r)
+}
+
+func (qc QuickConfig) Result() *uploadClient.Result {
+	return qc.result
 }
