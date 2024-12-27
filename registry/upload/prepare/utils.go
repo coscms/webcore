@@ -6,7 +6,6 @@ import (
 	"io"
 	"path"
 
-	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/code"
 
@@ -14,7 +13,6 @@ import (
 	modelFile "github.com/coscms/webcore/model/file"
 	storerUtils "github.com/coscms/webcore/model/file/storer"
 	"github.com/coscms/webcore/registry/upload"
-	"github.com/coscms/webcore/registry/upload/checker"
 	uploadChunk "github.com/coscms/webcore/registry/upload/chunk"
 	"github.com/coscms/webcore/registry/upload/dbsaver"
 	"github.com/coscms/webcore/registry/upload/driver"
@@ -91,35 +89,6 @@ func DBSave(fileM *modelFile.File, subdir string, result *uploadClient.Result, o
 	return dbSaverFn(fileM, result, originalReader)
 }
 
-type QuickConfig struct {
-	FileType     string `validate:"required"`
-	Subdir       string `validate:"required"`
-	OwnerID      uint64 `validate:"required"`
-	OwnerType    string `validate:"required"`
-	Filename     string `validate:"required"`
-	SaveFilename string
-}
-
-func (qc QuickConfig) Validate(ctx echo.Context) error {
-	if !upload.AllowedSubdir(qc.Subdir) {
-		return ctx.NewError(code.InvalidParameter, `%s参数值“%s”未被登记`, `subdir`, qc.Subdir)
-	}
-	err := CheckFileTypeString(qc.FileType)
-	if err != nil {
-		return err
-	}
-	if len(qc.OwnerType) == 0 {
-		return ctx.NewError(code.InvalidParameter, `%s参数值“%s”无效`, `ownerType`, qc.OwnerType)
-	}
-	if qc.OwnerID == 0 {
-		return ctx.NewError(code.InvalidParameter, `%s参数值“%s”无效`, `ownerID`, qc.OwnerID)
-	}
-	if len(qc.Filename) == 0 {
-		return ctx.NewError(code.InvalidParameter, `%s参数值“%s”无效`, `filename`, qc.Filename)
-	}
-	return err
-}
-
 func CheckFileTypeString(fileType string) error {
 	return CheckFileType(uploadClient.FileType(fileType))
 }
@@ -132,47 +101,4 @@ func CheckFileType(fileType uploadClient.FileType) error {
 		return nil
 	}
 	return fmt.Errorf(`%w (%s)`, ErrInvalidFileType, fileType)
-}
-
-// QuickStore 快存
-func QuickStore(ctx echo.Context, cfg QuickConfig, r io.Reader, size int64) error {
-	if err := cfg.Validate(ctx); err != nil {
-		return err
-	}
-	stor, err := NewStorer(ctx, cfg.Subdir)
-	if err != nil {
-		return err
-	}
-	m := NewModel(ctx, cfg.OwnerType, cfg.OwnerID, cfg.Subdir, cfg.FileType)
-	var subdir string
-	subdir, _, err = checker.DefaultNoCheck(ctx)
-	if err != nil {
-		return err
-	}
-	var dstFile string
-	dstFile, err = storerUtils.SaveFilename(subdir, cfg.SaveFilename, cfg.Filename)
-	if err != nil {
-		return err
-	}
-	result := uploadClient.Result{
-		FileType: uploadClient.FileType(cfg.FileType),
-		FileName: cfg.Filename,
-		FileSize: size,
-	}
-	result.SavePath, result.FileURL, err = stor.Put(dstFile, r, size)
-	if err != nil {
-		return err
-	}
-	sk, ok := r.(io.Seeker)
-	if ok {
-		sk.Seek(0, 0)
-	}
-	result.Md5, err = com.Md5Reader(r)
-	if err != nil {
-		return err
-	}
-	if ok {
-		sk.Seek(0, 0)
-	}
-	return DBSave(m, cfg.Subdir, &result, r)
 }
