@@ -218,6 +218,25 @@ func (f *File) DeleteBySavePath(savePath string) (err error) {
 	return f.fireDelete()
 }
 
+func (f *File) DeleteByURL(viewURL string) (err error) {
+	f.Context().Begin()
+	defer func() {
+		f.Context().End(err == nil)
+	}()
+	err = f.Get(nil, db.Cond{`view_url`: viewURL})
+	if err != nil {
+		if err != db.ErrNoMoreRows {
+			return
+		}
+		return nil
+	}
+	err = f.Delete(nil, db.Cond{`id`: f.Id})
+	if err != nil {
+		return
+	}
+	return f.fireDelete()
+}
+
 func (f *File) RemoveUnusedAvatar(ownerType string, excludeID uint64) error {
 	return f.DeleteBy(db.And(
 		db.Cond{`subdir`: `avatar`},
@@ -270,6 +289,8 @@ func (f *File) DeleteBy(cond db.Compound) error {
 				f.Context().Rollback()
 				return err
 			}
+			fm.SetContext(f.Context())
+			f.NgingFile = fm
 			err = f.fireDelete()
 			f.Context().End(err == nil)
 			if err != nil {
