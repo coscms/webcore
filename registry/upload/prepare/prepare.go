@@ -54,14 +54,7 @@ func (p *PrepareData) Close() error {
 }
 
 func (p *PrepareData) MakeModel(ownerType string, ownerID uint64) *modelFile.File {
-	fileM := modelFile.NewFile(p.ctx)
-	fileM.StorerName = p.StorerInfo.Name
-	fileM.StorerId = p.StorerInfo.ID
-	fileM.OwnerId = ownerID
-	fileM.OwnerType = ownerType
-	fileM.Type = p.FileType
-	fileM.Subdir = p.Subdir
-	return fileM
+	return NewModel(p.ctx, ownerType, ownerID, p.Subdir, p.FileType, p.StorerInfo)
 }
 
 func (p *PrepareData) MakeCallback(fileM *modelFile.File, storer driver.Storer, subdir string) func(*uploadClient.Result, io.Reader, io.Reader) error {
@@ -224,7 +217,7 @@ func Prepare(ctx echo.Context, subdir string, fileType string, storerInfos ...st
 		subdir = `default`
 	}
 	if !upload.AllowedSubdir(subdir) {
-		return nil, ctx.NewError(code.InvalidParameter, `subdir参数值“%s”未被登记`, subdir)
+		return nil, ctx.NewError(code.InvalidParameter, `%s参数值“%s”未被登记`, `subdir`, subdir)
 	}
 	var storerInfo storerUtils.Info
 	if len(storerInfos) > 0 {

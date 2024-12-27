@@ -2,6 +2,7 @@ package storer
 
 import (
 	"path/filepath"
+	"strings"
 
 	"github.com/coscms/webcore/library/common"
 	"github.com/webx-top/echo"
@@ -51,7 +52,11 @@ func SaveFilename(subdir, name, postFilename string) (string, error) {
 		if err != nil {
 			return ``, err
 		}
+		fname += ext
+	} else {
+		if !strings.HasSuffix(fname, ext) {
+			fname += ext
+		}
 	}
-	fname += ext
 	return subdir + fname, nil
 }
