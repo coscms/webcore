@@ -109,7 +109,7 @@ func initFileChan() {
 				db, err := LevelDB().OpenDB(mf.Config.Id)
 				if err != nil {
 					err = fmt.Errorf(`failed to open levelDB file: %w`, err)
-					log.Errorf(`[cloundbackup] %v`, err)
+					log.Errorf(`[cloudbackup] %v`, err)
 					RecordLog(ctx, err, &mf.Config, mf.FilePath, mf.ObjectName, mf.Operation, startTime, 0)
 					continue
 				}
@@ -123,7 +123,7 @@ func initFileChan() {
 				if err != nil {
 					if err != leveldb.ErrNotFound {
 						err = fmt.Errorf(`failed to read data from levelDB: %w`, err)
-						log.Errorf(`[cloundbackup] %v`, err)
+						log.Errorf(`[cloudbackup] %v`, err)
 						RecordLog(ctx, err, &mf.Config, mf.FilePath, mf.ObjectName, mf.Operation, startTime, 0)
 						continue
 					}
@@ -154,7 +154,7 @@ func initFileChan() {
 				err = db.Put(dbKey, com.Str2bytes(strings.Join(parts, `||`)), nil)
 				if err != nil {
 					err = fmt.Errorf(`failed to write data to levelDB: %w`, err)
-					log.Errorf(`[cloundbackup] %v`, err)
+					log.Errorf(`[cloudbackup] %v`, err)
 					RecordLog(ctx, err, &mf.Config, mf.FilePath, mf.ObjectName, mf.Operation, startTime, 0)
 					continue
 				}
@@ -172,7 +172,7 @@ func initFileChan() {
 					}
 					err := db.Put(dbKey, com.Str2bytes(strings.Join(parts, `||`)), nil)
 					if err != nil {
-						log.Errorf(`[cloundbackup] failed to write data to levelDB: %v`, err)
+						log.Errorf(`[cloudbackup] failed to write data to levelDB: %v`, err)
 					}
 				}
 			}
