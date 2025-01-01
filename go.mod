@@ -19,7 +19,7 @@ require (
 	github.com/admpub/errors v0.8.2
 	github.com/admpub/events v1.3.6
 	github.com/admpub/go-bindata-assetfs v0.0.0-20170428090253-36eaa4c19588
-	github.com/admpub/go-captcha/v2 v2.0.4
+	github.com/admpub/go-captcha/v2 v2.0.5
 	github.com/admpub/go-download/v2 v2.1.15
 	github.com/admpub/go-figure v0.0.0-20180619031829-18b2b544842c
 	github.com/admpub/go-isatty v0.0.11
@@ -54,7 +54,7 @@ require (
 	github.com/admpub/web-terminal v0.2.1
 	github.com/aws/aws-sdk-go v1.55.5
 	github.com/caddy-plugins/webdav v1.2.10
-	github.com/coscms/captcha v0.1.2
+	github.com/coscms/captcha v0.1.3
 	github.com/coscms/forms v1.13.10
 	github.com/coscms/go-imgparse v0.0.1
 	github.com/coscms/oauth2s v0.4.1
@@ -186,7 +186,7 @@ require (
 	github.com/ncruces/go-strftime v0.1.9 // indirect
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646 // indirect
 	github.com/nxadm/tail v1.4.11 // indirect
-	github.com/onsi/ginkgo/v2 v2.22.1 // indirect
+	github.com/onsi/ginkgo/v2 v2.22.2 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect
@@ -235,8 +235,8 @@ require (
 	google.golang.org/protobuf v1.36.1 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
-	modernc.org/libc v1.61.5 // indirect
-	modernc.org/mathutil v1.7.0 // indirect
+	modernc.org/libc v1.61.6 // indirect
+	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.8.0 // indirect
 	modernc.org/sqlite v1.34.4 // indirect
 	rsc.io/qr v0.2.0 // indirect
