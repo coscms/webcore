@@ -18,7 +18,7 @@ func (r *Login) BeforeValidate(ctx echo.Context) error {
 	if len(r.Pass) == 0 {
 		return ctx.NewError(code.InvalidParameter, `请输入密码`).SetZone(`password`)
 	}
-	passwd, err := backend.DecryptPassword(ctx, r.Pass)
+	passwd, err := backend.DecryptPassword(ctx, r.User, r.Pass)
 	if err != nil {
 		err = ctx.NewError(code.InvalidParameter, `密码解密失败: %v`, err).SetZone(`password`)
 	} else {

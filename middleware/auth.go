@@ -157,7 +157,7 @@ func Auth(c echo.Context) error {
 	}
 	pass := c.Form(`pass`)
 	var err error
-	pass, err = backend.DecryptPassword(c, pass)
+	pass, err = backend.DecryptPassword(c, user, pass)
 	if err != nil {
 		return c.NewError(code.InvalidParameter, `密码解密失败: %v`, err)
 	}

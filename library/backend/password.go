@@ -7,12 +7,12 @@ import (
 	"github.com/coscms/webcore/library/sessionguard"
 )
 
-func DecryptPassword(c echo.Context, pass string) (string, error) {
+func DecryptPassword(c echo.Context, username, pass string) (string, error) {
 	var err error
 	pass, err = codec.DefaultSM2DecryptHex(pass)
 	if err != nil {
 		return pass, err
 	}
-	pass, err = sessionguard.Unpack(c, pass, true)
+	pass, err = sessionguard.Unpack(c, `user`, username, pass)
 	return pass, err
 }

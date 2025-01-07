@@ -19,10 +19,13 @@ func EnvKey(ctx echo.Context, cfg SessionGuardConfig) string {
 	if cfg.IgnoreBrowserUA {
 		return com.Md5(ctx.RealIP()) + `T` + strconv.FormatInt(time.Now().Unix(), 10)
 	}
+	if cfg.IgnoreBrowserIP {
+		return com.Md5(`|`+ctx.Request().UserAgent()) + `T` + strconv.FormatInt(time.Now().Unix(), 10)
+	}
 	return com.Md5(ctx.RealIP()+`|`+ctx.Request().UserAgent()) + `T` + strconv.FormatInt(time.Now().Unix(), 10)
 }
 
-func (cfg *SessionGuardConfig) VerifyEnvKey(ctx echo.Context, envKey string, dontCheckTime bool) error {
+func (cfg *SessionGuardConfig) VerifyEnvKey(ctx echo.Context, ownerType string, ownerIdOrName interface{}, envKey string, dontCheckTime bool) error {
 	pos := strings.LastIndex(envKey, `T`)
 	end := len(envKey) - 1
 	if pos < 1 || pos >= end {
@@ -45,7 +48,15 @@ func (cfg *SessionGuardConfig) VerifyEnvKey(ctx echo.Context, envKey string, don
 		lastIPMd5 := envKey[0:pos]
 		currentIPMd5 := com.Md5(currentIP)
 		if currentIPMd5 != lastIPMd5 {
-			log.Debugf(`[%s]ip mismatched: %q(last) != %q(now)`, currentIP, lastIPMd5, currentIPMd5)
+			log.Debugf(`[%s:%v]ip mismatched: %q(last) != %q(now)`, ownerType, ownerIdOrName, lastIPMd5, currentIPMd5)
+			return ctx.NewError(code.DataStatusIncorrect, `凭证来源不符合要求`).SetZone(`envKey`)
+		}
+	} else if cfg.IgnoreBrowserIP {
+		currentUA := ctx.Request().UserAgent()
+		lastUAMd5 := envKey[0:pos]
+		currentUAMd5 := com.Md5(`|` + currentUA)
+		if currentUAMd5 != lastUAMd5 {
+			log.Debugf(`[%s:%v]userAgent mismatched: %q(last) != %q(now)`, ownerType, ownerIdOrName, lastUAMd5, currentUAMd5)
 			return ctx.NewError(code.DataStatusIncorrect, `凭证来源不符合要求`).SetZone(`envKey`)
 		}
 	} else {
@@ -64,10 +75,10 @@ type PE struct {
 	Timestamp int64  `json:"t"`
 }
 
-func (p *PE) Verify(ctx echo.Context, isBackend bool) error {
+func (p *PE) Verify(ctx echo.Context, ownerType string, ownerIdOrName interface{}) error {
 	cfg := GetConfig()
 	sessionGuardCfg := cfg.SessionGuardConfig
-	if !isBackend {
+	if ownerType != `user` {
 		if cfg.Frontend == nil {
 			return nil
 		}
@@ -80,10 +91,10 @@ func (p *PE) Verify(ctx echo.Context, isBackend bool) error {
 	if time.Now().Unix()-p.Timestamp > encryptedPasswordExpires {
 		return ctx.NewError(code.DataHasExpired, `凭证已经失效`).SetZone(`envKey`)
 	}
-	return sessionGuardCfg.VerifyEnvKey(ctx, p.EnvKey, true)
+	return sessionGuardCfg.VerifyEnvKey(ctx, ownerType, ownerIdOrName, p.EnvKey, true)
 }
 
-func Unpack(ctx echo.Context, encrypted string, isBackend bool) (password string, err error) {
+func Unpack(ctx echo.Context, ownerType string, ownerIdOrName interface{}, encrypted string) (password string, err error) {
 	if !strings.HasPrefix(encrypted, `{`) {
 		return encrypted, nil
 	}
@@ -93,5 +104,5 @@ func Unpack(ctx echo.Context, encrypted string, isBackend bool) (password string
 		err = ctx.NewError(code.DataFormatIncorrect, `密码拆包失败`)
 		return
 	}
-	return pe.Password, pe.Verify(ctx, isBackend)
+	return pe.Password, pe.Verify(ctx, ownerType, ownerIdOrName)
 }

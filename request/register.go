@@ -22,13 +22,13 @@ func (r *Register) BeforeValidate(ctx echo.Context) error {
 	if len(r.ConfirmationPassword) == 0 {
 		return ctx.NewError(code.InvalidParameter, `请输入确认密码`).SetZone(`confirmationPassword`)
 	}
-	passwd, err := backend.DecryptPassword(ctx, r.Password)
+	passwd, err := backend.DecryptPassword(ctx, r.Username, r.Password)
 	if err != nil {
 		err = ctx.NewError(code.InvalidParameter, `密码解密失败: %v`, err).SetZone(`password`)
 	} else {
 		r.Password = passwd
 	}
-	cpasswd, err := backend.DecryptPassword(ctx, r.ConfirmationPassword)
+	cpasswd, err := backend.DecryptPassword(ctx, r.Username, r.ConfirmationPassword)
 	if err != nil {
 		err = ctx.NewError(code.InvalidParameter, `密码解密失败: %v`, err).SetZone(`confirmationPassword`)
 	} else {
