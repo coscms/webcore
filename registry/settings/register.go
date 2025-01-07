@@ -29,21 +29,21 @@ import (
 
 var settings = []*SettingForm{
 	{
-		Short:    `系统设置`,
-		Label:    `系统设置`,
+		Short:    echo.T(`系统设置`),
+		Label:    echo.T(`系统设置`),
 		Group:    `base`,
 		Tmpl:     []string{`manager/settings/base`},
 		FootTmpl: []string{`manager/settings/base_footer`},
 	},
 	{
-		Short: `SMTP设置`,
-		Label: `SMTP服务器设置`,
+		Short: echo.T(`SMTP设置`),
+		Label: echo.T(`SMTP服务器设置`),
 		Group: `smtp`,
 		Tmpl:  []string{`manager/settings/smtp`},
 	},
 	{
-		Short: `日志设置`,
-		Label: `日志设置`,
+		Short: echo.T(`日志设置`),
+		Label: echo.T(`日志设置`),
 		Group: `log`,
 		Tmpl:  []string{`manager/settings/log`},
 	},
