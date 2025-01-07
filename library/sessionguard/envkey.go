@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/admpub/log"
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/code"
@@ -40,11 +41,19 @@ func (cfg *SessionGuardConfig) VerifyEnvKey(ctx echo.Context, envKey string, don
 		return nil
 	}
 	if cfg.IgnoreBrowserUA {
-		if com.Md5(ctx.RealIP()) != envKey[0:pos] {
+		currentIP := ctx.RealIP()
+		lastIPMd5 := envKey[0:pos]
+		currentIPMd5 := com.Md5(currentIP)
+		if currentIPMd5 != lastIPMd5 {
+			log.Debugf(`[%s]ip mismatched: %q(last) != %q(now)`, currentIP, lastIPMd5, currentIPMd5)
 			return ctx.NewError(code.DataStatusIncorrect, `凭证来源不符合要求`).SetZone(`envKey`)
 		}
-	} else if com.Md5(ctx.RealIP()+`|`+ctx.Request().UserAgent()) != envKey[0:pos] {
-		return ctx.NewError(code.DataStatusIncorrect, `凭证来源不符合要求`).SetZone(`envKey`)
+	} else {
+		currentIP := ctx.RealIP()
+		lastIPAndUAMd5 := envKey[0:pos]
+		if com.Md5(currentIP+`|`+ctx.Request().UserAgent()) != lastIPAndUAMd5 {
+			return ctx.NewError(code.DataStatusIncorrect, `凭证来源不符合要求`).SetZone(`envKey`)
+		}
 	}
 	return nil
 }
