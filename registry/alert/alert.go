@@ -25,7 +25,7 @@ func init() {
 	for name, mess := range imbot.Messagers() {
 		RecipientPlatforms.Add(name, mess.Label)
 	}
-	RecipientPlatforms.Add(RecipientPlatformWebhookCustom, `自定义`)
+	RecipientPlatforms.Add(RecipientPlatformWebhookCustom, echo.T(`自定义`))
 
 	//Topics.Add(`test`, `测试`)
 }

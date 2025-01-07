@@ -26,4 +26,4 @@ const (
 	KvDefaultDataType = `text`
 )
 
-var KvDataTypes = echo.NewKVData().Add(`number`, `数字`).Add(`text`, `文本`).Add(`json`, `JSON`)
+var KvDataTypes = echo.NewKVData().Add(`number`, echo.T(`数字`)).Add(`text`, `文本`).Add(`json`, echo.T(`JSON`))

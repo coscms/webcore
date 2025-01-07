@@ -38,11 +38,11 @@ func (s SafeItemInfo) IsHide() bool {
 // 	Add(`password`, `修改密码`)
 
 var SafeItems = echo.NewKVData().
-	Add(`google`, `两步验证`, echo.KVOptX(SafeItemInfo{
-		Step: 2, ConfigTitle: `两步验证`, ConfigRoute: `gauth_bind`,
+	Add(`google`, echo.T(`两步验证`), echo.KVOptX(SafeItemInfo{
+		Step: 2, ConfigTitle: echo.T(`两步验证`), ConfigRoute: `gauth_bind`,
 	})).
-	Add(`password`, `密码登录`, echo.KVOptX(SafeItemInfo{
-		Step: 1, ConfigTitle: `修改密码`, ConfigRoute: `password`,
+	Add(`password`, echo.T(`密码登录`), echo.KVOptX(SafeItemInfo{
+		Step: 1, ConfigTitle: echo.T(`修改密码`), ConfigRoute: `password`,
 	}))
 
 var emptySafeItemInfo = SafeItemInfo{}

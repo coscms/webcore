@@ -7,6 +7,7 @@ import (
 	"github.com/coscms/webcore/library/cron/send"
 	"github.com/coscms/webcore/library/cron/writer"
 	"github.com/coscms/webcore/registry/alert"
+	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/defaults"
 )
 
@@ -73,5 +74,5 @@ func OtherSender(alertData *alert.AlertData) error {
 func init() {
 	AddSender(EmailSender)
 	AddSender(OtherSender)
-	alert.Topics.Add(`cron`, `定时任务`)
+	alert.Topics.Add(`cron`, echo.T(`定时任务`))
 }

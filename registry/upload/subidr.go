@@ -9,8 +9,8 @@ import (
 var Subdir = echo.NewKVData()
 
 func init() {
-	Subdir.Add(`default`, `默认`)
-	Subdir.Add(`avatar`, `头像`)
+	Subdir.Add(`default`, echo.T(`默认`))
+	Subdir.Add(`avatar`, echo.T(`头像`))
 }
 
 func AllowedSubdir(subdir string) bool {

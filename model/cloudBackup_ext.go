@@ -18,7 +18,7 @@ const (
 	StorageEngineSMB    = `smb`
 )
 
-var CloudBackupLogTypes = echo.NewKVData().Add(CloudBackupLogTypeAll, `全部`).Add(CloudBackupLogTypeError, `报错`)
+var CloudBackupLogTypes = echo.NewKVData().Add(CloudBackupLogTypeAll, echo.T(`全部`)).Add(CloudBackupLogTypeError, echo.T(`报错`))
 
 var CloudBackupStorageEngines = echo.NewKVData()
 

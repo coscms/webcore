@@ -18,7 +18,7 @@ func init() {
 		IconName:  `fa-user`,
 		IconColor: `success`,
 		Short:     `USERS`,
-		Name:      `用户数量`,
+		Name:      echo.T(`用户数量`),
 		Summary:   ``,
 	}).SetContentGenerator(func(ctx echo.Context) interface{} {
 		//用户统计
