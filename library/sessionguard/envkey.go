@@ -16,7 +16,7 @@ func EnvKey(ctx echo.Context, cfg SessionGuardConfig) string {
 	if cfg.IgnoreBrowserIP && cfg.IgnoreBrowserUA {
 		return `T` + strconv.FormatInt(time.Now().Unix(), 10)
 	}
-	if cfg.IgnoreBrowserIP {
+	if cfg.IgnoreBrowserUA {
 		return com.Md5(ctx.RealIP()) + `T` + strconv.FormatInt(time.Now().Unix(), 10)
 	}
 	return com.Md5(ctx.RealIP()+`|`+ctx.Request().UserAgent()) + `T` + strconv.FormatInt(time.Now().Unix(), 10)
