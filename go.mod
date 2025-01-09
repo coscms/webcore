@@ -84,13 +84,13 @@ require (
 	github.com/webx-top/codec v0.3.0
 	github.com/webx-top/com v1.3.20
 	github.com/webx-top/db v1.28.2
-	github.com/webx-top/echo v1.14.2
+	github.com/webx-top/echo v1.14.5
 	github.com/webx-top/image v0.1.2
 	github.com/webx-top/restyclient v0.0.5
 	github.com/webx-top/validation v0.0.3
 	github.com/webx-top/validator v0.3.0
-	golang.org/x/crypto v0.31.0
-	golang.org/x/net v0.33.0
+	golang.org/x/crypto v0.32.0
+	golang.org/x/net v0.34.0
 	golang.org/x/oauth2 v0.25.0
 	golang.org/x/sync v0.10.0
 	golang.org/x/text v0.21.0
@@ -108,7 +108,7 @@ require (
 	github.com/admpub/go-utility v0.0.1 // indirect
 	github.com/admpub/gohttp v0.0.0-20190322032039-b55c707b8f1e // indirect
 	github.com/admpub/humanize v0.0.0-20190501023926-5f826e92c8ca // indirect
-	github.com/admpub/i18n v0.3.2 // indirect
+	github.com/admpub/i18n v0.4.4 // indirect
 	github.com/admpub/identicon v1.0.2 // indirect
 	github.com/admpub/imaging v1.6.3 // indirect
 	github.com/admpub/json5 v0.0.1 // indirect

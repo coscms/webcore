@@ -32,7 +32,7 @@ func init() {
 			IconName:  `fa-tasks`,
 			IconColor: `danger`,
 			Short:     `TASKS`,
-			Name:      `计划任务数量`,
+			Name:      echo.T(`计划任务数量`),
 			Summary:   ``,
 		}).SetContentGenerator(func(ctx echo.Context) interface{} {
 			//计划任务统计
