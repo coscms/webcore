@@ -57,12 +57,12 @@ require (
 	github.com/coscms/captcha v0.2.1
 	github.com/coscms/forms v1.13.10
 	github.com/coscms/go-imgparse v0.0.1
-	github.com/coscms/oauth2s v0.4.1
-	github.com/coscms/session-boltstore v0.0.0-20241123103427-f7a05e3c6d60
-	github.com/coscms/session-mysqlstore v0.0.0-20241122060432-e4161cb8f12f
-	github.com/coscms/session-redisstore v0.0.0-20241123110057-3c697bf14511
-	github.com/coscms/session-sqlitestore v0.0.3
-	github.com/coscms/session-sqlstore v0.0.0-20241206070659-19aaf21e7876
+	github.com/coscms/oauth2s v0.4.2
+	github.com/coscms/session-boltstore v0.0.0-20250122075547-392556af7a5a
+	github.com/coscms/session-mysqlstore v0.0.0-20250122075110-d94d6bc2ce54
+	github.com/coscms/session-redisstore v0.0.0-20250122075426-4fb2344fcc5b
+	github.com/coscms/session-sqlitestore v0.0.4
+	github.com/coscms/session-sqlstore v0.0.1
 	github.com/dsoprea/go-logging v0.0.0-20200710184922-b02d349568dd
 	github.com/fynelabs/selfupdate v0.2.0
 	github.com/go-playground/validator/v10 v10.24.0
