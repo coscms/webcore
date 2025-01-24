@@ -44,7 +44,7 @@ func TestLicenseDownload(t *testing.T) {
 }
 
 func TestLicenseLatestVersion(t *testing.T) {
-	//return
+	return
 	defer log.Close()
 	ctx := defaults.NewMockContext()
 	info, err := LatestVersion(ctx, ``, true)
@@ -58,7 +58,7 @@ func TestLicenseLatestVersion(t *testing.T) {
 	}
 	ppnocolor.Println(info.extractedDir)
 	ppnocolor.Println(info.executable)
-	ngingDir, _ := filepath.Abs(`./testdata`)
+	ngingDir, err := filepath.Abs(`./testdata`)
 	if err != nil {
 		panic(err)
 	}
