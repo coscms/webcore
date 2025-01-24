@@ -266,7 +266,9 @@ func VerifyChecksum(file string, expected string) error {
 	}
 
 	sha256Result := hex.EncodeToString(h.Sum(nil))
-	if sha256Result == strings.SplitN(expected, ` `, 2)[0] {
+	expected = strings.SplitN(expected, ` `, 2)[0]
+	if sha256Result != expected {
+		//log.Warnf(`Checksum unmatched: %s != %s`, sha256Result, expected)
 		err = ErrChecksumUnmatched
 	}
 	return err

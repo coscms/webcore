@@ -44,7 +44,7 @@ func TestLicenseDownload(t *testing.T) {
 }
 
 func TestLicenseLatestVersion(t *testing.T) {
-	return
+	//return
 	defer log.Close()
 	ctx := defaults.NewMockContext()
 	info, err := LatestVersion(ctx, ``, true)
