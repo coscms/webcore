@@ -115,7 +115,7 @@ func DownloadTime() time.Time {
 }
 
 func ProductDetailURL() (url string) {
-	url = ProductURL() + `?version=` + Version()
+	url = ProductURL() + `?version=` + Version() + `&package=` + Package()
 	switch licenseMode {
 	case ModeMachineID:
 		mid, err := MachineID()
