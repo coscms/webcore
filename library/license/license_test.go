@@ -30,6 +30,11 @@ func init() {
 	//*/
 }
 
+func TestEmptyLicense(t *testing.T) {
+	SetEmptyLicenseFeature(`A`, `B`, `C`)
+	assert.True(t, HasFeature(`A`))
+}
+
 func TestLicenseDownload(t *testing.T) {
 	return
 	// dirEntries, _ := os.ReadDir(filepath.Join(echo.Wd(), `.`))

@@ -171,6 +171,24 @@ func License() lib.LicenseData {
 	return *licenseData
 }
 
+func SetEmptyLicense(setters ...func(*lib.LicenseData)) {
+	for _, setter := range setters {
+		setter(&emptyLicense)
+	}
+}
+
+func SetEmptyLicenseFeature(features ...string) {
+	for _, f := range features {
+		if len(f) == 0 {
+			continue
+		}
+		if com.InSlice(f, emptyLicense.Info.Feature) {
+			continue
+		}
+		emptyLicense.Info.Feature = append(emptyLicense.Info.Feature, f)
+	}
+}
+
 var (
 	MachineIDEncode = func(v string) string {
 		return com.MakePassword(v, `coscms`, 3, 8, 19)
