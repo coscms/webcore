@@ -1,6 +1,7 @@
 package license
 
 import (
+	"github.com/coscms/webcore/library/navigate"
 	"github.com/webx-top/echo/middleware/tplfunc"
 )
 
@@ -13,4 +14,8 @@ func init() {
 	tplfunc.TplFuncMap[`LicenseSkipCheck`] = func() bool { return SkipLicenseCheck }
 	tplfunc.TplFuncMap[`TrackerURL`] = TrackerURL
 	tplfunc.TplFuncMap[`TrackerHTML`] = TrackerHTML
+
+	navigate.FeatureChecker = func(feature string) bool {
+		return HasFeature(feature)
+	}
 }

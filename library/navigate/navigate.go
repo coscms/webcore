@@ -24,6 +24,10 @@ import (
 	"github.com/webx-top/echo"
 )
 
+var FeatureChecker = func(feature string) bool {
+	return true
+}
+
 // Item 操作
 type Item struct {
 	Display    bool        `json:",omitempty" xml:",omitempty"` //是否在菜单上显示
@@ -33,6 +37,7 @@ type Item struct {
 	Badge      string      `json:",omitempty" xml:",omitempty"` // <sup class="badge badge-danger">123</sup>
 	Target     string      `json:",omitempty" xml:",omitempty"` //打开方式
 	Unlimited  bool        `json:",omitempty" xml:",omitempty"` //是否不限制权限
+	Feature    string      `json:",omitempty" xml:",omitempty"` //功能
 	Attributes echo.KVList `json:",omitempty" xml:",omitempty"` //HTML标签a属性
 	Children   *List       `json:",omitempty" xml:",omitempty"` //子菜单
 }
@@ -42,6 +47,16 @@ func (a *Item) FullPath(parentPath string) string {
 		return parentPath
 	}
 	return path.Join(parentPath, a.Action)
+}
+
+func (a *Item) IsValid() bool {
+	if a == nil {
+		return false
+	}
+	if len(a.Feature) == 0 {
+		return true
+	}
+	return FeatureChecker(a.Feature)
 }
 
 // List 操作列表
