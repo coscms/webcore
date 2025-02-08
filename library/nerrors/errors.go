@@ -38,24 +38,24 @@ var (
 	// - User
 
 	//ErrUserNotLoggedIn 用户未登录
-	ErrUserNotLoggedIn = echo.NewError(`User not logged in`, code.Unauthenticated)
+	ErrUserNotLoggedIn = echo.NewError(echo.T(`User not logged in`), code.Unauthenticated)
 	//ErrUserNotFound 用户不存在
-	ErrUserNotFound = echo.NewError(`User does not exist`, code.UserNotFound)
+	ErrUserNotFound = echo.NewError(echo.T(`User does not exist`), code.UserNotFound)
 	//ErrUserNoPerm 用户无权限
-	ErrUserNoPerm = echo.NewError(`User has no permission`, code.NonPrivileged)
+	ErrUserNoPerm = echo.NewError(echo.T(`User has no permission`), code.NonPrivileged)
 	//ErrUserDisabled 用户已被禁用
-	ErrUserDisabled = echo.NewError(`User has been disabled`, code.UserDisabled)
+	ErrUserDisabled = echo.NewError(echo.T(`User has been disabled`), code.UserDisabled)
 	//ErrBalanceNoEnough 余额不足
-	ErrBalanceNoEnough = echo.NewError(`Balance is not enough`, code.BalanceNoEnough)
+	ErrBalanceNoEnough = echo.NewError(echo.T(`Balance is not enough`), code.BalanceNoEnough)
 
 	// - App
 
 	//ErrInvalidAppID App ID 无效
-	ErrInvalidAppID = echo.NewError(`Invalid app id`, code.InvalidAppID)
+	ErrInvalidAppID = echo.NewError(echo.T(`Invalid app id`), code.InvalidAppID)
 	//ErrInvalidSign 无效签名
-	ErrInvalidSign = echo.NewError(`Invalid sign`, code.InvalidSignature)
+	ErrInvalidSign = echo.NewError(echo.T(`Invalid sign`), code.InvalidSignature)
 	//ErrInvalidToken 令牌无效
-	ErrInvalidToken = echo.NewError(`Invalid token`, code.InvalidToken)
+	ErrInvalidToken = echo.NewError(echo.T(`Invalid token`), code.InvalidToken)
 
 	// - Captcha
 
@@ -69,22 +69,22 @@ var (
 	// - Operation
 
 	//ErrRepeatOperation 重复操作
-	ErrRepeatOperation = echo.NewError(`Repeat operation`, code.RepeatOperation)
+	ErrRepeatOperation = echo.NewError(echo.T(`Repeat operation`), code.RepeatOperation)
 	//ErrUnsupported 不支持
-	ErrUnsupported = echo.NewError(`Unsupported`, code.Unsupported)
+	ErrUnsupported = echo.NewError(echo.T(`Unsupported`), code.Unsupported)
 	//ErrOperationTimeout 操作超时
-	ErrOperationTimeout = echo.NewError(`Operation timeout`, code.OperationTimeout)
+	ErrOperationTimeout = echo.NewError(echo.T(`Operation timeout`), code.OperationTimeout)
 	//ErrOperationFail 操作失败
-	ErrOperationFail = echo.NewError(`Operation fail`, code.Failure)
+	ErrOperationFail = echo.NewError(echo.T(`Operation fail`), code.Failure)
 
 	// - HTTP
 
 	//ErrResponseFormatError 响应格式错误
-	ErrResponseFormatError = echo.NewError(`Response format error`, code.AbnormalResponse)
+	ErrResponseFormatError = echo.NewError(echo.T(`Response format error`), code.AbnormalResponse)
 	//ErrRequestTimeout 提交超时
-	ErrRequestTimeout = echo.NewError(`Request timeout`, code.RequestTimeout)
+	ErrRequestTimeout = echo.NewError(echo.T(`Request timeout`), code.RequestTimeout)
 	//ErrRequestFail 提交失败
-	ErrRequestFail = echo.NewError(`Request fail`, code.RequestFailure)
+	ErrRequestFail = echo.NewError(echo.T(`Request fail`), code.RequestFailure)
 
 	// - Watcher
 
