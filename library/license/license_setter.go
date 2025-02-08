@@ -49,6 +49,7 @@ func SetProductName(name string, domains ...string) {
 	productURL = `https://` + domain + `/product/detail/` + name
 	licenseURL = `https://` + domain + `/product/license/` + name
 	versionURL = `https://` + domain + `/product/version/` + name
+	productName = name
 }
 
 func SetProductDomain(domain string) {

@@ -47,10 +47,11 @@ const (
 )
 
 var (
-	trackerURL        = `https://www.webx.top/product/script/nging/tracker.js`
-	productURL        = `https://www.webx.top/product/detail/nging`
-	licenseURL        = `https://www.webx.top/product/license/nging`
-	versionURL        = `https://www.webx.top/product/version/nging`
+	productName       = `nging`
+	trackerURL        = `https://www.webx.top/product/script/` + productName + `/tracker.js`
+	productURL        = `https://www.webx.top/product/detail/` + productName
+	licenseURL        = `https://www.webx.top/product/license/` + productName
+	versionURL        = `https://www.webx.top/product/version/` + productName
 	licenseMode       = ModeMachineID
 	licenseData       *lib.LicenseData // 拥有的授权数据
 	licenseFileName   = `license.key`
@@ -87,6 +88,10 @@ func Package() string {
 
 func ProductURL() string {
 	return productURL
+}
+
+func ProductName() string {
+	return productName
 }
 
 func Domain() string {
