@@ -185,6 +185,7 @@ func SelfRestart() {
 	if hasParentProcess(parentExe) {
 		exitCode = ExitCodeSelfRestart
 	}
+	config.FromCLI().Close()
 	SendSignal(os.Interrupt, exitCode)
 	time.Sleep(time.Second)
 	os.Exit(exitCode)
