@@ -5,11 +5,14 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 	"time"
 
 	"github.com/admpub/events"
+	"github.com/admpub/go-ps"
 	"github.com/admpub/log"
+	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/engine"
 
@@ -154,4 +157,35 @@ func handleSignal(eng engine.Engine) {
 		fmt.Println(`received signal: ` + sig.String())
 		CallSignalOperation(sig, i, eng)
 	}
+}
+
+func hasParentProcess(parentExe string) bool {
+	ppid := os.Getppid()
+	if ppid == 1 {
+		return false
+	}
+	proc, err := ps.FindProcess(ppid)
+	if err != nil {
+		log.Debug(`ps.FindProcess: `, err)
+		return false
+	}
+	if proc == nil {
+		return false
+	}
+	name := filepath.Base(proc.Executable())
+	return parentExe == name
+}
+
+func SelfRestart() {
+	exitCode := 0
+	parentExe := `startup`
+	if com.IsWindows {
+		parentExe += `.exe`
+	}
+	if hasParentProcess(parentExe) {
+		exitCode = ExitCodeSelfRestart
+	}
+	SendSignal(os.Interrupt, exitCode)
+	time.Sleep(time.Second)
+	os.Exit(exitCode)
 }
