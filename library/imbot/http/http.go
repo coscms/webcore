@@ -1,18 +1,20 @@
 package http
 
 import (
-	"encoding/json"
+	"errors"
 
-	"github.com/admpub/marmot/miner"
+	"github.com/webx-top/restyclient"
 )
 
 func Send(url string, m interface{}) ([]byte, error) {
-	worker := miner.NewAPI()
-	worker.SetURL(url).SetMaxRetries(3)
-	body, err := json.Marshal(m)
+	client := restyclient.Retryable()
+	resp, err := client.SetBody(m).SetHeader(`Content-Type`, `application/json`).Post(url)
 	if err != nil {
 		return nil, err
 	}
-	worker.SetBinary(body)
-	return worker.PostJSON()
+	if resp.IsError() {
+		err = errors.New(resp.String())
+		return nil, err
+	}
+	return resp.Body(), err
 }

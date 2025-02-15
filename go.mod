@@ -6,7 +6,7 @@ require (
 	gitee.com/admpub/certmagic v0.8.8
 	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/abh/errorutil v1.0.0
-	github.com/admpub/9t v0.0.0-20190605154903-a68069ace5e1
+	github.com/admpub/9t v0.0.1
 	github.com/admpub/captcha-go v0.0.1
 	github.com/admpub/ccs-gm v0.0.5
 	github.com/admpub/checksum v1.1.0
@@ -18,10 +18,10 @@ require (
 	github.com/admpub/email v2.4.1+incompatible
 	github.com/admpub/errors v0.8.2
 	github.com/admpub/events v1.3.6
-	github.com/admpub/go-bindata-assetfs v0.0.0-20170428090253-36eaa4c19588
+	github.com/admpub/go-bindata-assetfs v0.0.1
 	github.com/admpub/go-captcha/v2 v2.0.6
 	github.com/admpub/go-download/v2 v2.1.15
-	github.com/admpub/go-figure v0.0.0-20180619031829-18b2b544842c
+	github.com/admpub/go-figure v0.0.2
 	github.com/admpub/go-isatty v0.0.11
 	github.com/admpub/go-password v0.1.3
 	github.com/admpub/go-pretty/v6 v6.0.4
@@ -37,7 +37,6 @@ require (
 	github.com/admpub/mahonia v0.0.0-20151019004008-c528b747d92d
 	github.com/admpub/mail v0.0.0-20170408110349-d63147b0317b
 	github.com/admpub/map2struct v0.1.3
-	github.com/admpub/marmot v0.0.0-20200702042226-2170d9ff59f5
 	github.com/admpub/mysql-schema-sync v0.2.6
 	github.com/admpub/null v8.0.4+incompatible
 	github.com/admpub/oauth2/v4 v4.0.2
@@ -45,9 +44,10 @@ require (
 	github.com/admpub/pp v0.0.7
 	github.com/admpub/qrcode v0.0.3
 	github.com/admpub/realip v0.2.7
+	github.com/admpub/resty/v2 v2.7.2
 	github.com/admpub/securecookie v1.3.0
 	github.com/admpub/service v0.0.5
-	github.com/admpub/snowflake v0.0.0-20190412223032-c09e69ae5993
+	github.com/admpub/snowflake v0.0.0-20250215093046-736db7f88827
 	github.com/admpub/sonyflake v0.0.1
 	github.com/admpub/tail v1.1.1
 	github.com/admpub/timeago v1.2.2
@@ -63,7 +63,6 @@ require (
 	github.com/coscms/session-redisstore v0.0.0-20250122075426-4fb2344fcc5b
 	github.com/coscms/session-sqlitestore v0.0.4
 	github.com/coscms/session-sqlstore v0.0.1
-	github.com/dsoprea/go-logging v0.0.0-20200710184922-b02d349568dd
 	github.com/fynelabs/selfupdate v0.2.0
 	github.com/go-playground/validator/v10 v10.24.0
 	github.com/hirochachacha/go-smb2 v1.1.0
@@ -71,7 +70,7 @@ require (
 	github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0
 	github.com/mattn/go-runewidth v0.0.16
 	github.com/microcosm-cc/bluemonday v1.0.27
-	github.com/minio/minio-go/v7 v7.0.85
+	github.com/minio/minio-go/v7 v7.0.86
 	github.com/pkg/sftp v1.13.7
 	github.com/shirou/gopsutil/v3 v3.24.5
 	github.com/spf13/cobra v1.8.1
@@ -107,16 +106,13 @@ require (
 	github.com/admpub/go-captcha-assets v0.0.0-20250122071745-baa7da4bda0d // indirect
 	github.com/admpub/go-reuseport v0.0.4 // indirect
 	github.com/admpub/go-utility v0.0.1 // indirect
-	github.com/admpub/gohttp v0.0.0-20190322032039-b55c707b8f1e // indirect
 	github.com/admpub/humanize v0.0.0-20190501023926-5f826e92c8ca // indirect
 	github.com/admpub/i18n v0.4.6 // indirect
 	github.com/admpub/identicon v1.0.2 // indirect
 	github.com/admpub/imaging v1.6.3 // indirect
 	github.com/admpub/json5 v0.0.1 // indirect
-	github.com/admpub/pester v0.0.0-20200411024648-005672a2bd48 // indirect
 	github.com/admpub/randomize v0.0.2 // indirect
 	github.com/admpub/redistore v1.2.2 // indirect
-	github.com/admpub/resty/v2 v2.7.1 // indirect
 	github.com/admpub/safesvg v0.0.8 // indirect
 	github.com/admpub/sessions v0.2.3 // indirect
 	github.com/admpub/webdav/v4 v4.1.3 // indirect
@@ -128,6 +124,7 @@ require (
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
+	github.com/dsoprea/go-logging v0.0.0-20200710184922-b02d349568dd // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/fcjr/aia-transport-go v1.2.2 // indirect
 	github.com/flynn/go-shlex v0.0.0-20150515145356-3f9db97f8568 // indirect
@@ -178,6 +175,7 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-sqlite3 v1.14.24 // indirect
 	github.com/miekg/dns v1.1.63 // indirect
+	github.com/minio/crc64nvme v1.0.1 // indirect
 	github.com/minio/md5-simd v1.1.2 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
@@ -238,6 +236,6 @@ require (
 	modernc.org/libc v1.61.13 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.8.2 // indirect
-	modernc.org/sqlite v1.34.5 // indirect
+	modernc.org/sqlite v1.35.0 // indirect
 	rsc.io/qr v0.2.0 // indirect
 )

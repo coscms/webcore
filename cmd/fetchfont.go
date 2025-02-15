@@ -20,6 +20,7 @@ package cmd
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"os"
 	"path"
@@ -29,8 +30,9 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
+	"github.com/webx-top/restyclient"
 
-	"github.com/admpub/marmot/miner"
+	"github.com/admpub/resty/v2"
 )
 
 // 下载 googleapis css文件中的字体
@@ -54,14 +56,19 @@ func fetchFontRunE(cmd *cobra.Command, args []string) error {
 }
 
 func FetchFont(_cssFile string, _outputDir string, _debug bool) error {
-	worker, err := miner.NewWorker(nil)
-	if err != nil {
-		return err
-	}
+	client := restyclient.Classic()
 	var body []byte
+	var err error
 	if com.IsURL(_cssFile) {
-		worker.SetURL(_cssFile)
-		body, err = worker.Get()
+		var resp *resty.Response
+		resp, err = client.Get(_cssFile)
+		if err != nil {
+			return err
+		}
+		if resp.IsError() {
+			return errors.New(resp.String())
+		}
+		body = resp.Body()
 	} else {
 		body, err = os.ReadFile(_cssFile)
 	}
@@ -80,7 +87,16 @@ func FetchFont(_cssFile string, _outputDir string, _debug bool) error {
 		name := match[1]
 		font := match[2]
 		//format := match[3]
-		fontBody, err := worker.SetURL(font).Get()
+		var resp *resty.Response
+		resp, err = client.Get(font)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		if resp.IsError() {
+			return errors.New(resp.String())
+		}
+		fontBody := resp.Body()
 		if err == nil {
 			destName := name + path.Ext(font)
 			destFile := filepath.Join(_outputDir, destName)

@@ -4,9 +4,9 @@ import (
 	"time"
 
 	"github.com/admpub/events"
+	"github.com/admpub/log"
 	"github.com/coscms/webcore/library/backend"
 	"github.com/coscms/webcore/library/common"
-	log "github.com/dsoprea/go-logging"
 	"github.com/webx-top/com"
 	"github.com/webx-top/com/formatter"
 	"github.com/webx-top/db"
