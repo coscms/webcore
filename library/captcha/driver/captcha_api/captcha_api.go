@@ -62,6 +62,9 @@ func (c *captchaAPI) Render(ctx echo.Context, templatePath string, keysValues ..
 		jsURL = c.jsURL
 	}
 	c.captchaID = com.RandomAlphanumeric(16)
+	if c.provider == `turnstile` {
+		jsURL += `?onload=tarnstileRender` + c.captchaID
+	}
 	options.Set("jsURL", jsURL)
 	options.Set("captchaID", c.captchaID)
 	if !options.Has("captchaName") {
@@ -84,6 +87,7 @@ func (c *captchaAPI) Render(ctx echo.Context, templatePath string, keysValues ..
 			htmlContent += `<div class="cf-turnstile" id="` + locationID + `" data-sitekey="` + c.siteKey + `"></div>`
 			htmlContent += `<input type="hidden" id="` + locationID + `-extend" disabled />`
 			htmlContent += `<script>
+window["tarnstileRender` + c.captchaID + `"]=function(){turnstile.render('#turnstile-{{$.Data.captchaID}}',{sitekey:'{{$.Data.siteKey}}'});}
 window.addEventListener('load', function(){
 	$('#` + locationID + `').closest('.input-group-addon').addClass('xxs-padding-top').prev('input').remove();
 	var $form=$('#` + locationID + `').closest('form');
