@@ -87,8 +87,14 @@ func (c *captchaAPI) Render(ctx echo.Context, templatePath string, keysValues ..
 			htmlContent += `<input type="hidden" name="captchaId" value="` + c.captchaID + `" />`
 			htmlContent += `<div class="cf-turnstile" id="` + locationID + `" data-sitekey="` + c.siteKey + `"></div>`
 			htmlContent += `<input type="hidden" id="` + locationID + `-extend" disabled />`
+			var theme string
+			if ctx.Cookie().Get(`ThemeColor`) == `dark` {
+				theme = `dark`
+			} else {
+				theme = `light`
+			}
 			htmlContent += `<script>
-window["tarnstileRender` + c.captchaID + `"]=function(){turnstile.render('#turnstile-{{$.Data.captchaID}}',{sitekey:'{{$.Data.siteKey}}'});}
+window["tarnstileRender` + c.captchaID + `"]=function(){turnstile.render('#turnstile-{{$.Data.captchaID}}',{sitekey:'{{$.Data.siteKey}}',theme:'` + theme + `'});}
 window.addEventListener('load', function(){
 	$('#` + locationID + `').closest('.input-group-addon').addClass('xxs-padding-top').prev('input').remove();
 	var $form=$('#` + locationID + `').closest('form');
