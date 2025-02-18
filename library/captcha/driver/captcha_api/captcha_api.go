@@ -57,12 +57,15 @@ func (c *captchaAPI) Render(ctx echo.Context, templatePath string, keysValues ..
 	options.Set("provider", c.provider)
 	initedKey := `CaptchaJSInited.` + c.provider
 	var jsURL string
-	if !ctx.Internal().Bool(initedKey) {
+	if true || !ctx.Internal().Bool(initedKey) {
 		ctx.Internal().Set(initedKey, true)
 		jsURL = c.jsURL
 	}
-	options.Set("jsURL", jsURL)
 	c.captchaID = com.RandomAlphanumeric(16)
+	if len(jsURL) > 0 {
+		jsURL = com.WithURLParams(jsURL, `_`, c.captchaID)
+	}
+	options.Set("jsURL", jsURL)
 	options.Set("captchaID", c.captchaID)
 	if !options.Has("captchaName") {
 		switch c.endpoint {
