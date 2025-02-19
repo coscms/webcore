@@ -54,7 +54,9 @@ func resetRunE(cmd *cobra.Command, args []string) error {
 		username := strings.TrimSpace(args[1])
 		password := strings.TrimSpace(args[2])
 		m := dbschema.NewNgingUser(ctx)
-		err = m.Get(nil, `username`, username)
+		err = m.Get(func(r db.Result) db.Result {
+			return r.Select(`id`, `salt`)
+		}, `username`, username)
 		if err != nil {
 			return err
 		}
