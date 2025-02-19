@@ -16,7 +16,7 @@ import (
 var resetCmd = &cobra.Command{
 	Use:   "reset",
 	Short: "reset config",
-	RunE:  upgradeRunE,
+	RunE:  resetRunE,
 	Example: rootCmd.Use + ` reset captcha
 ` + rootCmd.Use + ` reset password <username> <new_password>`,
 }
@@ -26,7 +26,9 @@ func resetRunE(cmd *cobra.Command, args []string) error {
 		return cmd.Usage()
 	}
 	conf, err := config.InitConfig()
-	config.MustOK(err)
+	if err != nil {
+		return err
+	}
 	conf.AsDefault()
 	switch args[0] {
 	case `captcha`: // 重置验证码配置
