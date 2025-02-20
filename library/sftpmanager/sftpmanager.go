@@ -314,6 +314,7 @@ func (s *SftpManager) Upload(ctx echo.Context, ppath string,
 	defer fileDst.Close()
 
 	if s.noticer != nil {
+		s.noticer.Success(ctx.T(`上传文件到「%s」`, ctx.T(`SFTP服务器`)))
 		s.noticer.Add(fileSize)
 		fileSrc = s.noticer.ProxyReader(fileSrc)
 	}
