@@ -31,6 +31,7 @@ import (
 
 	"github.com/coscms/webcore/library/charset"
 	"github.com/coscms/webcore/library/filemanager"
+	"github.com/coscms/webcore/library/notice"
 
 	"github.com/pkg/sftp"
 	"github.com/webx-top/com"
@@ -59,11 +60,16 @@ type SftpManager struct {
 	connector       Connector
 	connerror       error
 	EditableMaxSize int
+	noticer         notice.NProgressor
 }
 
 func (s *SftpManager) Connect() error {
 	s.client, s.connerror = s.connector(s.config)
 	return s.connerror
+}
+
+func (s *SftpManager) SetNoticer(noticer notice.NProgressor) {
+	s.noticer = noticer
 }
 
 func (s *SftpManager) Client() *sftp.Client {
@@ -257,6 +263,7 @@ func (s *SftpManager) Upload(ctx echo.Context, ppath string,
 		return ctx.E(`路径不正确`)
 	}
 	var fileSrc io.Reader
+	var fileSize int64
 	var filename string
 	var chunked bool // 是否支持分片
 	if chunkUpload != nil {
@@ -278,6 +285,7 @@ func (s *SftpManager) Upload(ctx echo.Context, ppath string,
 				return err
 			}
 			fileSrc = _fp
+			fileSize = chunkUpload.GetSaveSize()
 			defer func() {
 				_fp.Close()
 				os.Remove(chunkUpload.GetSavePath())
@@ -296,6 +304,7 @@ func (s *SftpManager) Upload(ctx echo.Context, ppath string,
 
 		// Destination
 		filename = _fileHdr.Filename
+		fileSize = _fileHdr.Size
 
 	}
 	fileDst, err := c.Create(path.Join(ppath, filename))
@@ -304,6 +313,10 @@ func (s *SftpManager) Upload(ctx echo.Context, ppath string,
 	}
 	defer fileDst.Close()
 
+	if s.noticer != nil {
+		s.noticer.Add(fileSize)
+		fileSrc = s.noticer.ProxyReader(fileSrc)
+	}
 	_, err = io.Copy(fileDst, fileSrc)
 	return err
 }

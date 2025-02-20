@@ -36,6 +36,7 @@ import (
 	"github.com/coscms/webcore/dbschema"
 	"github.com/coscms/webcore/library/charset"
 	"github.com/coscms/webcore/library/filemanager"
+	"github.com/coscms/webcore/library/notice"
 	"github.com/coscms/webcore/library/s3manager/fileinfo"
 	"github.com/coscms/webcore/library/s3manager/s3client/awsclient"
 
@@ -68,6 +69,7 @@ type S3Manager struct {
 	connector       Connector
 	connerror       error
 	mu              sync.RWMutex
+	noticer         notice.NProgressor
 }
 
 func (s *S3Manager) Connect() (*minio.Client, error) {
@@ -75,6 +77,10 @@ func (s *S3Manager) Connect() (*minio.Client, error) {
 	defer s.mu.Unlock()
 	s.client, s.connerror = s.connector(s.config)
 	return s.client, s.connerror
+}
+
+func (s *S3Manager) SetNoticer(noticer notice.NProgressor) {
+	s.noticer = noticer
 }
 
 func (s *S3Manager) Client() (*minio.Client, error) {
@@ -382,11 +388,7 @@ func (s *S3Manager) Upload(ctx echo.Context, ppath string,
 			}()
 			chunked = true
 			objectName = path.Join(ppath, filepath.Base(chunkUpload.GetSavePath()))
-			fi, err := _fp.Stat()
-			if err != nil {
-				return err
-			}
-			objectSize = fi.Size()
+			objectSize = chunkUpload.GetSaveSize()
 		}
 	}
 	if !chunked {
@@ -398,6 +400,10 @@ func (s *S3Manager) Upload(ctx echo.Context, ppath string,
 		fileSrc = _fileSrc
 		objectName = path.Join(ppath, _fileHdr.Filename)
 		objectSize = _fileHdr.Size
+	}
+	if s.noticer != nil {
+		s.noticer.Add(objectSize)
+		fileSrc = s.noticer.ProxyReader(fileSrc)
 	}
 	//return s.uploadByAWS(ctx,fileSrc, objectName)
 	return s.Put(ctx, fileSrc, objectName, objectSize)
