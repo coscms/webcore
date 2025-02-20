@@ -402,7 +402,7 @@ func (s *S3Manager) Upload(ctx echo.Context, ppath string,
 		objectSize = _fileHdr.Size
 	}
 	if s.noticer != nil {
-		s.noticer.Success(ctx.T(`上传文件到「%s」`, s.config.Name))
+		s.noticer.Success(ctx.T(`上传文件 “%s” 到「%s」`, path.Base(objectName), s.config.Name))
 		s.noticer.Add(objectSize)
 		fileSrc = s.noticer.ProxyReader(fileSrc)
 	}
