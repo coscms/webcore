@@ -388,7 +388,12 @@ func (s *S3Manager) Upload(ctx echo.Context, ppath string,
 			}()
 			chunked = true
 			objectName = path.Join(ppath, filepath.Base(chunkUpload.GetSavePath()))
-			objectSize = chunkUpload.GetSaveSize()
+			var fi os.FileInfo
+			fi, err = _fp.Stat()
+			if err != nil {
+				return err
+			}
+			objectSize = fi.Size()
 		}
 	}
 	if !chunked {

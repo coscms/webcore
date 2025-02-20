@@ -285,13 +285,18 @@ func (s *SftpManager) Upload(ctx echo.Context, ppath string,
 				return err
 			}
 			fileSrc = _fp
-			fileSize = chunkUpload.GetSaveSize()
 			defer func() {
 				_fp.Close()
 				os.Remove(chunkUpload.GetSavePath())
 			}()
 			chunked = true
 			filename = filepath.Base(chunkUpload.GetSavePath())
+			var fi os.FileInfo
+			fi, err = _fp.Stat()
+			if err != nil {
+				return err
+			}
+			fileSize = fi.Size()
 		}
 	}
 	if !chunked {
