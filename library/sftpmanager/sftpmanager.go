@@ -312,11 +312,14 @@ func (s *SftpManager) Upload(ctx echo.Context, ppath string,
 		return err
 	}
 	defer fileDst.Close()
-
-	if s.noticer != nil {
-		s.noticer.Success(ctx.T(`上传文件 “%s” 到「%s」`, filename, ctx.T(`SFTP服务器`)))
-		s.noticer.Add(fileSize)
-		fileSrc = s.noticer.ProxyReader(fileSrc)
+	noticer := s.noticer
+	if noticer == nil {
+		noticer, _ = ctx.Internal().Get(`noticer`).(notice.NProgressor)
+	}
+	if noticer != nil {
+		noticer.Success(ctx.T(`上传文件 “%s” 到「%s」`, filename, ctx.T(`SFTP服务器`)))
+		noticer.Add(fileSize)
+		fileSrc = noticer.ProxyReader(fileSrc)
 	}
 	_, err = io.Copy(fileDst, fileSrc)
 	return err
