@@ -407,7 +407,7 @@ func (s *S3Manager) Upload(ctx echo.Context, ppath string,
 		objectName = path.Join(ppath, _fileHdr.Filename)
 		objectSize = _fileHdr.Size
 	}
-	//return s.uploadByAWS(ctx,fileSrc, objectName)
+	//return s.uploadByAWS(ctx,fileSrc, objectName, objectSize)
 	return s.Put(ctx, fileSrc, objectName, objectSize)
 }
 
@@ -597,10 +597,16 @@ func (s *S3Manager) listByMinio(ctx context.Context, objectPrefix string) (dirs 
 	return
 }
 
-func (s *S3Manager) uploadByAWS(ctx context.Context, reader io.Reader, objectName string) error {
+func (s *S3Manager) uploadByAWS(ctx context.Context, reader io.Reader, objectName string, objectSize int64) error {
 	s3client, err := awsclient.Connect(s.config, s.bucketName)
 	if err != nil {
 		return err
+	}
+	if s.noticer != nil {
+		s.noticer.Success(defaults.MustGetContext(ctx).T(`上传文件 “%s” 到「%s」`, path.Base(objectName), s.config.Name))
+		s.noticer.Add(objectSize)
+		reader = s.noticer.ProxyReader(reader)
+		defer reader.(io.Closer).Close()
 	}
 	_, err = s3client.Upload(reader, objectName)
 	return err
