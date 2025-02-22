@@ -46,6 +46,7 @@ import (
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/code"
+	"github.com/webx-top/echo/defaults"
 
 	uploadClient "github.com/webx-top/client/upload"
 )
@@ -406,11 +407,6 @@ func (s *S3Manager) Upload(ctx echo.Context, ppath string,
 		objectName = path.Join(ppath, _fileHdr.Filename)
 		objectSize = _fileHdr.Size
 	}
-	if s.noticer != nil {
-		s.noticer.Success(ctx.T(`上传文件 “%s” 到「%s」`, path.Base(objectName), s.config.Name))
-		s.noticer.Add(objectSize)
-		fileSrc = s.noticer.ProxyReader(fileSrc)
-	}
 	//return s.uploadByAWS(ctx,fileSrc, objectName)
 	return s.Put(ctx, fileSrc, objectName, objectSize)
 }
@@ -445,6 +441,13 @@ func (s *S3Manager) PutObject(ctx context.Context, reader io.Reader, objectName 
 	if opts.ContentType = mime.TypeByExtension(path.Ext(objectName)); len(opts.ContentType) == 0 {
 		opts.ContentType = ContentDefaultType
 	}
+	if s.noticer != nil {
+		s.noticer.Success(defaults.MustGetContext(ctx).T(`上传文件 “%s” 到「%s」`, path.Base(objectName), s.config.Name))
+		s.noticer.Add(size)
+		pr := s.noticer.ProxyReader(nil)
+		opts.Progress = pr
+		defer pr.Close()
+	}
 	info, err := c.PutObject(ctx, s.bucketName, objectName, reader, size, opts)
 	return info.Size, err
 }
@@ -458,6 +461,17 @@ func (s *S3Manager) FPutObject(ctx context.Context, filePath string, objectName 
 	}
 	if opts.ContentType = mime.TypeByExtension(filepath.Ext(filePath)); len(opts.ContentType) == 0 {
 		opts.ContentType = ContentDefaultType
+	}
+	if s.noticer != nil {
+		fi, err := os.Stat(filePath)
+		if err != nil {
+			return 0, err
+		}
+		s.noticer.Success(defaults.MustGetContext(ctx).T(`上传文件 “%s” 到「%s」`, path.Base(objectName), s.config.Name))
+		s.noticer.Add(fi.Size())
+		pr := s.noticer.ProxyReader(nil)
+		opts.Progress = pr
+		defer pr.Close()
 	}
 	info, err := c.FPutObject(ctx, s.bucketName, objectName, filePath, opts)
 	return info.Size, err

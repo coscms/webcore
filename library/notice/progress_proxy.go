@@ -15,7 +15,7 @@ func ToWriteCloser(w io.Writer) io.WriteCloser {
 	if wc, ok := w.(io.WriteCloser); ok {
 		return wc
 	}
-	return nopWriteCloser{w}
+	return nopWriteCloser{Writer: w}
 }
 
 type nopWriteCloser struct {
@@ -25,6 +25,10 @@ type nopWriteCloser struct {
 func (nopWriteCloser) Close() error { return nil }
 
 func newProxyReader(r io.Reader, prog Progressor) io.ReadCloser {
+	if r == nil {
+		prog.AutoComplete(true)
+		return io.NopCloser(&proxyNonReader{prog: prog})
+	}
 	rc := ToReadCloser(r)
 	pr := &proxyReader{ReadCloser: rc, prog: prog}
 	if _, ok := r.(io.WriterTo); ok {
@@ -47,7 +51,21 @@ func (x proxyReader) Read(p []byte) (int, error) {
 	return n, err
 }
 
+type proxyNonReader struct {
+	prog Progressor
+}
+
+func (x *proxyNonReader) Read(p []byte) (int, error) {
+	n := len(p)
+	x.prog.Done(int64(n))
+	return n, nil
+}
+
 func newProxyWriter(w io.Writer, prog Progressor) io.WriteCloser {
+	if w == nil {
+		prog.AutoComplete(true)
+		return nopWriteCloser{Writer: &proxyNonWriter{prog: prog}}
+	}
 	wc := ToWriteCloser(w)
 	pw := &proxyWriter{WriteCloser: wc, prog: prog}
 	if _, ok := w.(io.ReaderFrom); ok {
@@ -61,7 +79,7 @@ type proxyWriter struct {
 	prog Progressor
 }
 
-func (x proxyWriter) Write(p []byte) (int, error) {
+func (x *proxyWriter) Write(p []byte) (int, error) {
 	n, err := x.WriteCloser.Write(p)
 	x.prog.Done(int64(n))
 	if err == io.EOF {
@@ -70,11 +88,21 @@ func (x proxyWriter) Write(p []byte) (int, error) {
 	return n, err
 }
 
+type proxyNonWriter struct {
+	prog Progressor
+}
+
+func (x *proxyNonWriter) Write(p []byte) (int, error) {
+	n := len(p)
+	x.prog.Done(int64(n))
+	return n, nil
+}
+
 type proxyWriterTo struct {
 	*proxyReader
 }
 
-func (x proxyWriterTo) WriteTo(w io.Writer) (int64, error) {
+func (x *proxyWriterTo) WriteTo(w io.Writer) (int64, error) {
 	n, err := x.ReadCloser.(io.WriterTo).WriteTo(w)
 	x.prog.Done(int64(n))
 	if err == io.EOF {
@@ -87,7 +115,7 @@ type proxyReaderFrom struct {
 	*proxyWriter
 }
 
-func (x proxyReaderFrom) ReadFrom(r io.Reader) (int64, error) {
+func (x *proxyReaderFrom) ReadFrom(r io.Reader) (int64, error) {
 	n, err := x.WriteCloser.(io.ReaderFrom).ReadFrom(r)
 	x.prog.Done(int64(n))
 	if err == io.EOF {

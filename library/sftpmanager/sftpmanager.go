@@ -325,6 +325,7 @@ func (s *SftpManager) Upload(ctx echo.Context, ppath string,
 		noticer.Success(ctx.T(`上传文件 “%s” 到「%s」`, filename, ctx.T(`SFTP服务器`)))
 		noticer.Add(fileSize)
 		fileSrc = noticer.ProxyReader(fileSrc)
+		defer fileSrc.(io.Closer).Close()
 	}
 	_, err = io.Copy(fileDst, fileSrc)
 	return err
