@@ -19,7 +19,10 @@
 package notice
 
 import (
+	"bytes"
 	"context"
+	"io"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -54,5 +57,19 @@ func TestNoticeProgress(t *testing.T) {
 	assert.Equal(t, int64(1), noticer.prog.Finish())
 	noticer.Done(1)
 	assert.Equal(t, int64(2), noticer.prog.Finish())
+	assert.True(t, noticer.prog.Complete())
+}
+
+func TestNoticeProgressProxy(t *testing.T) {
+	ctx := context.Background()
+	eCtx := defaults.NewMockContext()
+	noticer := NewP(eCtx, `databaseImport`, `username`, ctx)
+	noticer.Success(`start test`)
+	br := bytes.NewReader([]byte(strings.Repeat(`test`, 1024*1024)))
+	noticer.Add(int64(br.Len()))
+	rc := noticer.ProxyReader(br)
+	_, err := io.ReadAll(rc)
+	rc.Close()
+	assert.Nil(t, err)
 	assert.True(t, noticer.prog.Complete())
 }
