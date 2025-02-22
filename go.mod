@@ -85,7 +85,7 @@ require (
 	github.com/webx-top/codec v0.3.0
 	github.com/webx-top/com v1.3.25
 	github.com/webx-top/db v1.28.2
-	github.com/webx-top/echo v1.14.5
+	github.com/webx-top/echo v1.15.0
 	github.com/webx-top/image v0.1.2
 	github.com/webx-top/restyclient v0.0.5
 	github.com/webx-top/validation v0.0.3
@@ -116,7 +116,7 @@ require (
 	github.com/admpub/randomize v0.0.2 // indirect
 	github.com/admpub/redistore v1.2.2 // indirect
 	github.com/admpub/safesvg v0.0.8 // indirect
-	github.com/admpub/sessions v0.2.3 // indirect
+	github.com/admpub/sessions v0.3.0 // indirect
 	github.com/admpub/webdav/v4 v4.1.3 // indirect
 	github.com/admpub/websocket v1.0.4 // indirect
 	github.com/andybalholm/brotli v1.1.1 // indirect
