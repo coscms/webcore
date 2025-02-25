@@ -129,8 +129,15 @@ func (v *ProductVersion) Upgrade(ctx echo.Context, ngingDir string, restartMode 
 	if com.IsWindows {
 		extension = `.exe`
 	}
+
+	// 复制文件到安装位置
 	err := com.CopyDir(v.extractedDir, ngingDir, func(filePath string) bool {
-		//fmt.Println(filePath)
+		// 复制前的过滤操作：返回 true 代表是需要被过滤(跳过)的文件
+		// 此处顺带进行文件备份
+		// fmt.Println(filePath)
+		if filePath == `download_dir.txt` {
+			return true // 跳过标记文件
+		}
 		oldFile := filepath.Join(ngingDir, filePath)
 		if fi, err := os.Stat(oldFile); err == nil {
 			if fi.IsDir() {
@@ -143,23 +150,25 @@ func (v *ProductVersion) Upgrade(ctx echo.Context, ngingDir string, restartMode 
 					return true // 跳过此处复制。如果需要升级 startup，需要手动升级
 				}
 				backupFile := filepath.Join(backupDir, filePath)
-				err = com.Copy(oldFile, backupFile)
+				err = com.Copy(oldFile, backupFile) // 备份文件
 				if err != nil {
 					v.prog.Send(fmt.Sprintf(`failed to back up file %q: %v`, backupFile, err), notice.StateFailure)
 				} else {
 					v.prog.Send(fmt.Sprintf(`back up file %q to %q`, oldFile, backupFile), notice.StateSuccess)
 				}
-				backupFiles = append(backupFiles, backupFile)
+				backupFiles = append(backupFiles, backupFile) // 记录下来备份的文件
 			}
 		}
 		if executable == filePath {
 			return true // 跳过此处复制，采用单独的替换逻辑来处理
 		}
-		return false
+		return false // 需要复制(不跳过)
 	})
 	if err != nil {
 		return err
 	}
+
+	// 备份失败之后的还原处理
 	restore := func() {
 		for _, backupFile := range backupFiles {
 			targetFile := strings.TrimPrefix(backupFile, backupDir)
@@ -172,6 +181,7 @@ func (v *ProductVersion) Upgrade(ctx echo.Context, ngingDir string, restartMode 
 			}
 		}
 	}
+
 	if len(v.executable) > 0 {
 		var fp *os.File
 		fp, err = os.Open(v.executable)
