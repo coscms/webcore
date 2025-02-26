@@ -12,7 +12,7 @@ import (
 	_ "github.com/coscms/webcore/library/captcha/driver/captcha_go"
 )
 
-func GetCaptchaEngine(ctx echo.Context, types ...string) (captcha.ICaptcha, error) {
+func GetCaptchaType(types ...string) (echo.H, string) {
 	cfg := config.FromDB().GetStore(`captcha`)
 	typ := cfg.String(`type`, captcha.TypeDefault)
 	if len(types) > 0 && len(types[0]) > 0 {
@@ -21,6 +21,11 @@ func GetCaptchaEngine(ctx echo.Context, types ...string) (captcha.ICaptcha, erro
 	if len(typ) == 0 {
 		typ = captcha.TypeDefault
 	}
+	return cfg, typ
+}
+
+func GetCaptchaEngine(ctx echo.Context, types ...string) (captcha.ICaptcha, error) {
+	cfg, typ := GetCaptchaType(types...)
 	create := captcha.Get(typ)
 	if create == nil {
 		if typ != captcha.TypeDefault {
