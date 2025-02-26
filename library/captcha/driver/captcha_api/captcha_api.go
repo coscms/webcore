@@ -218,15 +218,10 @@ func (c *captchaAPI) MakeData(ctx echo.Context, hostAlias string, name string) e
 	case `turnstile`:
 		captchaName = `cf-turnstile-response`
 		locationID = `turnstile-` + c.captchaID
-		jsInit = `(function(){
-	var f=function(){typeof(turnstile)!='undefined' ? turnstile.render('#` + locationID + `') : window.setTimeout(f,200);};
-	f();
-})();`
+		jsInit = `(function(){ typeof(turnstile)!='undefined' && turnstile.render('#` + locationID + `'); })();`
 		jsCallback = `function(callback){
 	callback && callback();
-	window.setTimeout(function(){
-		turnstile.reset('#` + locationID + `');
-	},1000);
+	window.setTimeout(function(){turnstile.reset('#` + locationID + `');},1000);
 }`
 		var theme string
 		if ctx.Cookie().Get(`ThemeColor`) == `dark` {
@@ -239,16 +234,22 @@ func (c *captchaAPI) MakeData(ctx echo.Context, hostAlias string, name string) e
 		captchaName = `g-recaptcha-response`
 		locationID = `recaptcha-` + c.captchaID
 		defaultTips := strconv.Quote(ctx.T(`加载成功，请点击“提交”按钮继续`))
-		jsInit = `grecaptcha.ready(function() {
-	grecaptcha.execute('` + c.siteKey + `', {action: 'submit'}).then(function(token) {
-		$('#` + locationID + `').val(token);
-		$('#` + locationID + `').data('lastGeneratedAt',(new Date()).getTime());
-		if($('#` + locationID + `-loading').length>0){
-			var successTips = $('#` + locationID + `-loading').data('success-tips')||` + defaultTips + `;
-			$('#` + locationID + `-loading').html('<i class="fa fa-check text-success"></i> '+successTips);
-		}
+		jsInit = `(function(){
+var f=function(){
+	if(typeof(grecaptcha)=='undefined'){setTimeout(f,200);return;}
+	grecaptcha.ready(function() {
+		grecaptcha.execute('` + c.siteKey + `', {action: 'submit'}).then(function(token) {
+			$('#` + locationID + `').val(token);
+			$('#` + locationID + `').data('lastGeneratedAt',(new Date()).getTime());
+			if($('#` + locationID + `-loading').length>0){
+				var t=$('#` + locationID + `-loading').data('success-tips')||` + defaultTips + `;
+				$('#` + locationID + `-loading').html('<i class="fa fa-check text-success"></i> '+t);
+			}
+		});
 	});
-});`
+};
+f();
+})();`
 		jsCallback = `function(callback){
 	grecaptcha.execute('` + c.siteKey + `', {action: 'submit'}).then(function(token) {
 		$('#` + locationID + `').val(token);
