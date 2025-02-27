@@ -57,14 +57,10 @@ func (c *captchaAPI) Render(ctx echo.Context, templatePath string, keysValues ..
 	options.Set("provider", c.provider)
 	var jsURL string
 	c.captchaID = com.RandomAlphanumeric(16)
-	if c.provider == `turnstile` {
-		jsURL = c.jsURL + `?onload=tarnstileRender` + c.captchaID
-	} else {
-		initedKey := `CaptchaJSInited.` + c.provider
-		if !ctx.Internal().Bool(initedKey) {
-			ctx.Internal().Set(initedKey, true)
-			jsURL = c.jsURL
-		}
+	initedKey := `CaptchaJSInited.` + c.provider
+	if !ctx.Internal().Bool(initedKey) {
+		ctx.Internal().Set(initedKey, true)
+		jsURL = c.jsURL
 	}
 	options.Set("jsURL", jsURL)
 	options.Set("captchaID", c.captchaID)
