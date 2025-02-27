@@ -91,20 +91,20 @@ func (c *captchaAPI) Render(ctx echo.Context, templatePath string, keysValues ..
 			htmlContent += `<input type="hidden" id="` + locationID + `-extend" disabled />`
 			htmlContent += `<script>
 window.addEventListener('load', function(){
-	$('#` + locationID + `').closest('.input-group-addon').addClass('xxs-padding-top').prev('input').remove();
-	var $form=$('#` + locationID + `').closest('form');
+    var id='#` + locationID + `', $box=$(id);
+	$box.closest('.input-group-addon').addClass('xxs-padding-top').prev('input').remove();
+	var $form=$box.closest('form');
 	$form.on('submit',function(e){
-		if($('#` + locationID + `').data('lastGeneratedAt')>(new Date()).getTime()-290) {
-			$('#` + locationID + `').data('lastGeneratedAt',0);
+		if($box.data('lastGeneratedAt')>(new Date()).getTime()-290) {
+			$box.data('lastGeneratedAt',0);
 			return true;
 		}
-		window.setTimeout(function(){
-			turnstile.reset('#` + locationID + `');
-		},1000);
-		$('#` + locationID + `').data('lastGeneratedAt',(new Date()).getTime());
+		window.setTimeout(function(){turnstile.reset(id);},1000);
+		$box.data('lastGeneratedAt',(new Date()).getTime());
 	});
-    if($('#` + locationID + `').children('div').length>0)return;
-    turnstile.render('#` + locationID + `');
+    if(!$('body').data('tarnstileInited')){$('body').data('tarnstileInited',true);return;}
+    if($box.children('div').length>0)return;
+    turnstile.render(id);
 })
 </script>`
 		default:
