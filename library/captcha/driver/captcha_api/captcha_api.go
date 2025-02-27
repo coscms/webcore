@@ -117,30 +117,31 @@ window.addEventListener('load', function(){
 			}
 			htmlContent += `<script>
 window.addEventListener('load', function(){
+	var id='#` + locationID + `';
 	grecaptcha.ready(function() {
 	  grecaptcha.execute('` + c.siteKey + `', {action: 'submit'}).then(function(token) {
-		$('#` + locationID + `').val(token);
-		$('#` + locationID + `').data('lastGeneratedAt',(new Date()).getTime());
+		$(id).val(token);
+		$(id).data('lastGeneratedAt',(new Date()).getTime());
 	  });
 	});
-	var igrp=$('#` + locationID + `').closest('.input-group');
+	var igrp=$(id).closest('.input-group');
 	if(igrp.length>0){
 		igrp.hide();
 		if(igrp.parent().hasClass('form-group')) igrp.parent().hide();
 	}
-	$('#` + locationID + `').closest('.input-group-addon').prev('input').remove();
-	var $form=$('#` + locationID + `').closest('form');
+	$(id).closest('.input-group-addon').prev('input').remove();
+	var $form=$(id).closest('form');
 	var $submit=$form.find(':submit');
 	$submit.on('click',function(e){
-		if($('#` + locationID + `').val() && $('#` + locationID + `').data('lastGeneratedAt')>(new Date()).getTime()-110) {
-			$('#` + locationID + `').data('lastGeneratedAt',0);
+		if($(id).val() && $(id).data('lastGeneratedAt')>(new Date()).getTime()-110) {
+			$(id).data('lastGeneratedAt',0);
 			return true;
 		}
 		var $this=$(this);
 		e.preventDefault();
 		grecaptcha.execute('` + c.siteKey + `', {action: 'submit'}).then(function(token) {
-		  $('#` + locationID + `').val(token);
-		  $('#` + locationID + `').data('lastGeneratedAt',(new Date()).getTime());
+		  $(id).val(token);
+		  $(id).data('lastGeneratedAt',(new Date()).getTime());
 		  $this.trigger('click');
 		});
 	});
@@ -235,12 +236,14 @@ func (c *captchaAPI) MakeData(ctx echo.Context, hostAlias string, name string) e
 var f=function(){
 	if(typeof(grecaptcha)=='undefined'){setTimeout(f,200);return;}
 	grecaptcha.ready(function() {
+		var id='#` + locationID + `';
 		grecaptcha.execute('` + c.siteKey + `', {action: 'submit'}).then(function(token) {
-			$('#` + locationID + `').val(token);
-			$('#` + locationID + `').data('lastGeneratedAt',(new Date()).getTime());
-			if($('#` + locationID + `-loading').length>0){
-				var t=$('#` + locationID + `-loading').data('success-tips')||` + defaultTips + `;
-				$('#` + locationID + `-loading').html('<i class="fa fa-check text-success"></i> '+t);
+			$(id).val(token);
+			$(id).data('lastGeneratedAt',(new Date()).getTime());
+			var $loading=$('#` + locationID + `-loading');
+			if($loading.length>0){
+				var t=$loading.data('success-tips')||` + defaultTips + `;
+				$loading.html('<i class="fa fa-check text-success"></i> '+t);
 			}
 		});
 	});
@@ -249,8 +252,9 @@ f();
 })();`
 		jsCallback = `function(callback){
 	grecaptcha.execute('` + c.siteKey + `', {action: 'submit'}).then(function(token) {
-		$('#` + locationID + `').val(token);
-		$('#` + locationID + `').data('lastGeneratedAt',(new Date()).getTime());
+		var id='#` + locationID + `';
+		$(id).val(token);
+		$(id).data('lastGeneratedAt',(new Date()).getTime());
 		callback && callback(token);
 	});
 }`
