@@ -81,16 +81,15 @@ func (c *captchaAPI) Render(ctx echo.Context, templatePath string, keysValues ..
 			}
 			locationID := `turnstile-` + c.captchaID
 			htmlContent += `<input type="hidden" name="captchaId" value="` + c.captchaID + `" />`
-			htmlContent += `<div class="cf-turnstile" id="` + locationID + `" data-sitekey="` + c.siteKey + `"></div>`
-			htmlContent += `<input type="hidden" id="` + locationID + `-extend" disabled />`
 			var theme string
 			if ctx.Cookie().Get(`ThemeColor`) == `dark` {
 				theme = `dark`
 			} else {
 				theme = `light`
 			}
+			htmlContent += `<div class="cf-turnstile" id="` + locationID + `" data-sitekey="` + c.siteKey + `" data-theme="` + theme + `"></div>`
+			htmlContent += `<input type="hidden" id="` + locationID + `-extend" disabled />`
 			htmlContent += `<script>
-window["tarnstileRender` + c.captchaID + `"]=function(){turnstile.render('#turnstile-{{$.Data.captchaID}}',{sitekey:'{{$.Data.siteKey}}',theme:'` + theme + `'});}
 window.addEventListener('load', function(){
 	$('#` + locationID + `').closest('.input-group-addon').addClass('xxs-padding-top').prev('input').remove();
 	var $form=$('#` + locationID + `').closest('form');
@@ -104,6 +103,8 @@ window.addEventListener('load', function(){
 		},1000);
 		$('#` + locationID + `').data('lastGeneratedAt',(new Date()).getTime());
 	});
+    if($('#` + locationID + `').children('div').length>0)return;
+    turnstile.render('#` + locationID + `');
 })
 </script>`
 		default:
