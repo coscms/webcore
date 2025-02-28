@@ -18,14 +18,20 @@ func New() *IPFilter {
 type IPFilter struct {
 	Whitelist *bart.Table[struct{}]
 	Blacklist *bart.Table[struct{}]
+	disallow  bool
 }
 
-func (f *IPFilter) Allowed(ip string) error {
-	return f.AddWhitelist(ip)
+func (a *IPFilter) SetDisallow(dfl bool) *IPFilter {
+	a.disallow = dfl
+	return a
 }
 
-func (f *IPFilter) Blocked(ip string) error {
-	return f.AddBlacklist(ip)
+func (a *IPFilter) Allowed(ip string) error {
+	return a.AddWhitelist(ip)
+}
+
+func (a *IPFilter) Blocked(ip string) error {
+	return a.AddBlacklist(ip)
 }
 
 func (a *IPFilter) AddWhitelist(ips ...string) error {
@@ -96,5 +102,5 @@ func (a *IPFilter) IsAllowedAddr(ip netip.Addr) bool {
 	if a.Blacklist.Size() > 0 {
 		return !a.Blacklist.Contains(ip)
 	}
-	return true
+	return !a.disallow
 }
