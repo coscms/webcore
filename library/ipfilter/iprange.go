@@ -8,18 +8,6 @@ import (
 	"strings"
 )
 
-func Validate(ip string) error {
-	parts := strings.SplitN(ip, `-`, 2)
-	if len(parts) == 2 {
-		return ValidateRange(parts[0], parts[1])
-	}
-	_, err := ParsePrefix(ip)
-	if err != nil {
-		return err
-	}
-	return err
-}
-
 func ParsePrefix(ip string) (pfx netip.Prefix, err error) {
 	if !strings.Contains(ip, `/`) {
 		ipr := net.ParseIP(ip)
