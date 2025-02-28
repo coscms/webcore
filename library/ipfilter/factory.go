@@ -52,6 +52,14 @@ func (f *Factory[UK, GK]) SetGroupGetter(fn func(ctx echo.Context, groupID GK) (
 	f.groupGetter = fn
 }
 
+func (f *Factory[UK, GK]) DeleteUser(userID UK) {
+	f.userFilters.Delete(userID)
+}
+
+func (f *Factory[UK, GK]) DeleteGroup(groupID GK) {
+	f.groupFilters.Delete(groupID)
+}
+
 func (f *Factory[UK, GK]) IsAllowed(ctx echo.Context, userID UK, groupID GK, ipBlacklist string, ipWhitelist string, ip netip.Addr) bool {
 	filter, ok := f.userFilters.GetOk(userID)
 	if !ok {
