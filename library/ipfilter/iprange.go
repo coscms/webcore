@@ -5,7 +5,56 @@ import (
 	"math/bits"
 	"net"
 	"net/netip"
+	"strings"
 )
+
+func Validate(ip string) error {
+	parts := strings.SplitN(ip, `-`, 2)
+	if len(parts) == 2 {
+		return ValidateRange(parts[0], parts[1])
+	}
+	_, err := ParsePrefix(ip)
+	if err != nil {
+		return fmt.Errorf(`failed to parse ip(%q): %w`, ip, err)
+	}
+	return err
+}
+
+func ParsePrefix(ip string) (pfx netip.Prefix, err error) {
+	if !strings.Contains(ip, `/`) {
+		ipr := net.ParseIP(ip)
+		if ipr == nil {
+			err = fmt.Errorf(`invalid ip: %v`, ip)
+			return
+		}
+		if len(ipr) == net.IPv4len {
+			ip += `/32`
+		} else {
+			ip += `/128`
+		}
+	}
+	pfx, err = netip.ParsePrefix(ip)
+	if err != nil {
+		err = fmt.Errorf(`failed to parse ip(%q): %w`, ip, err)
+	}
+	return
+}
+
+func ValidateRange(startIP, endIP string) error {
+	start, err := netip.ParseAddr(startIP)
+	if err != nil {
+		return fmt.Errorf(`failed to parse ip(%q): %w`, startIP, err)
+	}
+	var end netip.Addr
+	end, err = netip.ParseAddr(endIP)
+	if err != nil {
+		return fmt.Errorf(`failed to parse ip(%q): %w`, endIP, err)
+	}
+	if start.BitLen() != end.BitLen() {
+		return fmt.Errorf(`inconsistency between start and end ip types: %v - %v`, start.String(), end.String())
+	}
+	return err
+}
 
 func ParseIPRange(startIP, endIP string) ([]netip.Prefix, error) {
 	start, err := netip.ParseAddr(startIP)

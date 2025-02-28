@@ -45,7 +45,7 @@ func (a *IPFilter) AddWhitelist(ips ...string) error {
 			}
 			continue
 		}
-		pfx, err := netip.ParsePrefix(ip)
+		pfx, err := ParsePrefix(ip)
 		if err != nil {
 			return err
 		}
@@ -71,7 +71,7 @@ func (a *IPFilter) AddBlacklist(ips ...string) error {
 			}
 			continue
 		}
-		pfx, err := netip.ParsePrefix(ip)
+		pfx, err := ParsePrefix(ip)
 		if err != nil {
 			return err
 		}

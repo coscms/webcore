@@ -37,6 +37,15 @@ func TestToPrefixes(t *testing.T) {
 	for _, pf := range pfx {
 		t.Log(pf.String())
 	}
+
+	start = `fe80::`
+	end = `fe80::`
+	pfx, err = ParseIPRange(start, end)
+	assert.NoError(t, err)
+	assert.Equal(t, []netip.Prefix{netip.MustParsePrefix(`fe80::/128`)}, pfx)
+	for _, pf := range pfx {
+		t.Log(pf.String())
+	}
 }
 
 func TestContains(t *testing.T) {
