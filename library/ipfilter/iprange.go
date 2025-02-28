@@ -15,7 +15,7 @@ func ParsePrefix(ip string) (pfx netip.Prefix, err error) {
 			err = fmt.Errorf(`invalid ip: %v`, ip)
 			return
 		}
-		if len(ipr) == net.IPv4len {
+		if ipr.To4() != nil {
 			ip += `/32`
 		} else {
 			ip += `/128`
@@ -26,22 +26,6 @@ func ParsePrefix(ip string) (pfx netip.Prefix, err error) {
 		err = fmt.Errorf(`failed to parse ip(%q): %w`, ip, err)
 	}
 	return
-}
-
-func ValidateRange(startIP, endIP string) error {
-	start, err := netip.ParseAddr(startIP)
-	if err != nil {
-		return fmt.Errorf(`%w(%q): %w`, ErrParseStartIPAddress, startIP, err)
-	}
-	var end netip.Addr
-	end, err = netip.ParseAddr(endIP)
-	if err != nil {
-		return fmt.Errorf(`%w(%q): %w`, ErrParseEndIPAddress, endIP, err)
-	}
-	if start.BitLen() != end.BitLen() {
-		return fmt.Errorf(`%w: %v - %v`, ErrStartAndEndIPMismatchType, start.String(), end.String())
-	}
-	return err
 }
 
 func ParseIPRange(startIP, endIP string) ([]netip.Prefix, error) {

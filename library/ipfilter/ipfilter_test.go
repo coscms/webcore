@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/webx-top/echo/defaults"
 )
 
 func TestToPrefixes(t *testing.T) {
@@ -64,4 +65,21 @@ func TestContains(t *testing.T) {
 	ip = `127.0.0.0`
 	y = i.IsAllowed(ip)
 	assert.True(t, y)
+}
+
+func TestValidate(t *testing.T) {
+	err := Validate(`192.168.0.0-192.168.255.255`)
+	assert.NoError(t, err)
+	err = Validate(`192.168.0.0/16`)
+	assert.NoError(t, err)
+	err = Validate(`192.168.0.1`)
+	assert.NoError(t, err)
+	err = Validate(`fe80::`)
+	assert.NoError(t, err)
+
+	ctx := defaults.NewMockContext()
+	err = ValidateRows(ctx, `192.168.0.0-192.168.254.255 
+	
+127.0.0.0/16`)
+	assert.NoError(t, err)
 }

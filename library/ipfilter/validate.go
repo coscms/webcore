@@ -2,6 +2,8 @@ package ipfilter
 
 import (
 	"errors"
+	"fmt"
+	"net/netip"
 	"strings"
 
 	"github.com/webx-top/echo"
@@ -9,8 +11,16 @@ import (
 	"github.com/webx-top/echo/param"
 )
 
+func isNotEmptyString(s *string) bool {
+	if s == nil {
+		return false
+	}
+	*s = strings.TrimSpace(*s)
+	return len(*s) > 0
+}
+
 func ValidateRows(ctx echo.Context, iplist string) error {
-	ips := param.Split(iplist, "\n").Filter().Unique().String()
+	ips := param.Split(iplist, "\n").Filter(isNotEmptyString).Unique().String()
 	var err error
 	for _, ip := range ips {
 		err = Validate(ip)
@@ -38,6 +48,22 @@ func Validate(ip string) error {
 	_, err := ParsePrefix(ip)
 	if err != nil {
 		return err
+	}
+	return err
+}
+
+func ValidateRange(startIP, endIP string) error {
+	start, err := netip.ParseAddr(startIP)
+	if err != nil {
+		return fmt.Errorf(`%w(%q): %w`, ErrParseStartIPAddress, startIP, err)
+	}
+	var end netip.Addr
+	end, err = netip.ParseAddr(endIP)
+	if err != nil {
+		return fmt.Errorf(`%w(%q): %w`, ErrParseEndIPAddress, endIP, err)
+	}
+	if start.BitLen() != end.BitLen() {
+		return fmt.Errorf(`%w: %v - %v`, ErrStartAndEndIPMismatchType, start.String(), end.String())
 	}
 	return err
 }
