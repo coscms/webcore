@@ -81,11 +81,15 @@ func (a *IPFilter) AddBlacklist(ips ...string) error {
 }
 
 func (a *IPFilter) IsAllowed(realIP string) bool {
-	ip, err := netip.ParseAddr(realIP)
+	addr, err := netip.ParseAddr(realIP)
 	if err != nil {
 		log.Warnf("failed to netip.ParseAddr(%q): %v", realIP, err)
 		return false
 	}
+	return a.IsAllowedAddr(addr)
+}
+
+func (a *IPFilter) IsAllowedAddr(ip netip.Addr) bool {
 	if a.Whitelist.Size() > 0 {
 		return a.Whitelist.Contains(ip)
 	}
