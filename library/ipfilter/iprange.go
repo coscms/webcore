@@ -15,7 +15,7 @@ func Validate(ip string) error {
 	}
 	_, err := ParsePrefix(ip)
 	if err != nil {
-		return fmt.Errorf(`failed to parse ip(%q): %w`, ip, err)
+		return err
 	}
 	return err
 }
@@ -43,15 +43,15 @@ func ParsePrefix(ip string) (pfx netip.Prefix, err error) {
 func ValidateRange(startIP, endIP string) error {
 	start, err := netip.ParseAddr(startIP)
 	if err != nil {
-		return fmt.Errorf(`failed to parse ip(%q): %w`, startIP, err)
+		return fmt.Errorf(`%w(%q): %w`, ErrParseStartIPAddress, startIP, err)
 	}
 	var end netip.Addr
 	end, err = netip.ParseAddr(endIP)
 	if err != nil {
-		return fmt.Errorf(`failed to parse ip(%q): %w`, endIP, err)
+		return fmt.Errorf(`%w(%q): %w`, ErrParseEndIPAddress, endIP, err)
 	}
 	if start.BitLen() != end.BitLen() {
-		return fmt.Errorf(`inconsistency between start and end ip types: %v - %v`, start.String(), end.String())
+		return fmt.Errorf(`%w: %v - %v`, ErrStartAndEndIPMismatchType, start.String(), end.String())
 	}
 	return err
 }
