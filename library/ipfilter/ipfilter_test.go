@@ -65,6 +65,13 @@ func TestContains(t *testing.T) {
 	ip = `127.0.0.0`
 	y = i.IsAllowed(ip)
 	assert.True(t, y)
+
+	f := NewWithIP(``, ip).SetDisallow(true)
+	y = f.IsAllowed(ip)
+	assert.True(t, y)
+	f = NewWithIP(ip, ``)
+	y = f.IsAllowed(ip)
+	assert.False(t, y)
 }
 
 func TestValidate(t *testing.T) {

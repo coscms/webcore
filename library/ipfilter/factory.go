@@ -91,7 +91,7 @@ func NewWithIP(ipBlacklist, ipWhitelist string) *IPFilter {
 	}
 	ipWhitelist = strings.TrimSpace(ipWhitelist)
 	if len(ipWhitelist) > 0 {
-		ips := param.Split(ipBlacklist, "\n").Filter(isNotEmptyString).Unique().String()
+		ips := param.Split(ipWhitelist, "\n").Filter(isNotEmptyString).Unique().String()
 		err := filter.AddWhitelist(ips...)
 		if err != nil {
 			log.Errorf(`failed to add ipWhitelist: %v`, err)
