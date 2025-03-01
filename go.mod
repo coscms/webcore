@@ -9,7 +9,7 @@ require (
 	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/abh/errorutil v1.0.0
 	github.com/admpub/9t v0.0.1
-	github.com/admpub/bart v0.0.0-20250228043657-ac611bda7852
+	github.com/admpub/bart v0.0.0-20250301070216-7c20c680ac55
 	github.com/admpub/captcha-go v0.0.1
 	github.com/admpub/ccs-gm v0.0.5
 	github.com/admpub/checksum v1.1.0

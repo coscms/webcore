@@ -10,14 +10,16 @@ import (
 
 func New() *IPFilter {
 	return &IPFilter{
-		Whitelist: &bart.Table[struct{}]{},
-		Blacklist: &bart.Table[struct{}]{},
+		whitelist: &bart.Lite{},
+		blacklist: &bart.Lite{},
 	}
 }
 
 type IPFilter struct {
-	Whitelist *bart.Table[struct{}]
-	Blacklist *bart.Table[struct{}]
+	whitelist *bart.Lite
+	blacklist *bart.Lite
+	whitesize uint
+	blacksize uint
 	disallow  bool
 }
 
@@ -47,7 +49,7 @@ func (a *IPFilter) AddWhitelist(ips ...string) error {
 				return err
 			}
 			for _, pfx := range pfxList {
-				a.Whitelist.Insert(pfx, struct{}{})
+				a.insertWhitelist(pfx)
 			}
 			continue
 		}
@@ -55,9 +57,14 @@ func (a *IPFilter) AddWhitelist(ips ...string) error {
 		if err != nil {
 			return err
 		}
-		a.Whitelist.Insert(pfx, struct{}{})
+		a.insertWhitelist(pfx)
 	}
 	return nil
+}
+
+func (a *IPFilter) insertWhitelist(pfx netip.Prefix) {
+	a.whitesize++
+	a.whitelist.Insert(pfx)
 }
 
 func (a *IPFilter) AddBlacklist(ips ...string) error {
@@ -73,7 +80,7 @@ func (a *IPFilter) AddBlacklist(ips ...string) error {
 				return err
 			}
 			for _, pfx := range pfxList {
-				a.Whitelist.Insert(pfx, struct{}{})
+				a.insertBlacklist(pfx)
 			}
 			continue
 		}
@@ -81,9 +88,14 @@ func (a *IPFilter) AddBlacklist(ips ...string) error {
 		if err != nil {
 			return err
 		}
-		a.Blacklist.Insert(pfx, struct{}{})
+		a.insertBlacklist(pfx)
 	}
 	return nil
+}
+
+func (a *IPFilter) insertBlacklist(pfx netip.Prefix) {
+	a.blacksize++
+	a.blacklist.Insert(pfx)
 }
 
 func (a *IPFilter) IsAllowed(realIP string) bool {
@@ -96,11 +108,11 @@ func (a *IPFilter) IsAllowed(realIP string) bool {
 }
 
 func (a *IPFilter) IsAllowedAddr(ip netip.Addr) bool {
-	if a.Whitelist.Size() > 0 {
-		return a.Whitelist.Contains(ip)
+	if a.whitesize > 0 {
+		return a.whitelist.Contains(ip)
 	}
-	if a.Blacklist.Size() > 0 {
-		return !a.Blacklist.Contains(ip)
+	if a.blacksize > 0 {
+		return !a.blacklist.Contains(ip)
 	}
 	return !a.disallow
 }
