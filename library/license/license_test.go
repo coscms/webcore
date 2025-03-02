@@ -110,3 +110,19 @@ func TestLicenseEqDomain(t *testing.T) {
 	assert.False(t, icann)
 	assert.Equal(t, `x`, publicSuffix)
 }
+
+func TestUserAgent(t *testing.T) {
+	version = `1.2.3-beta`
+	packageName = `free`
+	emptyLicense.Info.Name = `user`
+	ua := MakeUserAgent()
+	assert.Equal(t, `nging-free/1.2.3-beta user`, ua)
+	t.Log(ua)
+	r := ParseUserAgent(ua)
+	assert.Equal(t, UserAgentRaw{
+		Product: `nging`,
+		Package: `free`,
+		Version: `1.2.3-beta`,
+		User:    `user`,
+	}, r)
+}

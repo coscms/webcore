@@ -93,6 +93,7 @@ func (v *ValidateResult) Validate() error {
 func validateFromOfficial(ctx echo.Context) error {
 	client := restclient.RestyRetryable()
 	client.SetHeader("Accept", "application/json")
+	client.SetHeader("User-Agent", MakeUserAgent())
 	result := NewValidateResponse()
 	client.SetResult(result)
 	fullURL := FullLicenseURL(ctx)
@@ -132,6 +133,7 @@ type VersionResponse struct {
 func LatestVersion(ctx echo.Context, version string, download bool) (*ProductVersion, error) {
 	client := restclient.RestyRetryable()
 	client.SetHeader("Accept", "application/json")
+	client.SetHeader("User-Agent", MakeUserAgent())
 	result := &VersionResponse{}
 	client.SetResult(result)
 	surl := versionURL + `?` + URLValues(ctx, version).Encode()

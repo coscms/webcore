@@ -23,6 +23,7 @@ func Download(ctx echo.Context) error {
 	operation := `获取授权证书失败：%v`
 	client := restclient.RestyRetryable()
 	client.SetHeader("Accept", "application/json")
+	client.SetHeader("User-Agent", MakeUserAgent())
 	officialResponse := &OfficialResponse{}
 	client.SetResult(officialResponse)
 	fullURL := FullLicenseURL(ctx) + `&pipe=download`
