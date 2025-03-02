@@ -41,6 +41,7 @@ func NewMessageWithValue(typ string, title string, content interface{}, status .
 		st = status[0]
 	}
 	msg := acquireMessage()
+	msg.ClientID = AnyClientID
 	msg.Type = typ
 	msg.Title = title
 	msg.Status = st
