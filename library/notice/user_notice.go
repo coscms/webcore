@@ -170,9 +170,12 @@ func (u *userNotices) UserList(limit int) []string {
 	return u.users.UserList(limit)
 }
 
-func (u *userNotices) MakeMessageGetter(username string) (func(), <-chan *Message, error) {
+func (u *userNotices) MakeMessageGetter(username string, messageTypes ...string) (func(), <-chan *Message, error) {
 	oUser, clientID := u.OpenClient(username)
 	oUser.OpenMessageType(`clientID`)
+	if len(messageTypes) > 0 {
+		oUser.OpenMessageType(messageTypes...)
+	}
 	msg := NewMessage().SetMode(`-`).SetType(`clientID`).SetClientID(clientID)
 	err := oUser.Send(msg)
 	if err != nil {

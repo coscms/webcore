@@ -41,7 +41,7 @@ type UserMessageSystem interface {
 	Clear()
 	Count() int
 	UserList(limit int) []string
-	MakeMessageGetter(username string) (func(), <-chan *Message, error)
+	MakeMessageGetter(username string, messageTypes ...string) (func(), <-chan *Message, error)
 }
 
 type IOnlineUser interface {
