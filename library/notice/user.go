@@ -24,6 +24,7 @@ func (oUser *OnlineUser) HasMessageType(messageTypes ...string) bool {
 
 func (oUser *OnlineUser) Send(message *Message, openDebug ...bool) error {
 	if !oUser.Notice.types.Has(message.Type) {
+		message.Failure()
 		Stdout(message)
 		return ErrMsgTypeNotAccept
 	}
@@ -35,8 +36,11 @@ func (oUser *OnlineUser) Send(message *Message, openDebug ...bool) error {
 		msgbox.Debug(`[NOTICE]`, `[Send][MessageTo]: `+oUser.User)
 	}
 	err := oUser.Notice.messages.Send(message)
-	if err != nil && debug {
-		msgbox.Debug(`[NOTICE]`, `[Send][MessageTo]: `+oUser.User+` [NotFoundClientID]: `+fmt.Sprint(message.ClientID))
+	if err != nil {
+		message.Failure()
+		if debug {
+			msgbox.Debug(`[NOTICE]`, `[Send][MessageTo]: `+oUser.User+` [NotFoundClientID]: `+fmt.Sprint(message.ClientID))
+		}
 	}
 	return err
 }

@@ -18,6 +18,11 @@
 
 package notice
 
+type Callback struct {
+	Success func()
+	Failure func()
+}
+
 type Message struct {
 	ClientID string        `json:"client_id" xml:"client_id"`
 	ID       interface{}   `json:"id" xml:"id"`
@@ -27,6 +32,19 @@ type Message struct {
 	Content  interface{}   `json:"content" xml:"content"`
 	Mode     string        `json:"mode" xml:"mode"` //显示模式：notify/element/modal
 	Progress *ProgressInfo `json:"progress" xml:"progress"`
+	callback *Callback
+}
+
+func (m *Message) Success() {
+	if m.callback != nil && m.callback.Success != nil {
+		m.callback.Success()
+	}
+}
+
+func (m *Message) Failure() {
+	if m.callback != nil && m.callback.Failure != nil {
+		m.callback.Failure()
+	}
 }
 
 func (m *Message) Release() {
@@ -37,11 +55,17 @@ func (m *Message) Release() {
 	m.Status = 0
 	m.Content = nil
 	m.Mode = ``
+	m.callback = nil
 	if m.Progress != nil {
 		releaseProgressInfo(m.Progress)
 		m.Progress = nil
 	}
 	releaseMessage(m)
+}
+
+func (m *Message) SetCallback(cb *Callback) *Message {
+	m.callback = cb
+	return m
 }
 
 func (m *Message) SetType(t string) *Message {

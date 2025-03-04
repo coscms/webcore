@@ -73,6 +73,7 @@ func (n *noticeMessages) Add(clientID string) {
 
 func (n *noticeMessages) Send(message *Message) error {
 	if len(message.ClientID) == 0 {
+		message.Failure()
 		Stdout(message)
 		return nil
 	}
@@ -94,6 +95,7 @@ func (n *noticeMessages) Send(message *Message) error {
 		ch <- message
 		return nil
 	}
+	message.Failure()
 	message.Release()
 	return ErrClientIDNotOnline
 }

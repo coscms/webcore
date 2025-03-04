@@ -77,6 +77,7 @@ func (u *userNotices) Send(user string, message *Message) error {
 		if debug {
 			msgbox.Debug(`[NOTICE]`, `[Send][NotFoundUser]: `+user)
 		}
+		message.Failure()
 		Stdout(message)
 		return ErrUserNotOnline
 	}
