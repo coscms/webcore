@@ -19,8 +19,8 @@
 package notice
 
 type Callback struct {
-	Success func()
-	Failure func()
+	Success func(*Message)
+	Failure func(*Message)
 }
 
 type Message struct {
@@ -37,13 +37,13 @@ type Message struct {
 
 func (m *Message) Success() {
 	if m.callback != nil && m.callback.Success != nil {
-		m.callback.Success()
+		m.callback.Success(m)
 	}
 }
 
 func (m *Message) Failure() {
 	if m.callback != nil && m.callback.Failure != nil {
-		m.callback.Failure()
+		m.callback.Failure(m)
 	}
 }
 
