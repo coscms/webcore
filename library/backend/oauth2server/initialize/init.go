@@ -1,8 +1,6 @@
 package initialize
 
 import (
-
-	//"github.com/golang-jwt/jwt"
 	"encoding/gob"
 
 	"github.com/admpub/oauth2/v4"

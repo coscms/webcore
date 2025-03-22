@@ -1,8 +1,6 @@
 module github.com/coscms/webcore
 
-go 1.23.6
-
-toolchain go1.24.0
+go 1.24.0
 
 require (
 	gitee.com/admpub/certmagic v0.8.9
@@ -42,7 +40,7 @@ require (
 	github.com/admpub/map2struct v0.1.3
 	github.com/admpub/mysql-schema-sync v0.2.6
 	github.com/admpub/null v8.0.4+incompatible
-	github.com/admpub/oauth2/v4 v4.0.2
+	github.com/admpub/oauth2/v4 v4.0.3
 	github.com/admpub/once v0.0.1
 	github.com/admpub/pp v0.0.7
 	github.com/admpub/qrcode v0.0.3
@@ -60,7 +58,7 @@ require (
 	github.com/coscms/captcha v0.2.2
 	github.com/coscms/forms v1.13.10
 	github.com/coscms/go-imgparse v0.0.1
-	github.com/coscms/oauth2s v0.4.2
+	github.com/coscms/oauth2s v0.4.3
 	github.com/coscms/session-boltstore v0.0.0-20250122075547-392556af7a5a
 	github.com/coscms/session-mysqlstore v0.0.0-20250122075110-d94d6bc2ce54
 	github.com/coscms/session-redisstore v0.0.0-20250122075426-4fb2344fcc5b
@@ -86,7 +84,7 @@ require (
 	github.com/webx-top/codec v0.3.0
 	github.com/webx-top/com v1.3.28
 	github.com/webx-top/db v1.28.2
-	github.com/webx-top/echo v1.15.2
+	github.com/webx-top/echo v1.15.3
 	github.com/webx-top/image v0.1.2
 	github.com/webx-top/restyclient v0.0.5
 	github.com/webx-top/validation v0.0.3
@@ -120,6 +118,7 @@ require (
 	github.com/admpub/sessions v0.3.0 // indirect
 	github.com/admpub/webdav/v4 v4.1.3 // indirect
 	github.com/admpub/websocket v1.0.4 // indirect
+	github.com/admpub/xencoding v0.0.2 // indirect
 	github.com/andybalholm/brotli v1.1.1 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
@@ -148,7 +147,7 @@ require (
 	github.com/goccy/go-json v0.10.5 // indirect
 	github.com/gofrs/uuid v4.4.0+incompatible // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
-	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
+	github.com/golang-jwt/jwt/v5 v5.2.2 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/golang/snappy v1.0.0 // indirect
 	github.com/gomodule/redigo v1.9.2 // indirect
