@@ -118,7 +118,7 @@ require (
 	github.com/admpub/sessions v0.3.0 // indirect
 	github.com/admpub/webdav/v4 v4.1.3 // indirect
 	github.com/admpub/websocket v1.0.4 // indirect
-	github.com/admpub/xencoding v0.0.2 // indirect
+	github.com/admpub/xencoding v0.0.3 // indirect
 	github.com/andybalholm/brotli v1.1.1 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
