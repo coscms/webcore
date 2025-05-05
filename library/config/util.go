@@ -53,11 +53,17 @@ func MustGetConfig() *Config {
 }
 
 func InitConfig() (*Config, error) {
-	configFiles := []string{
-		FromCLI().Conf,
+	configFiles := []string{FromCLI().Conf}
+	if !strings.HasSuffix(configFiles[0], `.conf`) {
+		configFiles = append(
+			configFiles,
+			strings.TrimSuffix(configFiles[0], filepath.Ext(configFiles[0]))+`.conf`,
+		)
+	}
+	configFiles = append(configFiles,
 		filepath.Join(FromCLI().Confd, `config.sample.conf`),
 		filepath.Join(FromCLI().Confd, `config.yaml.sample`),
-	}
+	)
 	var (
 		configFile      string
 		err             error
@@ -93,17 +99,16 @@ func InitConfig() (*Config, error) {
 	return temporaryConfig, nil
 }
 
-func ParseConfig() error {
-	if false {
-		b, err := confl.Marshal(FromFile())
-		if err != nil {
-			return err
-		}
-		err = os.WriteFile(FromCLI().Conf, b, os.ModePerm)
-		if err != nil {
-			return err
-		}
+func GenerateDefaultConfig() error {
+	b, err := confl.Marshal(FromFile())
+	if err != nil {
+		return err
 	}
+	err = os.WriteFile(FromCLI().Conf, b, os.ModePerm)
+	return err
+}
+
+func ParseConfig() error {
 	conf, err := InitConfig()
 	if err != nil {
 		return err
