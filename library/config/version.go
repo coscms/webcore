@@ -79,15 +79,29 @@ func JoinVersionLabel(number string, label string) string {
 }
 
 func (v *VersionInfo) IsNew(number string, label string, dump ...bool) bool {
+	return v.IsNewWithBuildTime(number, label, ``, dump...)
+}
+
+func (v *VersionInfo) IsNewWithBuildTime(number string, label string, buildTime string, dump ...bool) bool {
 	var hasNew bool
 	newVersion := JoinVersionLabel(number, label)
 	oldVersion := v.VNumberString()
 	if len(dump) > 0 && dump[0] {
-		echo.Dump(echo.H{`newVersion`: newVersion, `oldVersion`: oldVersion})
+		d := echo.H{`newVersion`: newVersion, `oldVersion`: oldVersion}
+		if len(buildTime) > 0 {
+			d[`newBuildTime`] = buildTime
+			d[`oldBuildTime`] = v.BuildTime
+		}
+		echo.Dump(d)
 	}
 	compared := com.VersionCompare(newVersion, oldVersion)
-	if compared == com.VersionCompareGt {
+	switch compared {
+	case com.VersionCompareGt:
 		hasNew = true
+	case com.VersionCompareEq:
+		if len(buildTime) > 0 {
+			hasNew = com.Uint64(v.BuildTime) < com.Uint64(buildTime)
+		}
 	}
 	return hasNew
 }
