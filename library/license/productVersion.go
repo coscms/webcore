@@ -106,11 +106,16 @@ func (v *ProductVersion) Extract() error {
 	v.clean(downloadDir, newVersionDir)
 	com.MkdirAll(v.extractedDir, os.ModePerm)
 	ddp := filepath.Join(v.extractedDir, `download_dir.txt`)
-	if err := os.WriteFile(ddp, com.Str2bytes(downloadDir), 0666); err != nil {
+	err := os.WriteFile(ddp, com.Str2bytes(downloadDir), 0666)
+	if err != nil {
 		return fmt.Errorf(`%w: %s`, err, ddp)
 	}
 	v.prog.Send(fmt.Sprintf(`extract the file %q to %q`, v.downloadedPath, v.extractedDir), notice.StateSuccess)
-	_, err := com.UnTarGz(v.downloadedPath, v.extractedDir)
+	if strings.EqualFold(filepath.Ext(v.downloadedPath), `.zip`) {
+		err = com.Unzip(v.downloadedPath, v.extractedDir)
+	} else {
+		_, err = com.UnTarGz(v.downloadedPath, v.extractedDir)
+	}
 	if err != nil {
 		v.prog.Send(fmt.Sprintf(`failed to extract %q to %q`, v.downloadedPath, v.extractedDir), notice.StateFailure)
 		return fmt.Errorf(`%w: %s`, err, v.downloadedPath)
@@ -137,10 +142,26 @@ func (v *ProductVersion) findExecutable() error {
 	if err != nil {
 		return err
 	}
-	for _, sha256file := range files {
-		executable := strings.TrimSuffix(sha256file, `.sha256`)
+	if len(files) == 0 {
+		fileName := filepath.Base(v.downloadedPath)
+		parts := strings.SplitN(fileName, `_`, 2)
+		if len(parts) != 2 {
+			parts = strings.SplitN(fileName, `.`, 2)
+		}
+		executable := filepath.Join(v.extractedDir, parts[0])
+		if com.IsWindows {
+			executable += `.exe`
+		}
 		if com.FileExists(executable) {
 			v.executable = executable
+			return err
+		}
+	} else {
+		for _, sha256file := range files {
+			executable := strings.TrimSuffix(sha256file, `.sha256`)
+			if com.FileExists(executable) {
+				v.executable = executable
+			}
 		}
 	}
 	if len(v.executable) == 0 {
