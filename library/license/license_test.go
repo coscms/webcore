@@ -35,6 +35,24 @@ func TestEmptyLicense(t *testing.T) {
 	assert.True(t, HasFeature(`A`))
 }
 
+func TestParseVersionInfo(t *testing.T) {
+	output := `[DEBUG]88202|2025-05-06 14:47:23|Debug|app|******
+[ERROR]88202|2025-05-06 14:47:23|bindata_none.go:55|Error|app|*****
+Nging v5.3.3-dev licensed(free)
+Schema: v7.7001
+Build: 20250424162337`
+	ver, err := parseVersionInfo(output)
+	assert.NoError(t, err)
+	assert.Equal(t, &config.VersionInfo{
+		Name:      `Nging`,
+		Label:     `dev`,
+		Number:    `5.3.3`,
+		Package:   `free`,
+		DBSchema:  7.7001,
+		BuildTime: `20250424162337`,
+	}, ver)
+}
+
 func TestLicenseDownload(t *testing.T) {
 	return
 	// dirEntries, _ := os.ReadDir(filepath.Join(echo.Wd(), `.`))

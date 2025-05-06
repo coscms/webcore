@@ -21,10 +21,12 @@ package license
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 
 	"github.com/coscms/webcore/cmd/bootconfig"
+	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webcore/library/notice"
 	"github.com/coscms/webcore/library/selfupdate"
 	"github.com/webx-top/com"
@@ -124,6 +126,9 @@ func (v *ProductVersion) Extract() error {
 		}
 	}
 	os.Chmod(v.executable, 0755)
+	if len(v.Version) == 0 {
+		err = v.getVersionInfo()
+	}
 	return err
 }
 
@@ -142,6 +147,80 @@ func (v *ProductVersion) findExecutable() error {
 		err = fmt.Errorf(`no executable found in folder %s`, v.extractedDir)
 	}
 	return err
+}
+
+func (v *ProductVersion) getVersionInfo() error {
+	b, err := exec.Command(v.executable, `version`).CombinedOutput()
+	if err != nil {
+		return err
+	}
+	s := string(b)
+	var ver *config.VersionInfo
+	ver, err = parseVersionInfo(s)
+	if err != nil {
+		return err
+	}
+	if ver.Name != config.Version.Name {
+		err = fmt.Errorf(`software name mismatch (new != old): %s != %s`, ver.Name, config.Version.Name)
+		return err
+	}
+	if ver.Package != Package() {
+		err = fmt.Errorf(`software package mismatch (new != old): %s != %s`, ver.Package, Package())
+		return err
+	}
+	v.Version = ver.Number
+	v.Type = ver.Label
+	return err
+}
+
+func parseVersionInfo(s string) (*config.VersionInfo, error) {
+	var err error
+	// $ ./nging version
+	// Nging v5.3.3 licensed(vanguard)
+	// Schema: v7.7001
+	// Build: 20250424162337
+	s = strings.TrimSpace(s)
+	rows := strings.Split(s, "\n")
+	if len(rows) < 3 {
+		err = fmt.Errorf(`failed to query version information from command line output: %s`, "\n"+s)
+		return nil, err
+	}
+	rows = rows[len(rows)-3:]
+	ngingVer := strings.TrimSpace(rows[0])
+	parts := strings.Split(ngingVer, ` `)
+	if len(parts) != 3 {
+		err = fmt.Errorf(`failed to query version information from command line output: %s`, "\n"+ngingVer)
+		return nil, err
+	}
+	ver := &config.VersionInfo{
+		Name: parts[0],
+	}
+	if !strings.HasPrefix(parts[1], `v`) {
+		err = fmt.Errorf(`failed to query version information from command line output: %s`, "\n"+ngingVer)
+		return ver, err
+	}
+	ver.Number = strings.TrimPrefix(parts[1], `v`)
+	vParts := strings.SplitN(ver.Number, `-`, 2)
+	if len(vParts) == 2 {
+		ver.Number = vParts[0]
+		ver.Label = vParts[1]
+	}
+	parts2 := strings.SplitN(parts[2], `(`, 2)
+	if len(parts2) == 2 {
+		packageName = strings.TrimSuffix(parts2[1], `)`)
+		ver.Package = packageName
+	}
+
+	parts = strings.SplitN(rows[1], ` `, 2)
+	if len(parts) == 2 && parts[0] == `Schema:` {
+		ver.DBSchema = com.Float64(strings.TrimPrefix(parts[1], `v`))
+	}
+
+	parts = strings.SplitN(rows[2], ` `, 2)
+	if len(parts) == 2 && parts[0] == `Build:` {
+		ver.BuildTime = parts[1]
+	}
+	return ver, err
 }
 
 func (v *ProductVersion) Upgrade(ctx echo.Context, ngingDir string, restartMode ...string) error {
