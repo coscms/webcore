@@ -191,7 +191,7 @@ func LatestVersion(ctx echo.Context, version string, download bool) (*ProductVer
 			return result.Data, err
 		}
 		saveTo += echo.FilePathSeparator + path.Base(result.Data.DownloadURL)
-		result.Data.DownloadedPath = saveTo
+		result.Data.downloadedPath = saveTo
 		if com.FileExists(saveTo) {
 			np.Send(`the file already exists: `+saveTo, notice.StateSuccess)
 			return result.Data, nil

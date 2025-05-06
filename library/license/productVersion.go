@@ -42,12 +42,30 @@ type ProductVersion struct {
 	DownloadURL      string `comment:"下载网址" json:"download_url" xml:"download_url"`
 	Sign             string `comment:"下载后验证签名(多个签名之间用逗号分隔)" json:"sign" xml:"sign"`
 	DownloadURLOther string `comment:"备用下载网址" json:"download_url_other" xml:"download_url_other"`
-	DownloadedPath   string `comment:"自动下载保存路径" json:"-" xml:"-"`
-	extractedDir     string
-	backupDir        string
-	executable       string
-	isNew            bool
-	prog             notice.NProgressor
+
+	// local
+	downloadedPath string
+	extractedDir   string
+	backupDir      string
+	executable     string
+	isNew          bool
+	prog           notice.NProgressor
+}
+
+func (v *ProductVersion) SetDownloadedPath(downloadedPath string) {
+	v.downloadedPath = downloadedPath
+}
+
+func (v *ProductVersion) SetExecutable(executable string) {
+	v.executable = executable
+}
+
+func (v *ProductVersion) DownloadedPath() string {
+	return v.downloadedPath
+}
+
+func (v *ProductVersion) Executable() string {
+	return v.executable
 }
 
 func (v *ProductVersion) SetProgressor(prog notice.NProgressor) {
@@ -76,10 +94,10 @@ func (v *ProductVersion) clean(downloadDir string, newVersionDir string) {
 }
 
 func (v *ProductVersion) Extract() error {
-	if len(v.DownloadedPath) == 0 {
+	if len(v.downloadedPath) == 0 {
 		return fmt.Errorf(`failed to download: %s`, v.DownloadURL)
 	}
-	downloadDir := filepath.Dir(v.DownloadedPath)
+	downloadDir := filepath.Dir(v.downloadedPath)
 	v.backupDir = filepath.Join(downloadDir, `backup`)
 	newVersionDir := filepath.Join(echo.Wd(), `data/cache/nging-new-version`)
 	v.extractedDir = filepath.Join(newVersionDir, `latest`)
@@ -89,17 +107,27 @@ func (v *ProductVersion) Extract() error {
 	if err := os.WriteFile(ddp, com.Str2bytes(downloadDir), 0666); err != nil {
 		return fmt.Errorf(`%w: %s`, err, ddp)
 	}
-	v.prog.Send(fmt.Sprintf(`extract the file %q to %q`, v.DownloadedPath, v.extractedDir), notice.StateSuccess)
-	_, err := com.UnTarGz(v.DownloadedPath, v.extractedDir)
+	v.prog.Send(fmt.Sprintf(`extract the file %q to %q`, v.downloadedPath, v.extractedDir), notice.StateSuccess)
+	_, err := com.UnTarGz(v.downloadedPath, v.extractedDir)
 	if err != nil {
-		v.prog.Send(fmt.Sprintf(`failed to extract %q to %q`, v.DownloadedPath, v.extractedDir), notice.StateFailure)
-		return fmt.Errorf(`%w: %s`, err, v.DownloadedPath)
+		v.prog.Send(fmt.Sprintf(`failed to extract %q to %q`, v.downloadedPath, v.extractedDir), notice.StateFailure)
+		return fmt.Errorf(`%w: %s`, err, v.downloadedPath)
 	}
-	subDir := strings.SplitN(filepath.Base(v.DownloadedPath), `.`, 2)[0]
+	subDir := strings.SplitN(filepath.Base(v.downloadedPath), `.`, 2)[0]
 	_extractedDir := filepath.Join(v.extractedDir, subDir)
 	if com.FileExists(_extractedDir) {
 		v.extractedDir = _extractedDir
 	}
+	if len(v.executable) == 0 {
+		if err = v.findExecutable(); err != nil {
+			return err
+		}
+	}
+	os.Chmod(v.executable, 0755)
+	return err
+}
+
+func (v *ProductVersion) findExecutable() error {
 	files, err := filepath.Glob(v.extractedDir + echo.FilePathSeparator + `*.sha256`)
 	if err != nil {
 		return err
@@ -107,9 +135,11 @@ func (v *ProductVersion) Extract() error {
 	for _, sha256file := range files {
 		executable := strings.TrimSuffix(sha256file, `.sha256`)
 		if com.FileExists(executable) {
-			os.Chmod(executable, 0755)
 			v.executable = executable
 		}
+	}
+	if len(v.executable) == 0 {
+		err = fmt.Errorf(`no executable found in folder %s`, v.extractedDir)
 	}
 	return err
 }
