@@ -45,7 +45,7 @@ func TopNavURLs() map[string]int {
 func init() {
 	httpserver.Backend.Navigate.Add(navigate.Top, TopNavigate)
 	echo.OnCallback(`nging.httpserver.run.before`, func(_ events.Event) error {
-		ProjectInitURLsIdent()
+		ProjectInit()
 		for index, urlPath := range TopNavigate.FullPath(``) {
 			topNavURLs[urlPath] = index
 		}

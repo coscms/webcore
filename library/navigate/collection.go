@@ -9,10 +9,11 @@ const (
 	Bottom NavigateType = `bottom`
 )
 
-func NewProjectNavigates(baseProject string) *ProjectNavigates {
+func NewProjectNavigates(kind, baseProject string) *ProjectNavigates {
 	return &ProjectNavigates{
 		Navigates:        &Navigates{},
 		baseProject:      baseProject,
+		kind:             kind,
 		projectNavigates: map[string]*Navigates{},
 		Projects:         NewProjects(),
 	}
@@ -21,8 +22,14 @@ func NewProjectNavigates(baseProject string) *ProjectNavigates {
 type ProjectNavigates struct {
 	*Navigates
 	baseProject      string
+	kind             string
 	projectNavigates map[string]*Navigates
 	Projects         *Projects
+}
+
+func (p *ProjectNavigates) Init() {
+	p.Projects.InitURLsIdent()
+	p.GroupedChildren(p.kind)
 }
 
 func (p *ProjectNavigates) AddProject(index int, list ...*ProjectItem) {
@@ -57,10 +64,64 @@ func (p *ProjectNavigates) RemoveProject(project string) {
 	delete(p.projectNavigates, project)
 }
 
+// func (p *ProjectNavigates) Add(typ NavigateType, nav *List) {
+// 	p.navigates.Add(typ, nav)
+// }
+
+// func (p *ProjectNavigates) AddItems(typ NavigateType, index int, items ...*Item) {
+// 	p.navigates.AddItems(typ, index, items...)
+// }
+
+// func (p *ProjectNavigates) AddTopItems(index int, items ...*Item) {
+// 	p.navigates.AddTopItems(index, items...)
+// }
+
+// func (p *ProjectNavigates) AddLeftItems(index int, items ...*Item) {
+// 	p.navigates.AddLeftItems(index, items...)
+// }
+
+// func (p *ProjectNavigates) AddRightItems(index int, items ...*Item) {
+// 	p.navigates.AddRightItems(index, items...)
+// }
+
+// func (p *ProjectNavigates) AddBottomItems(index int, items ...*Item) {
+// 	p.navigates.AddBottomItems(typ)
+// }
+
+// func (p *ProjectNavigates) Get(typ NavigateType) (nav *List) {
+// 	return p.navigates.Get(typ)
+// }
+
+// func (p *ProjectNavigates) GetTop() *List {
+// 	return p.navigates.GetTop()
+// }
+
+// func (p *ProjectNavigates) GetLeft() *List {
+// 	return p.navigates.GetLeft()
+// }
+
+// func (p *ProjectNavigates) GetRight() *List {
+// 	return p.navigates.GetRight()
+// }
+
+// func (p *ProjectNavigates) GetBottom() *List {
+// 	return p.navigates.GetBottom()
+// }
+
+// func (p *ProjectNavigates) Remove(typ NavigateType) bool {
+// 	return p.navigates.Remove(typ)
+// }
+
 type Navigates map[NavigateType]*List
 
 func (n *Navigates) Add(typ NavigateType, nav *List) {
 	(*n)[typ] = nav
+}
+
+func (n *Navigates) GroupedChildren(prefix string) {
+	for nType, nRows := range *n {
+		nRows.groupedChildren(prefix + `.` + string(nType))
+	}
 }
 
 func (n *Navigates) AddItems(typ NavigateType, index int, items ...*Item) {

@@ -16,8 +16,8 @@ const (
 var (
 	Backend = New(KindBackend).
 		SetRouter(route.NewRegister(defaults.Default).AddGroupNamer(groupNamer)).
-		SetNavigate(navigate.NewProjectNavigates(`nging`))
-	Frontend = New(KindFrontend).SetNavigate(navigate.NewProjectNavigates(`webx`))
+		SetNavigate(navigate.NewProjectNavigates(KindBackend, `nging`))
+	Frontend = New(KindFrontend).SetNavigate(navigate.NewProjectNavigates(KindFrontend, `webx`))
 	Servers  = &HTTPServers{
 		Backend:  Backend,
 		Frontend: Frontend,

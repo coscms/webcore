@@ -204,5 +204,15 @@ func TestGroup(t *testing.T) {
 		Label: `测试`,
 	}
 	RegisterGroup(`test`, g)
-	assert.Equal(t, []Group{g}, navGroups[`test`])
+	assert.Equal(t, []Group{g}, navGroups[`test`].g)
+
+	g2 := Group{
+		Group: `testG2`,
+		Label: `测试`,
+	}
+	RegisterGroup(`test`, g2)
+	assert.Equal(t, []Group{g, g2}, navGroups[`test`].g)
+
+	UnregisterGroup(`test`, `testG`)
+	assert.Equal(t, []Group{g2}, navGroups[`test`].g)
 }

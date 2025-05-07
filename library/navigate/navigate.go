@@ -21,6 +21,7 @@ package navigate
 import (
 	"path"
 
+	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 )
 
@@ -60,15 +61,64 @@ func (a *Item) IsValid() bool {
 	return FeatureChecker(a.Feature)
 }
 
-func (a *Item) GroupedChildren(name string) []Group {
+func (a *Item) groupedChildren(prefix string) {
+	if a == nil || a.Children == nil {
+		return
+	}
+	if !HasGroup(prefix, a.Group) {
+		RegisterGroup(prefix, Group{
+			Group: a.Group,
+			Label: com.Title(a.Group),
+		})
+	}
+	prefix += `.` + a.Action
+	a.Children.groupedChildren(prefix)
+}
+
+func (a *Item) GetGroups(name string) []Group {
 	if a == nil || a.Children == nil {
 		return nil
 	}
-	return navGroups[name]
+	name += `.` + a.Action
+	groupIndexes := GetGroupIndexes(name)
+	if len(groupIndexes) == 0 {
+		return nil
+	}
+	result := make([]Group, 0, len(groupIndexes))
+	existGroups := map[string]struct{}{}
+	for _, item := range *a.Children {
+		if !item.Display {
+			continue
+		}
+		if _, ok := existGroups[item.Group]; ok {
+			continue
+		}
+		idx, ok := groupIndexes[item.Group]
+		if ok {
+			existGroups[item.Group] = struct{}{}
+			result = append(result, GetGroups(name)[idx])
+		}
+	}
+	return result
 }
 
 // List 操作列表
 type List []*Item
+
+func (a List) groupedChildren(prefix string) {
+	var hasGroup bool
+	for _, item := range a {
+		if len(item.Group) > 0 {
+			hasGroup = true
+			break
+		}
+	}
+	if hasGroup {
+		for _, item := range a {
+			item.groupedChildren(prefix)
+		}
+	}
+}
 
 func (a *List) FullPath(parentPath string) []string {
 	var r []string

@@ -35,8 +35,8 @@ func ProjectURLsIdent() map[string]string {
 	return httpserver.Backend.Navigate.Projects.URLsIdent()
 }
 
-func ProjectInitURLsIdent() *navigate.Projects {
-	return httpserver.Backend.Navigate.Projects.InitURLsIdent()
+func ProjectInit() {
+	httpserver.Backend.Navigate.Init()
 }
 
 func ProjectIdent(urlPath string) string {
