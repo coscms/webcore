@@ -61,22 +61,29 @@ func (a *Item) IsValid() bool {
 	return FeatureChecker(a.Feature)
 }
 
-func (a *Item) groupedChildren(prefix string) {
-	if a == nil || a.Children == nil {
+func (a *Item) groupedChildren(prefix string, hasGroup bool) {
+	if a == nil || !a.Display {
 		return
 	}
-	if !HasGroup(prefix, a.Group) {
-		RegisterGroup(prefix, Group{
+	if hasGroup && !HasGroup(prefix, a.Group) {
+		g := Group{
 			Group: a.Group,
 			Label: com.Title(a.Group),
-		})
+		}
+		if len(g.Label) == 0 {
+			g.Label = `Default`
+		}
+		RegisterGroup(prefix, g)
+	}
+	if a.Children == nil {
+		return
 	}
 	prefix += `.` + a.Action
 	a.Children.groupedChildren(prefix)
 }
 
 func (a *Item) GetGroups(name string) []Group {
-	if a == nil || a.Children == nil {
+	if a == nil || !a.Display || a.Children == nil {
 		return nil
 	}
 	name += `.` + a.Action
@@ -108,15 +115,13 @@ type List []*Item
 func (a List) groupedChildren(prefix string) {
 	var hasGroup bool
 	for _, item := range a {
-		if len(item.Group) > 0 {
+		if item.Display && len(item.Group) > 0 {
 			hasGroup = true
 			break
 		}
 	}
-	if hasGroup {
-		for _, item := range a {
-			item.groupedChildren(prefix)
-		}
+	for _, item := range a {
+		item.groupedChildren(prefix, hasGroup)
 	}
 }
 

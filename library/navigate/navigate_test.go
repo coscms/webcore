@@ -215,4 +215,41 @@ func TestGroup(t *testing.T) {
 
 	UnregisterGroup(`test`, `testG`)
 	assert.Equal(t, []Group{g2}, navGroups[`test`].g)
+
+	pn := NewProjectNavigates(`testCase`, `root`)
+	pn.Add(Top, &List{
+		{
+			Display: true,
+			Action:  `user`,
+			Group:   ``,
+			Children: &List{
+				{
+					Display: true,
+					Action:  `index`,
+					Group:   `user`,
+				},
+				{
+					Display: true,
+					Action:  `edit`,
+					Group:   `user`,
+				},
+				{
+					Display: true,
+					Action:  `hidden`,
+					Group:   ``,
+				},
+			},
+		},
+	})
+	pn.Init()
+	//com.Dump(navGroups)
+	assert.Equal(t, []Group{
+		Group{
+			Group: `user`,
+			Label: `User`,
+		}, Group{
+			Group: ``,
+			Label: `Default`,
+		},
+	}, navGroups[`testCase.top.user`].g)
 }
