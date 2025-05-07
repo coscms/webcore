@@ -14,6 +14,7 @@ func init() {
 	tplfunc.TplFuncMap[`LicenseSkipCheck`] = func() bool { return SkipLicenseCheck }
 	tplfunc.TplFuncMap[`TrackerURL`] = TrackerURL
 	tplfunc.TplFuncMap[`TrackerHTML`] = TrackerHTML
+	tplfunc.TplFuncMap[`ProductURL`] = ProductURL
 
 	navigate.FeatureChecker = func(feature string) bool {
 		return HasFeature(feature)

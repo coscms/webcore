@@ -36,16 +36,13 @@ func init() {
 	}))
 	httpserver.Backend.Dashboard.TopButtons.Add(0,
 		&dashboard.Button{
-			Tmpl: `manager/topbutton/donation`,
-		},
-		&dashboard.Button{
 			Tmpl: `manager/topbutton/language`,
 		},
 		&dashboard.Button{
-			Tmpl: `manager/topbutton/source`,
+			Tmpl: `manager/topbutton/upgrade`,
 		},
 		&dashboard.Button{
-			Tmpl: `manager/topbutton/bug-report`,
+			Tmpl: `manager/topbutton/official-site`,
 		},
 	)
 }
