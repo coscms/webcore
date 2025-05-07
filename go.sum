@@ -426,8 +426,8 @@ github.com/abh/errorutil v1.0.0/go.mod h1:EY+X82MG0wLqrNvLnxHdhPPLeHOe9EL2Skq1Pv
 github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d/go.mod h1:asat636LX7Bqt5lYEZ27JNDcqxfjdBQuJ/MM4CN/Lzo=
 github.com/admpub/9t v0.0.1 h1:lrWQwKKwams4oqWjOC4BqfvSMDxddkXZsLzGVCSp0WU=
 github.com/admpub/9t v0.0.1/go.mod h1:xYEKNm2uhIXq9xso+fNl+2LTa5+kzKpdm7EX+lNvdj8=
-github.com/admpub/bart v0.0.0-20250507102413-c3be65765b3f h1:TNd0dR0o1b1/HvmUJ5GFHDEsGsvExN257CyoDTJ+IaY=
-github.com/admpub/bart v0.0.0-20250507102413-c3be65765b3f/go.mod h1:vyJu67xi3ok+n8SED4iPrrocKdBhi1DO970nMS9cFyg=
+github.com/admpub/bart v0.0.1 h1:O+5W6MDLCqJXGZzsEzM3NZfDJkrTjw+JRFsKtZDW2z8=
+github.com/admpub/bart v0.0.1/go.mod h1:vyJu67xi3ok+n8SED4iPrrocKdBhi1DO970nMS9cFyg=
 github.com/admpub/boltstore v1.2.0 h1:rE6EBp59+ux/uVUkzc8PWG+TWGrA90GoRBeLGCmMh/s=
 github.com/admpub/boltstore v1.2.0/go.mod h1:ekSv9vnePbyr6EtSAGLfXzwX/7TpjE5TlL22FCHaMQY=
 github.com/admpub/caddy v1.1.11/go.mod h1:wb4LgV+7tN5tOI+D4pQyjz31wKEziN5TshwZXxEpbbg=
