@@ -60,6 +60,13 @@ func (a *Item) IsValid() bool {
 	return FeatureChecker(a.Feature)
 }
 
+func (a *Item) GroupedChildren(name string) []Group {
+	if a == nil || a.Children == nil {
+		return nil
+	}
+	return navGroups[name]
+}
+
 // List 操作列表
 type List []*Item
 

@@ -197,3 +197,12 @@ func TestConfigDefaultsAsStore(t *testing.T) {
   }
 ]`, com.Dump(v3, true))
 }
+
+func TestGroup(t *testing.T) {
+	g := Group{
+		Group: `testG`,
+		Label: `测试`,
+	}
+	RegisterGroup(`test`, g)
+	assert.Equal(t, []Group{g}, navGroups[`test`])
+}
