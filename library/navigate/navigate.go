@@ -38,6 +38,7 @@ type Item struct {
 	Target     string      `json:",omitempty" xml:",omitempty"` //打开方式
 	Unlimited  bool        `json:",omitempty" xml:",omitempty"` //是否不限制权限
 	Feature    string      `json:",omitempty" xml:",omitempty"` //功能
+	Group      string      `json:",omitempty" xml:",omitempty"` //组标识(仅部分地方有用到)
 	Attributes echo.KVList `json:",omitempty" xml:",omitempty"` //HTML标签a属性
 	Children   *List       `json:",omitempty" xml:",omitempty"` //子菜单
 }
