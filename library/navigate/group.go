@@ -26,11 +26,11 @@ var navGroups = map[string]*Groups{}
 func init() {
 	RegisterGroup(`backend.top.manager`, []Group{
 		{
-			Icon:  `gear`,
+			Icon:  `gears`,
 			Label: echo.T(`基本设置`),
 		},
 		{
-			Icon:  `gear`,
+			Icon:  `users`,
 			Label: echo.T(`管理员账号`),
 			Group: `admin`,
 		},
