@@ -214,14 +214,23 @@ func (p *program) run(logPrefix string) error {
 	return err
 }
 
+func (p *program) isSelfUpgradeRestart() bool {
+	return p.cmd != nil &&
+		p.cmd.ProcessState != nil &&
+		p.cmd.ProcessState.ExitCode() == ExitCodeSelfRestart
+}
+
 func (p *program) retryableRun() {
 	var err error
 	defer func() {
 		if p.cmd != nil && p.cmd.ProcessState != nil {
 			var result string
-			if p.cmd.ProcessState.Success() {
+			switch p.cmd.ProcessState.ExitCode() {
+			case 0:
 				result = `successful`
-			} else {
+			case ExitCodeSelfRestart:
+				result = `self-restart`
+			default:
 				result = `failed`
 			}
 			p.logger.Infof("Process execution result: %s", result)
@@ -229,13 +238,14 @@ func (p *program) retryableRun() {
 				p.killCmd()
 				log.Close()
 				os.Exit(p.cmd.ProcessState.ExitCode())
+				return
 			}
 		}
 		p.close()
 	}()
 	// Do work here
 	err = p.run(``)
-	if err == nil {
+	if err == nil || p.isSelfUpgradeRestart() {
 		return
 	}
 	maxRetries := p.MaxRetries
@@ -254,7 +264,7 @@ func (p *program) retryableRun() {
 		p.killCmd()
 		p.createCmd()
 		err = p.run(progress + `[retry]`)
-		if err == nil {
+		if err == nil || p.isSelfUpgradeRestart() {
 			return
 		}
 	}

@@ -27,6 +27,10 @@ import (
 var DefaultMaxRetries = 10
 var DefaultRetryInterval = 60 //60s
 
+const (
+	ExitCodeSelfRestart = 124
+)
+
 type Options struct {
 	Name          string // Required name of the service. No spaces suggested.
 	DisplayName   string // Display name, spaces allowed.

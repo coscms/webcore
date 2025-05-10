@@ -5,18 +5,16 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
-	"path/filepath"
 	"syscall"
 	"time"
 
 	"github.com/admpub/events"
-	"github.com/admpub/go-ps"
 	"github.com/admpub/log"
-	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/engine"
 
 	"github.com/coscms/webcore/library/config"
+	"github.com/coscms/webcore/library/service"
 )
 
 var signals = []os.Signal{
@@ -60,7 +58,7 @@ const (
 	ExitCodeStopFailed     = 2
 	ExitCodeShutdownFailed = 4
 	ExitCodeDefaultError   = 3
-	ExitCodeSelfRestart    = 124
+	ExitCodeSelfRestart    = service.ExitCodeSelfRestart
 )
 
 func stopWebServer(i int, eng engine.Engine, exitCode int) {
@@ -159,32 +157,8 @@ func handleSignal(eng engine.Engine) {
 	}
 }
 
-func hasParentProcess(parentExe string) bool {
-	ppid := os.Getppid()
-	if ppid == 1 {
-		return false
-	}
-	proc, err := ps.FindProcess(ppid)
-	if err != nil {
-		log.Debug(`ps.FindProcess: `, err)
-		return false
-	}
-	if proc == nil {
-		return false
-	}
-	name := filepath.Base(proc.Executable())
-	return parentExe == name
-}
-
 func SelfRestart() {
-	exitCode := 0
-	parentExe := `startup`
-	if com.IsWindows {
-		parentExe += `.exe`
-	}
-	if hasParentProcess(parentExe) {
-		exitCode = ExitCodeSelfRestart
-	}
+	exitCode := ExitCodeSelfRestart
 	config.FromCLI().Close()
 	SendSignal(os.Interrupt, exitCode)
 	time.Sleep(time.Second)

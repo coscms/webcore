@@ -30,6 +30,7 @@ import (
 	figure "github.com/admpub/go-figure"
 	"github.com/admpub/go-ps"
 	"github.com/admpub/log"
+	"github.com/admpub/service"
 	"github.com/kardianos/osext"
 	"github.com/spf13/cobra"
 	"github.com/webx-top/com"
@@ -66,6 +67,9 @@ func NewRoot() *cobra.Command {
 }
 
 func callStartup() error {
+	if !service.Interactive() { //非交互模式(即后台服务模式)
+		return nil
+	}
 	pproc, err := ps.FindProcess(os.Getppid())
 	if err != nil {
 		return err
