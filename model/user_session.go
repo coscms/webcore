@@ -15,6 +15,7 @@ func (u *User) SetSession(users ...*dbschema.NgingUser) {
 
 func (u *User) UnsetSession() {
 	u.Context().Session().Delete(`user`)
+	u.Context().Session().Delete(`auth2ndURL`)
 }
 
 func (u *User) VerifySession(users ...*dbschema.NgingUser) error {

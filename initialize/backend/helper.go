@@ -41,7 +41,7 @@ func Initialize() {
 	route.Use(middleware.FuncMap(), middleware.BackendFuncMap(), render.Auto())
 	route.Use(middleware.Middlewares...)
 	addRouter()
-	DefaultConfigWatcher(true)
+	defaultConfigWatcher(true)
 }
 
 var onConfigChange = []func(file string) error{}
@@ -62,7 +62,7 @@ func FireConfigChange(file string) error {
 
 var lockConfigChg = sync.Mutex{}
 
-func DefaultConfigWatcher(mustOk bool) {
+func defaultConfigWatcher(mustOk bool) {
 	if config.FromCLI().Type != `manager` {
 		return
 	}
