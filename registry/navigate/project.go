@@ -19,6 +19,8 @@
 package navigate
 
 import (
+	"strings"
+
 	"github.com/coscms/webcore/library/httpserver"
 	"github.com/coscms/webcore/library/navigate"
 )
@@ -40,6 +42,9 @@ func ProjectInit() {
 }
 
 func ProjectIdent(urlPath string) string {
+	if len(httpserver.Backend.Prefix()) > 0 {
+		urlPath = strings.TrimPrefix(urlPath, httpserver.Backend.Prefix())
+	}
 	return httpserver.Backend.Navigate.Projects.GetIdent(urlPath)
 }
 
