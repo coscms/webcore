@@ -2,8 +2,6 @@ module github.com/coscms/webcore
 
 go 1.24.0
 
-toolchain go1.24.3
-
 require (
 	gitee.com/admpub/certmagic v0.8.9
 	github.com/DATA-DOG/go-sqlmock v1.5.2
