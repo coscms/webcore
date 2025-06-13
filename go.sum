@@ -466,8 +466,8 @@ github.com/admpub/go-bindata-assetfs v0.0.1 h1:vBYOw0/zIn+jPrtBNFDYVn1F6uFseARah
 github.com/admpub/go-bindata-assetfs v0.0.1/go.mod h1:dX83JM2Dn+HXPC/bbN3bmXLEqAE8ERyFZmxWrhIPiXA=
 github.com/admpub/go-captcha-assets v0.0.0-20250122071745-baa7da4bda0d h1:+UO3s6gHqYJhie9FuyMsJ33nQDWEOh+C7LwQzOgdNmk=
 github.com/admpub/go-captcha-assets v0.0.0-20250122071745-baa7da4bda0d/go.mod h1:H30YA9pj/D2EljjRMMfQ4OUi4uJWZhD1ro8FqX5IB0E=
-github.com/admpub/go-captcha/v2 v2.0.6 h1:WruIsDPSDmd3QmvR/smmZEONmc3RtB7aWlg5i18uDX0=
-github.com/admpub/go-captcha/v2 v2.0.6/go.mod h1:X48enqEymrJnsEZBbyiabhWPIyVRxSAxY6PEdaDbGsA=
+github.com/admpub/go-captcha/v2 v2.0.7 h1:+jyBC3W3W6NnmuAcbH3P59UwAEU83R6CBDYro+TcV2c=
+github.com/admpub/go-captcha/v2 v2.0.7/go.mod h1:X48enqEymrJnsEZBbyiabhWPIyVRxSAxY6PEdaDbGsA=
 github.com/admpub/go-download/v2 v2.1.15 h1:MWGYEzBgRS1Fe/5q7rI5ss91bUIjZSIY4DjJxLjODY8=
 github.com/admpub/go-download/v2 v2.1.15/go.mod h1:i9ZAXwXjSfMTF3Qp165OzwEQY8nfUShUbUiu92puJJE=
 github.com/admpub/go-figure v0.0.2 h1:4AhVWjR5KtN1H+1NWkVw92nk+1FQcBSLVe7fAfqU4NE=
@@ -648,8 +648,8 @@ github.com/coreos/go-systemd v0.0.0-20181012123002-c6f51f82210d/go.mod h1:F5haX7
 github.com/coreos/go-systemd v0.0.0-20190321100706-95778dfbb74e/go.mod h1:F5haX7vjVVG0kc13fIWeqUViNPyEJxv/OmvnBo0Yme4=
 github.com/coreos/go-systemd/v22 v22.3.2/go.mod h1:Y58oyj3AT4RCenI/lSvhwexgC+NSVTIJ3seZv2GcEnc=
 github.com/coreos/pkg v0.0.0-20180928190104-399ea9e2e55f/go.mod h1:E3G3o1h8I7cfcXa63jLwjI0eiQQMgzzUDFVpN/nH/eA=
-github.com/coscms/captcha v0.2.2 h1:PgrjI26TsXj9uMM6KOW4DX00Wf/kuWiYC6tICnFC32M=
-github.com/coscms/captcha v0.2.2/go.mod h1:dV3+tDN/aHZ9V3zvO3nPEZO/xVwCPtnbFUYTidTXZsg=
+github.com/coscms/captcha v0.2.3 h1:r9GA1x8zvaC43gr+lRm79/EAqXx4+8WXCP+vC47vC8c=
+github.com/coscms/captcha v0.2.3/go.mod h1:IAdMnt5ExsjQPA7+SVzQa9qV/xNJmV7NMEXqrFJiSME=
 github.com/coscms/forms v1.13.10 h1:zpyd1xdYG3gn54g81ySPCn3hhHfHFQ4LzYcqDPBOVwo=
 github.com/coscms/forms v1.13.10/go.mod h1:SmoJCrusoUPSSHH3AGHAFFte4RdSIPSEXkcFstfXp/E=
 github.com/coscms/go-imgparse v0.0.1 h1:RMnw3/VtfTOil3SdukPgdGm4xmO5KoQpyVNtPKuFKFY=

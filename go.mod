@@ -22,7 +22,7 @@ require (
 	github.com/admpub/errors v0.8.2
 	github.com/admpub/events v1.3.6
 	github.com/admpub/go-bindata-assetfs v0.0.1
-	github.com/admpub/go-captcha/v2 v2.0.6
+	github.com/admpub/go-captcha/v2 v2.0.7
 	github.com/admpub/go-download/v2 v2.1.15
 	github.com/admpub/go-figure v0.0.2
 	github.com/admpub/go-isatty v0.0.11
@@ -57,7 +57,7 @@ require (
 	github.com/admpub/web-terminal v0.2.1
 	github.com/aws/aws-sdk-go v1.55.7
 	github.com/caddy-plugins/webdav v1.2.10
-	github.com/coscms/captcha v0.2.2
+	github.com/coscms/captcha v0.2.3
 	github.com/coscms/forms v1.13.10
 	github.com/coscms/go-imgparse v0.0.1
 	github.com/coscms/oauth2s v0.4.3
