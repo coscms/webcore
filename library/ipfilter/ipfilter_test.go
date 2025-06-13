@@ -72,6 +72,9 @@ func TestContains(t *testing.T) {
 	f = NewWithIP(ip, ``)
 	y = f.IsAllowed(ip)
 	assert.False(t, y)
+	f = NewWithIP(``, ``)
+	y = f.IsAllowed(ip)
+	assert.True(t, y)
 }
 
 func TestValidate(t *testing.T) {
