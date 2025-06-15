@@ -4,6 +4,7 @@ import (
 	"errors"
 	"html/template"
 	"io/fs"
+	"path"
 	"strings"
 
 	"github.com/webx-top/echo"
@@ -19,15 +20,25 @@ type ICaptcha interface {
 }
 
 func RenderTemplate(ctx echo.Context, captchaType string, templatePath string, options param.Store) template.HTML {
+	if len(templatePath) == 0 {
+		templatePath = `default`
+	}
 	tmplPath, tmplFile := fixTemplatePath(captchaType, templatePath)
 	b, err := ctx.Fetch(tmplPath, options)
 	if err != nil {
 		if templatePath != `default` && errors.Is(err, fs.ErrNotExist) {
-			tmplPath = strings.TrimSuffix(tmplPath, tmplFile)
-			if !strings.HasSuffix(tmplPath, `/`) {
-				tmplPath += `/`
+			fileNotExist := true
+			if !strings.HasPrefix(templatePath, `#`) {
+				b, err = ctx.Fetch(`#default#`+path.Join(`captcha`, captchaType, templatePath), options)
+				fileNotExist = err != nil && errors.Is(err, fs.ErrNotExist)
 			}
-			b, err = ctx.Fetch(tmplPath+`default`, options)
+			if fileNotExist {
+				tmplPath = strings.TrimSuffix(tmplPath, tmplFile)
+				if !strings.HasSuffix(tmplPath, `/`) {
+					tmplPath += `/`
+				}
+				b, err = ctx.Fetch(tmplPath+`default`, options)
+			}
 		}
 		if err != nil {
 			return template.HTML(err.Error())
