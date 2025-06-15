@@ -92,6 +92,15 @@ func SearchEngineNoindex() echo.MiddlewareFuncd {
 	}
 }
 
+func SetContextInternalValue(key, value interface{}) echo.MiddlewareFuncd {
+	return func(h echo.Handler) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			c.Internal().Set(key, value)
+			return h.Handle(c)
+		}
+	}
+}
+
 func HostChecker(key string) echo.MiddlewareFuncd {
 	return func(h echo.Handler) echo.HandlerFunc {
 		return func(c echo.Context) error {

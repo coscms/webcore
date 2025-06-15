@@ -158,6 +158,7 @@ func (h *HTTPServer) GuestHandler(handler interface{}, meta ...echo.H) echo.Hand
 
 func (h *HTTPServer) Apply() {
 	e := h.Router.Echo()
+	e.Extra().Set(`HTTP_SERVER_KIND`, h.Name)
 	//e.SetRenderDataWrapper(echo.DefaultRenderDataWrapper)
 	if len(h.Router.Prefix()) > 0 {
 		e.Pre(FixedUploadURLPrefix())

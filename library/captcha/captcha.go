@@ -28,7 +28,7 @@ func RenderTemplate(ctx echo.Context, captchaType string, templatePath string, o
 	if err != nil {
 		if templatePath != `default` && errors.Is(err, fs.ErrNotExist) {
 			fileNotExist := true
-			if !strings.HasPrefix(templatePath, `#`) {
+			if ctx.Echo().Extra().String(`HTTP_SERVER_KIND`) == `frontend` && !strings.HasPrefix(templatePath, `#`) {
 				b, err = ctx.Fetch(`#default#`+path.Join(`captcha`, captchaType, templatePath), options)
 				fileNotExist = err != nil && errors.Is(err, fs.ErrNotExist)
 			}
