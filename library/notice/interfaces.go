@@ -22,6 +22,8 @@ type Progressor interface {
 	ProxyReader(r io.Reader) io.ReadCloser
 	ProxyWriter(w io.Writer) io.WriteCloser
 	Callback(total int64, exec func(callback func(strLen int)) error) error
+	SetControl(IsExited) NProgressor
+	Progress() *Progress
 }
 
 type UserMessageSystem interface {

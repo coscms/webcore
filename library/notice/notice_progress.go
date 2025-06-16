@@ -111,6 +111,15 @@ func (a *NoticeAndProgress) Callback(total int64, exec func(callback func(strLen
 	return a.prog.Callback(total, exec)
 }
 
+func (a *NoticeAndProgress) SetControl(control IsExited) NProgressor {
+	a.prog.SetControl(control)
+	return a
+}
+
+func (a *NoticeAndProgress) Progress() *Progress {
+	return a.prog
+}
+
 func NewNoticer(ctx context.Context, config *HTTPNoticerConfig) Noticer {
 	var noticeSender Noticer
 	if config.IsExited == nil && config.Timeout != 0 {
