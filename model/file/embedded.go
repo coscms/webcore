@@ -67,11 +67,13 @@ func (f *Embedded) Updater(table string, field string, tableID string) *fileupda
 }
 
 func (f *Embedded) FileIDs() []uint64 {
-	fileIDs := []uint64{}
+	var fileIDs []uint64
 	if len(f.FileIds) == 0 {
 		return fileIDs
 	}
-	for _, fileID := range strings.Split(f.FileIds, `,`) {
+	fileStrIDs := strings.Split(f.FileIds, `,`)
+	fileIDs = make([]uint64, 0, len(fileStrIDs))
+	for _, fileID := range fileStrIDs {
 		fileIDs = append(fileIDs, param.AsUint64(fileID))
 	}
 	return fileIDs
@@ -116,8 +118,8 @@ func (f *Embedded) UpdateByFileID(project string, table string, field string, ta
 	m := dbschema.NewNgingFileEmbedded(f.Context())
 	err = m.Get(nil, db.And(
 		db.Cond{`table_id`: tableID},
-		db.Cond{`table_name`: table},
 		db.Cond{`field_name`: field},
+		db.Cond{`table_name`: table},
 	))
 	var newID uint64
 	if err != nil {
@@ -140,8 +142,8 @@ func (f *Embedded) UpdateEmbedded(embedded bool, project string, table string, f
 	m := dbschema.NewNgingFileEmbedded(f.Context())
 	err = m.Get(nil, db.And(
 		db.Cond{`table_id`: tableID},
-		db.Cond{`table_name`: table},
 		db.Cond{`field_name`: field},
+		db.Cond{`table_name`: table},
 	))
 	if err != nil {
 		if err != db.ErrNoMoreRows {
