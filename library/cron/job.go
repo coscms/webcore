@@ -40,6 +40,7 @@ import (
 	"github.com/webx-top/echo/engine"
 	"github.com/webx-top/echo/middleware/tplfunc"
 	"github.com/webx-top/echo/param"
+	"golang.org/x/sync/singleflight"
 
 	"github.com/admpub/log"
 	"github.com/coscms/webcore/dbschema"
@@ -268,8 +269,32 @@ func (j *Job) send(elapsed int64, t time.Time, err error, cmdOut string, isTimeo
 	})
 }
 
+var sg singleflight.Group
+
 // Run 运行Job
 func (j *Job) Run() {
+	if j.concurrent { // 允许同一个任务同时执行多次
+		j.run()
+		return
+	}
+
+	// 不允许同一个任务同时执行多次
+	t := time.Now()
+	key := com.String(j.id)
+	_, _, shared := sg.Do(key, func() (interface{}, error) {
+		j.run()
+		return nil, nil
+	})
+	if shared {
+		taskLog := new(dbschema.NgingTaskLog)
+		taskLog.TaskId = j.id
+		taskLog.Created = uint(t.Unix())
+		taskLog.Output = fmt.Sprintf("任务[ %d. %s ]上一次执行尚未结束，本次被忽略。", j.id, j.name)
+		j.addAndReturningLog(taskLog)
+	}
+}
+
+func (j *Job) run() {
 	var (
 		cmdOut    string
 		cmdErr    string
@@ -325,9 +350,7 @@ func (j *Job) Run() {
 	log.Debugf("开始执行任务: %d", j.id)
 
 	j.status.Add(1)
-	defer func() {
-		j.status.Add(-1)
-	}()
+	defer j.status.Add(-1)
 
 	timeout := time.Duration(time.Hour * 24)
 	if j.task.Timeout > 0 {
