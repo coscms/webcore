@@ -261,7 +261,7 @@ func (j *Job) send(elapsed int64, t time.Time, err error, cmdOut string, isTimeo
 	data["content"] = send.NewContent()
 	backendURL := common.Setting(`base`).String(`backendURL`)
 	backendURL = strings.TrimSuffix(backendURL, `/`)
-	data["detailURL"] = backendURL + httpserver.Backend.Router.Prefix() + `/task/log_view/` + fmt.Sprint(j.logID)
+	data["detailURL"] = backendURL + httpserver.Backend.Router.Prefix() + `/task/log_view/` + fmt.Sprint(j.LogID())
 	return Send(&alert.AlertData{
 		Title:   title,
 		Content: send.NewContent(),
