@@ -88,15 +88,14 @@ func CmdParams(command string) []string {
 
 // Job 定义需要处理的job
 type Job struct {
-	id         uint                   // 任务ID
-	logID      uint64                 // 日志记录ID
-	name       string                 // 任务名称
-	task       *dbschema.NgingTask    // 任务对象
-	taskLog    *dbschema.NgingTaskLog // 结果日志
-	runner     Runner                 // 执行函数
-	system     bool                   // 是否是系统内部功能
-	status     int32                  // 任务状态，大于0表示正在执行中
-	concurrent bool                   // 同一个任务是否允许并行执行
+	id         uint                // 任务ID
+	logID      atomic.Uint64       // 日志记录ID
+	name       string              // 任务名称
+	task       *dbschema.NgingTask // 任务对象
+	runner     Runner              // 执行函数
+	system     bool                // 是否是系统内部功能
+	status     atomic.Int32        // 任务状态，大于0表示正在执行中
+	concurrent bool                // 同一个任务是否允许并行执行
 }
 
 func NewJobFromTask(ctx context.Context, task *dbschema.NgingTask) (*Job, error) {
@@ -209,7 +208,7 @@ func NewCommandJob(ctx context.Context, id uint, name string, command string, di
 }
 
 func (j *Job) Status() int32 {
-	return atomic.LoadInt32(&j.status)
+	return j.status.Load()
 }
 
 func (j *Job) Name() string {
@@ -221,20 +220,16 @@ func (j *Job) Id() uint {
 }
 
 func (j *Job) LogID() uint64 {
-	return j.logID
+	return j.logID.Load()
 }
 
-func (j *Job) LogData() *dbschema.NgingTaskLog {
-	return j.taskLog
-}
-
-func (j *Job) addAndReturningLog() *Job {
+func (j *Job) addAndReturningLog(taskLog *dbschema.NgingTaskLog) *Job {
 	// 插入日志
-	_, err := j.taskLog.Insert()
+	_, err := taskLog.Insert()
 	if err != nil {
 		log.Error("Job: 日志写入失败: ", err)
 	}
-	j.logID = j.taskLog.Id
+	j.logID.Store(taskLog.Id)
 	return j
 }
 
@@ -285,9 +280,6 @@ func (j *Job) Run() {
 	taskLog := new(dbschema.NgingTaskLog)
 	taskLog.TaskId = j.id
 	taskLog.Created = uint(t.Unix())
-
-	j.taskLog = taskLog
-
 	defer func() {
 		taskLog.Output = cmdOut
 		taskLog.Error = cmdErr
@@ -309,12 +301,12 @@ func (j *Job) Run() {
 			return
 		}
 		if j.task.ClosedLog == `N` && !strings.HasPrefix(cmdOut, cronWriter.NotRecordPrefixFlag) && !strings.HasPrefix(cmdErr, cronWriter.NotRecordPrefixFlag) {
-			j.addAndReturningLog()
+			j.addAndReturningLog(taskLog)
 		}
 	}()
 
 	if !j.concurrent {
-		if atomic.LoadInt32(&j.status) > 0 {
+		if j.status.Load() > 0 {
 			taskLog.Output = fmt.Sprintf("任务[ %d. %s ]上一次执行尚未结束，本次被忽略。", j.id, j.name)
 			return
 		}
@@ -332,9 +324,9 @@ func (j *Job) Run() {
 
 	log.Debugf("开始执行任务: %d", j.id)
 
-	atomic.StoreInt32(&j.status, atomic.LoadInt32(&j.status)+1)
+	j.status.Add(1)
 	defer func() {
-		atomic.StoreInt32(&j.status, atomic.LoadInt32(&j.status)-1)
+		j.status.Add(-1)
 	}()
 
 	timeout := time.Duration(time.Hour * 24)
