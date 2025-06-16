@@ -24,13 +24,14 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"sync/atomic"
 	"time"
 
 	"github.com/admpub/log"
 	"github.com/coscms/webcore/dbschema"
 )
 
-var historyJobsRunning bool
+var historyJobsRunning atomic.Bool
 
 func InitJobs(ctx context.Context) error {
 	m := new(dbschema.NgingTask)
@@ -62,12 +63,12 @@ func InitJobs(ctx context.Context) error {
 			}
 		}
 	}
-	historyJobsRunning = true
+	historyJobsRunning.Store(true)
 	return nil
 }
 
 func HistoryJobsRunning() bool {
-	return historyJobsRunning
+	return historyJobsRunning.Load()
 }
 
 func runCmdWithTimeout(cmd *exec.Cmd, timeout time.Duration, ctx context.Context) (error, bool) {

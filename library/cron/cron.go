@@ -59,7 +59,7 @@ func Close() {
 		mainCron = nil
 		close(workPool)
 		workPool = nil
-		historyJobsRunning = false
+		historyJobsRunning.Store(false)
 		log.Info(`退出任务处理`)
 	}
 }
