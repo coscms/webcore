@@ -81,7 +81,8 @@ func (c *Config) DefaultOptions() service.KeyValue {
 	return map[string]interface{}{
 		//  * POSIX
 		//`PIDFile`: pidFile,
-		`Restart`: `always`,
+		`Restart`:    `always`,
+		`RestartSec`: 5,
 
 		//  * OS X
 		`RunAtLoad`: true,

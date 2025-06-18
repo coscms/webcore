@@ -21,7 +21,7 @@ require (
 	github.com/admpub/events v1.3.6
 	github.com/admpub/go-bindata-assetfs v0.0.1
 	github.com/admpub/go-captcha/v2 v2.0.7
-	github.com/admpub/go-download/v2 v2.1.15
+	github.com/admpub/go-download/v2 v2.2.0
 	github.com/admpub/go-figure v0.0.2
 	github.com/admpub/go-isatty v0.0.11
 	github.com/admpub/go-password v0.1.3
@@ -47,7 +47,7 @@ require (
 	github.com/admpub/realip v0.2.7
 	github.com/admpub/resty/v2 v2.7.2
 	github.com/admpub/securecookie v1.3.0
-	github.com/admpub/service v0.0.5
+	github.com/admpub/service v0.0.7
 	github.com/admpub/snowflake v0.0.0-20250215093046-736db7f88827
 	github.com/admpub/sonyflake v0.0.1
 	github.com/admpub/tail v1.1.1
@@ -59,8 +59,8 @@ require (
 	github.com/coscms/forms v1.13.10
 	github.com/coscms/go-imgparse v0.0.1
 	github.com/coscms/oauth2s v0.4.3
-	github.com/coscms/session-boltstore v0.0.0-20250122075547-392556af7a5a
-	github.com/coscms/session-mysqlstore v0.0.0-20250122075110-d94d6bc2ce54
+	github.com/coscms/session-boltstore v0.0.0-20250617034717-a58d8848fa61
+	github.com/coscms/session-mysqlstore v0.0.0-20250617035706-a20b648443b1
 	github.com/coscms/session-redisstore v0.0.0-20250122075426-4fb2344fcc5b
 	github.com/coscms/session-sqlitestore v0.0.4
 	github.com/coscms/session-sqlstore v0.0.1
@@ -71,7 +71,7 @@ require (
 	github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0
 	github.com/mattn/go-runewidth v0.0.16
 	github.com/microcosm-cc/bluemonday v1.0.27
-	github.com/minio/minio-go/v7 v7.0.92
+	github.com/minio/minio-go/v7 v7.0.94
 	github.com/pkg/sftp v1.13.9
 	github.com/shirou/gopsutil/v4 v4.25.5
 	github.com/spf13/cobra v1.9.1
@@ -143,7 +143,7 @@ require (
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
-	github.com/go-sql-driver/mysql v1.9.2 // indirect
+	github.com/go-sql-driver/mysql v1.9.3 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/goccy/go-json v0.10.5 // indirect
 	github.com/gofrs/uuid v4.4.0+incompatible // indirect
@@ -238,7 +238,7 @@ require (
 	google.golang.org/protobuf v1.36.6 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
-	modernc.org/libc v1.65.10 // indirect
+	modernc.org/libc v1.66.0 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect
 	modernc.org/sqlite v1.38.0 // indirect
