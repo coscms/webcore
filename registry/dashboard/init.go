@@ -44,5 +44,8 @@ func init() {
 		&dashboard.Button{
 			Tmpl: `manager/topbutton/official-site`,
 		},
+		&dashboard.Button{
+			Tmpl: `manager/topbutton/logs`,
+		},
 	)
 }
