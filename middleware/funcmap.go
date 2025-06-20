@@ -122,7 +122,7 @@ func BackendFuncMap() echo.MiddlewareFunc {
 			c.SetFunc(`EnvKey`, func() string {
 				return sessionguard.EnvKey(c, sessionguard.GetConfig().SessionGuardConfig)
 			})
-			c.SetFunc(`LogCatetories`, func() logcategory.LogCatetories {
+			c.SetFunc(`LogCategories`, func() logcategory.LogCatetories {
 				return logcategory.LogList(c)
 			})
 			return h.Handle(c)
