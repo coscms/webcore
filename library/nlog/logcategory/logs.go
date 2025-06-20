@@ -36,13 +36,13 @@ func addLogCategory(logCategories *echo.KVList, k, v string) {
 	logCategories.Add(k, v, echo.KVOptHKV(`logFilename`, logFilename))
 }
 
-type LogCatetories struct {
+type LogCategories struct {
 	WithCategory bool        `json:"withCategory"`
 	Categories   echo.KVList `json:"categories"`
 }
 
-func LogList(ctx echo.Context) LogCatetories {
-	logs := LogCatetories{}
+func LogList(ctx echo.Context) LogCategories {
+	logs := LogCategories{}
 	logCategories := &echo.KVList{}
 	addLogCategory(logCategories, log.DefaultLog.Category, ctx.T(`Nging日志`))
 	if strings.Contains(config.FromFile().Settings().Log.LogFile(), `{category}`) {
