@@ -50,6 +50,7 @@ func FuncMap() echo.MiddlewareFunc {
 }
 
 func BackendFuncMap() echo.MiddlewareFunc {
+	var emptyLogCategories logcategory.LogCategories
 	return func(h echo.Handler) echo.Handler {
 		return echo.HandlerFunc(func(c echo.Context) error {
 
@@ -123,6 +124,10 @@ func BackendFuncMap() echo.MiddlewareFunc {
 				return sessionguard.EnvKey(c, sessionguard.GetConfig().SessionGuardConfig)
 			})
 			c.SetFunc(`LogCategories`, func() logcategory.LogCategories {
+				permission := UserPermission(c)
+				if !permission.Check(c, `/manager/log/:category`) {
+					return emptyLogCategories
+				}
 				return logcategory.LogList(c)
 			})
 			return h.Handle(c)
