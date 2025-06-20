@@ -124,8 +124,11 @@ func BackendFuncMap() echo.MiddlewareFunc {
 				return sessionguard.EnvKey(c, sessionguard.GetConfig().SessionGuardConfig)
 			})
 			c.SetFunc(`LogCategories`, func() logcategory.LogCategories {
+				if user != nil && role.IsFounder(user) {
+					return logcategory.LogList(c)
+				}
 				permission := UserPermission(c)
-				if !permission.Check(c, `/manager/log/:category`) {
+				if !permission.Check(c, `manager/log/:category`) {
 					return emptyLogCategories
 				}
 				return logcategory.LogList(c)
