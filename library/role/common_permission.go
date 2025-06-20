@@ -161,8 +161,8 @@ func (r *CommonPermission) CheckByType(ctx echo.Context, typ string, permPath st
 	return rs
 }
 
-func (r *CommonPermission) Check(ctx echo.Context, permPath string) bool {
-	rs := r.CheckByType(ctx, RolePermissionTypePage, permPath)
+func (r *CommonPermission) HasPermission(ctx echo.Context, typ string, permPath string) bool {
+	rs := r.CheckByType(ctx, typ, permPath)
 	if rs == nil {
 		return false
 	}
@@ -172,15 +172,12 @@ func (r *CommonPermission) Check(ctx echo.Context, permPath string) bool {
 	return false
 }
 
+func (r *CommonPermission) Check(ctx echo.Context, permPath string) bool {
+	return r.HasPermission(ctx, RolePermissionTypePage, permPath)
+}
+
 func (r *CommonPermission) CheckCmd(ctx echo.Context, permPath string) bool {
-	rs := r.CheckByType(ctx, RolePermissionTypeCommand, permPath)
-	if rs == nil {
-		return false
-	}
-	if bl, ok := rs.(bool); ok {
-		return bl
-	}
-	return false
+	return r.HasPermission(ctx, RolePermissionTypeCommand, permPath)
 }
 
 func (r *CommonPermission) CheckBehavior(ctx echo.Context, permPath string) *perm.CheckedBehavior {

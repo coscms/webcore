@@ -133,6 +133,16 @@ func BackendFuncMap() echo.MiddlewareFunc {
 				}
 				return logcategory.LogList(c)
 			})
+			c.SetFunc(`HasPermission`, func(key string, typ ...string) bool {
+				if user != nil && role.IsFounder(user) {
+					return true
+				}
+				permission := UserPermission(c)
+				if len(typ) > 0 && len(typ[0]) > 0 {
+					return permission.HasPermission(c, typ[0], key)
+				}
+				return permission.Check(c, key)
+			})
 			return h.Handle(c)
 		})
 	}
