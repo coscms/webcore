@@ -29,6 +29,7 @@ import (
 	"github.com/coscms/webcore/library/httpserver"
 	"github.com/coscms/webcore/library/modal"
 	navigateLib "github.com/coscms/webcore/library/navigate"
+	"github.com/coscms/webcore/library/nlog/logcategory"
 	"github.com/coscms/webcore/library/role"
 	"github.com/coscms/webcore/library/role/roleutils"
 	"github.com/coscms/webcore/library/sessionguard"
@@ -120,6 +121,9 @@ func BackendFuncMap() echo.MiddlewareFunc {
 			})
 			c.SetFunc(`EnvKey`, func() string {
 				return sessionguard.EnvKey(c, sessionguard.GetConfig().SessionGuardConfig)
+			})
+			c.SetFunc(`LogCatetories`, func() logcategory.LogCatetories {
+				return logcategory.LogList(c)
 			})
 			return h.Handle(c)
 		})
