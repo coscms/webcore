@@ -40,6 +40,10 @@ func initialize() (err error) {
 		region.Close()
 	}
 	region, err = ip2region.New(dictFile)
+	if err != nil {
+		err = fmt.Errorf(`ip2region.New(%s) error: %w`, dictFile, err)
+		log.Error(err)
+	}
 	return
 }
 
