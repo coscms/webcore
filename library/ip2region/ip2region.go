@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/admpub/ip2region/v2/binding/golang/ip2region"
+	"github.com/admpub/log"
 	syncOnce "github.com/admpub/once"
 	"github.com/webx-top/echo"
 )
@@ -67,6 +68,8 @@ func IPInfo(ip string) (info ip2region.IpInfo, err error) {
 	}
 	defer func() {
 		if e := recover(); e != nil {
+			panicErr := echo.NewPanicError(e, nil).Parse(15)
+			log.Error(panicErr)
 			err = fmt.Errorf(`%v`, e)
 		}
 	}()
