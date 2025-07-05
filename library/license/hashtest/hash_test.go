@@ -16,7 +16,7 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-package license_test
+package hashtest
 
 import (
 	"encoding/hex"
