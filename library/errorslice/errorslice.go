@@ -9,8 +9,10 @@ const (
 	NLT = "\n\t"
 )
 
-func New() Errors {
-	return Errors{}
+func New(errs ...error) Errors {
+	e := Errors{}
+	e.Join(errs...)
+	return e
 }
 
 // Errors 多个错误信息
