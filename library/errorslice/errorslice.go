@@ -40,6 +40,15 @@ func (e Errors) IsEmpty() bool {
 	return len(e) == 0
 }
 
+func (e *Errors) Join(errs ...error) *Errors {
+	for _, err := range errs {
+		if err != nil {
+			*e = append(*e, err)
+		}
+	}
+	return e
+}
+
 func (e *Errors) Add(err error) {
 	*e = append(*e, err)
 }
