@@ -50,7 +50,9 @@ func (e *Errors) Join(errs ...error) *Errors {
 }
 
 func (e *Errors) Add(err error) {
-	*e = append(*e, err)
+	if err != nil {
+		*e = append(*e, err)
+	}
 }
 
 func (e Errors) Unwrap() []error {
