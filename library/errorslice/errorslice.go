@@ -11,7 +11,9 @@ const (
 
 func New(errs ...error) Errors {
 	e := Errors{}
-	e.Join(errs...)
+	if len(errs) > 0 {
+		e.Join(errs...)
+	}
 	return e
 }
 
