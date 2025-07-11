@@ -102,33 +102,25 @@ func (s *Kv) autoCreateKey(key string, value ...string) error {
 	m.Key = key
 	m.Type = AutoCreatedType
 	m.ChildKeyType = KvDefaultDataType
-	m.Value = ``
-	m.Description = ``
-	if len(value) > 0 {
-		m.Value = value[0]
-		if len(value) > 1 {
-			m.Description = value[1]
-			if len(value) > 2 {
-				m.Help = value[2]
-			}
-		}
-	}
+	com.SliceExtract(value, &m.Value, &m.Description, &m.Help)
 	m.Updated = uint(time.Now().Unix())
-	if _, err := m.Insert(); err != nil {
+	_, err := m.Insert()
+	if err != nil {
 		return err
 	}
-	m.Reset()
-	err := m.Get(nil, `key`, AutoCreatedType)
-	if err != nil {
-		if err != db.ErrNoMoreRows {
-			return err
-		}
-		m.Key = AutoCreatedType
-		m.Type = KvRootType
-		m.ChildKeyType = KvDefaultDataType
-		m.Value = `自动创建`
-		_, err = m.Insert()
+
+	var exists bool
+	exists, err = m.Exists(nil, `key`, AutoCreatedType)
+	if err != nil || exists {
+		return err
 	}
+
+	m.Reset()
+	m.Key = AutoCreatedType
+	m.Type = KvRootType
+	m.ChildKeyType = KvDefaultDataType
+	m.Value = `自动创建`
+	_, err = m.Insert()
 	return err
 }
 
