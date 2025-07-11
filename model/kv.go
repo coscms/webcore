@@ -26,6 +26,7 @@ import (
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/code"
+	"golang.org/x/sync/singleflight"
 
 	"github.com/coscms/webcore/dbschema"
 )
@@ -84,9 +85,19 @@ func (s *Kv) Get(mw func(db.Result) db.Result, args ...interface{}) error {
 	return nil
 }
 
+var sg singleflight.Group
+
 // AutoCreateKey 自动创建 key
 // value: 0. 值; 1. 说明; 2. 帮助说明
 func (s *Kv) AutoCreateKey(key string, value ...string) error {
+	_, err, _ := sg.Do(key, func() (interface{}, error) {
+		err := s.autoCreateKey(key, value...)
+		return nil, err
+	})
+	return err
+}
+
+func (s *Kv) autoCreateKey(key string, value ...string) error {
 	m := dbschema.NewNgingKv(s.Context())
 	m.Key = key
 	m.Type = AutoCreatedType
