@@ -20,7 +20,13 @@ package bootconfig
 
 var onStartList []func()
 
+// OnStart OnWebStart的别名函数。注册Web(管理面板)开始启动时执行的函数
 func OnStart(index int, fn ...func()) {
+	OnWebStart(index, fn...)
+}
+
+// OnWebStart 注册Web(管理面板)开始启动时执行的函数
+func OnWebStart(index int, fn ...func()) {
 	if len(fn) == 0 {
 		return
 	}
@@ -43,7 +49,8 @@ func OnStart(index int, fn ...func()) {
 	onStartList = append(onStartList, fn...)
 }
 
-func Start() {
+// WebStart Web(管理面板)开始启动
+func WebStart() {
 	for _, fn := range onStartList {
 		if fn == nil {
 			continue

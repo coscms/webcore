@@ -160,7 +160,7 @@ If you have already purchased a license, please place the ` + license.FileName()
 	// LOGO
 	fmt.Println(strings.TrimSuffix(figure.NewFigure(bootconfig.SoftwareName, `big`, false).String(), "\n"), config.Version.VString()+"\n")
 
-	bootconfig.Start()
+	bootconfig.WebStart()
 	startup.FireBefore(`web`)
 	if config.IsInstalled() {
 		startup.FireAfter(`web.installed`)
