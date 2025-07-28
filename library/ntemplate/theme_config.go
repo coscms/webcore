@@ -162,6 +162,10 @@ func (t *ThemeInfo) GetCurrentColor() string {
 
 const Dark = `dark`
 
+func (t *ThemeInfo) IsDarkMode() bool {
+	return t.IsColorName(Dark)
+}
+
 func (t *ThemeInfo) IsColorName(colorName string) bool {
 	if t.ColorName() == colorName {
 		return true
