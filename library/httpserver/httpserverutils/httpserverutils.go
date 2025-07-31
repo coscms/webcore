@@ -15,3 +15,19 @@ func GetServerKind(e *echo.Echo) string {
 func GetServerKindByContext(ctx echo.Context) string {
 	return GetServerKind(ctx.Echo())
 }
+
+func IsFrontend(e *echo.Echo) bool {
+	return GetServerKind(e) == KindFrontend
+}
+
+func IsBackend(e *echo.Echo) bool {
+	return GetServerKind(e) == KindBackend
+}
+
+func IsFrontendContext(ctx echo.Context) bool {
+	return GetServerKindByContext(ctx) == KindFrontend
+}
+
+func IsBackendContext(ctx echo.Context) bool {
+	return GetServerKindByContext(ctx) == KindBackend
+}
