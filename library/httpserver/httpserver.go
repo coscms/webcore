@@ -158,15 +158,15 @@ func (h *HTTPServer) GuestHandler(handler interface{}, meta ...echo.H) echo.Hand
 
 func (h *HTTPServer) Apply() {
 	e := h.Router.Echo()
-	e.Extra().Set(`HTTP_SERVER_KIND`, h.Name)
+	e.Extra().Set(ServerKindKey, h.Name)
 	//e.SetRenderDataWrapper(echo.DefaultRenderDataWrapper)
+	if len(h.HostCheckerRegexpKey) > 0 {
+		e.Pre(HostChecker(h.HostCheckerRegexpKey))
+	}
 	if len(h.Router.Prefix()) > 0 {
 		e.Pre(FixedUploadURLPrefix())
 	}
 	e.Use(middleware.Recover())
-	if len(h.HostCheckerRegexpKey) > 0 {
-		e.Use(HostChecker(h.HostCheckerRegexpKey))
-	}
 	e.Use(MaxRequestBodySize)
 	if len(h.Middlewares) == 0 {
 		if !config.FromFile().Sys.DisableHTTPLog {

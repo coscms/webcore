@@ -6,11 +6,14 @@ import (
 	"github.com/coscms/webcore/library/navigate"
 	"github.com/coscms/webcore/library/route"
 	"github.com/webx-top/echo/defaults"
+
+	"github.com/coscms/webcore/library/httpserver/httpserverutils"
 )
 
 const (
-	KindBackend  = `backend`
-	KindFrontend = `frontend`
+	KindBackend   = httpserverutils.KindBackend
+	KindFrontend  = httpserverutils.KindFrontend
+	ServerKindKey = httpserverutils.ServerKindKey
 )
 
 var (
