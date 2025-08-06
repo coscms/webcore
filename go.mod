@@ -7,7 +7,7 @@ require (
 	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/abh/errorutil v1.0.0
 	github.com/admpub/9t v0.0.1
-	github.com/admpub/bart v0.0.1
+	github.com/admpub/bart v0.0.2
 	github.com/admpub/captcha-go v0.0.1
 	github.com/admpub/ccs-gm v0.0.5
 	github.com/admpub/checksum v1.1.0
@@ -47,13 +47,13 @@ require (
 	github.com/admpub/realip v0.2.7
 	github.com/admpub/resty/v2 v2.7.2
 	github.com/admpub/securecookie v1.3.0
-	github.com/admpub/service v0.0.7
+	github.com/admpub/service v0.0.8
 	github.com/admpub/snowflake v0.0.0-20250215093046-736db7f88827
 	github.com/admpub/sonyflake v0.0.1
 	github.com/admpub/tail v1.1.1
 	github.com/admpub/timeago v1.2.2
 	github.com/admpub/web-terminal v0.2.1
-	github.com/aws/aws-sdk-go v1.55.7
+	github.com/aws/aws-sdk-go v1.55.8
 	github.com/caddy-plugins/webdav v1.2.10
 	github.com/coscms/captcha v0.2.3
 	github.com/coscms/forms v1.13.10
@@ -73,7 +73,7 @@ require (
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/minio/minio-go/v7 v7.0.95
 	github.com/pkg/sftp v1.13.9
-	github.com/shirou/gopsutil/v4 v4.25.6
+	github.com/shirou/gopsutil/v4 v4.25.7
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/pflag v1.0.7
 	github.com/stretchr/testify v1.10.0
@@ -137,7 +137,7 @@ require (
 	github.com/go-acme/lego/v4 v4.25.1 // indirect
 	github.com/go-errors/errors v1.5.1 // indirect
 	github.com/go-ini/ini v1.67.0 // indirect
-	github.com/go-jose/go-jose/v4 v4.1.1 // indirect
+	github.com/go-jose/go-jose/v4 v4.1.2 // indirect
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
@@ -173,7 +173,7 @@ require (
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-sqlite3 v1.14.30 // indirect
-	github.com/miekg/dns v1.1.67 // indirect
+	github.com/miekg/dns v1.1.68 // indirect
 	github.com/minio/crc64nvme v1.1.0 // indirect
 	github.com/minio/md5-simd v1.1.2 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
@@ -189,7 +189,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect
-	github.com/prometheus/client_golang v1.22.0 // indirect
+	github.com/prometheus/client_golang v1.23.0 // indirect
 	github.com/prometheus/client_model v0.6.2 // indirect
 	github.com/prometheus/common v0.65.0 // indirect
 	github.com/prometheus/procfs v0.17.0 // indirect
@@ -202,7 +202,7 @@ require (
 	github.com/rwcarlsen/goexif v0.0.0-20190401172101-9e8deecbddbd // indirect
 	github.com/segmentio/fasthash v1.0.3 // indirect
 	github.com/smartystreets/assertions v1.2.0 // indirect
-	github.com/tidwall/btree v1.8.0 // indirect
+	github.com/tidwall/btree v1.8.1 // indirect
 	github.com/tidwall/buntdb v1.3.2 // indirect
 	github.com/tidwall/gjson v1.18.0 // indirect
 	github.com/tidwall/grect v0.1.4 // indirect
