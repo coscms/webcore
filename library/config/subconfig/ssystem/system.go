@@ -38,6 +38,7 @@ type System struct {
 	SSLCacheDir             string            `json:"sslCacheDir"`
 	SSLKeyFile              string            `json:"sslKeyFile"`
 	SSLCertFile             string            `json:"sslCertFile"`
+	ReusePort               bool              `json:"reusePort"`
 	RealIPTrustedProxies    []string          `json:"realIPTrustedProxies"`
 	RealIPProxyType         string            `json:"realIPProxyType"`
 	RealIPHeaders           []string          `json:"realIPHeaders"`

@@ -170,7 +170,7 @@ If you have already purchased a license, please place the ` + license.FileName()
 	}()
 
 	c := &engine.Config{
-		ReusePort:          true,
+		ReusePort:          config.FromFile().Sys.ReusePort,
 		TLSAuto:            config.FromFile().Sys.SSLAuto,
 		TLSEmail:           config.FromFile().Sys.SSLEmail,
 		TLSHosts:           config.FromFile().Sys.SSLHosts,
