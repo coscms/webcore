@@ -21,6 +21,7 @@ package backend
 import (
 	"path/filepath"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/webx-top/echo/handler/captcha"
@@ -61,6 +62,7 @@ func FireConfigChange(file string) error {
 }
 
 var lockConfigChg = sync.Mutex{}
+var PauseWatchConfig atomic.Bool
 
 func defaultConfigWatcher(mustOk bool) {
 	if config.FromCLI().Type != `manager` {
@@ -73,6 +75,9 @@ func defaultConfigWatcher(mustOk bool) {
 		name := filepath.Base(file)
 		switch name {
 		case conf:
+			if PauseWatchConfig.Load() {
+				return nil
+			}
 			time.Sleep(time.Second)
 			err := nretry.OnErrorRetry(config.ParseConfig, 3, time.Second)
 			if err != nil {

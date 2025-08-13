@@ -132,24 +132,25 @@ func InstalledLockFile() string {
 }
 
 func IsInstalled() bool {
-	if !Installed.Valid {
-		lockFile := InstalledLockFile()
-		if len(lockFile) > 0 {
-			if b, e := os.ReadFile(lockFile); e == nil {
-				content := string(b)
-				content = strings.TrimSpace(content)
-				lines := strings.Split(content, "\n")
-				switch len(lines) {
-				case 2:
-					installedSchemaVer, _ = strconv.ParseFloat(strings.TrimSpace(lines[1]), 64)
-					fallthrough
-				case 1:
-					installedTime, _ = time.Parse(`2006-01-02 15:04:05`, strings.TrimSpace(lines[0]))
-				}
+	if Installed.Valid {
+		return Installed.Bool
+	}
+	lockFile := InstalledLockFile()
+	if len(lockFile) > 0 {
+		if b, e := os.ReadFile(lockFile); e == nil {
+			content := string(b)
+			content = strings.TrimSpace(content)
+			lines := strings.Split(content, "\n")
+			switch len(lines) {
+			case 2:
+				installedSchemaVer, _ = strconv.ParseFloat(strings.TrimSpace(lines[1]), 64)
+				fallthrough
+			case 1:
+				installedTime, _ = time.Parse(`2006-01-02 15:04:05`, strings.TrimSpace(lines[0]))
 			}
-			Installed.Valid = true
-			Installed.Bool = true
 		}
+		Installed.Valid = true
+		Installed.Bool = true
 	}
 	return Installed.Bool
 }
