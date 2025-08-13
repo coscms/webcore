@@ -310,7 +310,7 @@ func Init(ctx echo.Context) error {
 	}, 0, -1)
 	if err != nil {
 		err = errors.WithMessage(err, `Find configuration data`)
-		log.Error(err)
+		return err
 	}
 	existsList := m.Objects()
 	existsIndex := map[string]int{}
@@ -331,7 +331,7 @@ func Init(ctx echo.Context) error {
 			_, err = conf.EventOFF().Insert()
 			if err != nil {
 				err = errors.WithMessage(err, `Add configuration data`)
-				log.Error(err)
+				return err
 			}
 		}
 	}
