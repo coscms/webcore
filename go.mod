@@ -84,7 +84,7 @@ require (
 	github.com/webx-top/codec v0.3.0
 	github.com/webx-top/com v1.3.31
 	github.com/webx-top/db v1.28.6
-	github.com/webx-top/echo v1.16.13
+	github.com/webx-top/echo v1.16.14
 	github.com/webx-top/image v0.1.2
 	github.com/webx-top/restyclient v0.0.6
 	github.com/webx-top/validation v0.0.3
@@ -102,7 +102,7 @@ require (
 	github.com/admpub/boltstore v1.2.0 // indirect
 	github.com/admpub/caddy v1.2.9 // indirect
 	github.com/admpub/fasthttp v0.0.7 // indirect
-	github.com/admpub/fsnotify v1.7.0 // indirect
+	github.com/admpub/fsnotify v1.7.1 // indirect
 	github.com/admpub/gifresize v1.0.2 // indirect
 	github.com/admpub/go-captcha-assets v0.0.0-20250122071745-baa7da4bda0d // indirect
 	github.com/admpub/go-reuseport v0.5.0 // indirect
