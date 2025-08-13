@@ -78,7 +78,6 @@ func defaultConfigWatcher(mustOk bool) {
 			if PauseWatchConfig.Load() {
 				return nil
 			}
-			time.Sleep(time.Second)
 			err := nretry.OnErrorRetry(config.ParseConfig, 3, time.Second)
 			if err != nil {
 				if mustOk && config.IsInstalled() {
@@ -91,7 +90,6 @@ func defaultConfigWatcher(mustOk bool) {
 				return nil
 			}
 			filePath := filepath.ToSlash(file)
-			time.Sleep(time.Second)
 			return FireConfigChange(filePath)
 		}
 	})
