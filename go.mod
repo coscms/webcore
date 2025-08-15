@@ -84,7 +84,7 @@ require (
 	github.com/webx-top/codec v0.3.0
 	github.com/webx-top/com v1.3.31
 	github.com/webx-top/db v1.28.6
-	github.com/webx-top/echo v1.16.19
+	github.com/webx-top/echo v1.16.20
 	github.com/webx-top/image v0.1.2
 	github.com/webx-top/restyclient v0.0.6
 	github.com/webx-top/validation v0.0.3
@@ -108,7 +108,7 @@ require (
 	github.com/admpub/go-reuseport v0.5.0 // indirect
 	github.com/admpub/go-utility v0.0.1 // indirect
 	github.com/admpub/humanize v0.0.0-20190501023926-5f826e92c8ca // indirect
-	github.com/admpub/i18n v0.4.6 // indirect
+	github.com/admpub/i18n v0.5.0 // indirect
 	github.com/admpub/identicon v1.0.2 // indirect
 	github.com/admpub/imaging v1.6.3 // indirect
 	github.com/admpub/json5 v0.0.1 // indirect
