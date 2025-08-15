@@ -51,7 +51,7 @@ require (
 	github.com/admpub/snowflake v0.0.0-20250215093046-736db7f88827
 	github.com/admpub/sonyflake v0.0.1
 	github.com/admpub/tail v1.1.1
-	github.com/admpub/timeago v1.2.2
+	github.com/admpub/timeago v1.3.0
 	github.com/admpub/web-terminal v0.2.1
 	github.com/aws/aws-sdk-go v1.55.8
 	github.com/caddy-plugins/webdav v1.2.10
@@ -82,9 +82,9 @@ require (
 	github.com/webx-top/chardet v0.0.2
 	github.com/webx-top/client v0.9.6
 	github.com/webx-top/codec v0.3.0
-	github.com/webx-top/com v1.3.31
+	github.com/webx-top/com v1.4.0
 	github.com/webx-top/db v1.28.6
-	github.com/webx-top/echo v1.16.20
+	github.com/webx-top/echo v1.16.21
 	github.com/webx-top/image v0.1.2
 	github.com/webx-top/restyclient v0.0.6
 	github.com/webx-top/validation v0.0.3
