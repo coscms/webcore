@@ -224,6 +224,10 @@ func (h *HTTPServer) Apply() {
 
 	h.renderOptions.ApplyTo(e, h.TmplMgr)
 
+	h.SetDefaultExtension(e)
+}
+
+func (h *HTTPServer) SetDefaultExtension(e *echo.Echo) {
 	if len(h.RouteDefaultExtension) > 0 {
 		e.SetDefaultExtension(h.RouteDefaultExtension)
 		if len(h.KeepExtensionPrefixes) > 0 {
