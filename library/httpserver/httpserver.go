@@ -166,7 +166,7 @@ func (h *HTTPServer) Apply() {
 	if len(h.Router.Prefix()) > 0 {
 		e.Pre(FixedUploadURLPrefix())
 	}
-	e.Use(middleware.Recover())
+	e.Pre(middleware.Recover())
 	e.Use(MaxRequestBodySize)
 	if len(h.Middlewares) == 0 {
 		if !config.FromFile().Sys.DisableHTTPLog {
@@ -178,14 +178,14 @@ func (h *HTTPServer) Apply() {
 
 	// 注册静态资源文件(网站素材文件)
 	if staticMW := h.GetStaticMW(); staticMW != nil {
-		e.Use(staticMW)
+		e.Pre(staticMW)
 	}
 
 	// 启用session
 	e.Use(session.Middleware(config.SessionOptions, config.AutoSecure))
 	// 启用多语言支持
 	h.language = language.New(&config.FromFile().Language)
-	e.Use(h.language.Middleware())
+	e.Pre(h.language.Middleware())
 
 	// 启用Validation
 	e.Use(validator.Middleware())
@@ -224,10 +224,6 @@ func (h *HTTPServer) Apply() {
 
 	h.renderOptions.ApplyTo(e, h.TmplMgr)
 
-	h.SetDefaultExtension(e)
-}
-
-func (h *HTTPServer) SetDefaultExtension(e *echo.Echo) {
 	if len(h.RouteDefaultExtension) > 0 {
 		e.SetDefaultExtension(h.RouteDefaultExtension)
 		if len(h.KeepExtensionPrefixes) > 0 {
