@@ -65,7 +65,7 @@ func TrimPathSuffix(ignorePrefixes ...string) echo.MiddlewareFuncd {
 				}
 			}
 			cleanedPath := strings.TrimSuffix(upath, c.DefaultExtension())
-			c.Request().URL().SetPath(cleanedPath)
+			c.SetDispatchPath(cleanedPath)
 			return h.Handle(c)
 		}
 	}
