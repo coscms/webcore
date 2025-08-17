@@ -327,17 +327,19 @@ func (c *Config) SetDefaults() *Config {
 			sd.SetDefaults()
 		}
 	}
+	return c.initLanguage()
+}
+
+func (c *Config) initLanguage() *Config {
 	if len(c.Language.Default) > 0 {
 		c.Language.Default = echo.NewLangCode(c.Language.Default).Normalize()
 	}
 	if len(c.Language.Fallback) > 0 {
 		c.Language.Fallback = echo.NewLangCode(c.Language.Fallback).Normalize()
 	}
-	if c.Language.AllList != nil {
-		for index, lang := range c.Language.AllList {
-			lang = echo.NewLangCode(lang).Normalize()
-			c.Language.AllList[index] = lang
-		}
+	for index, lang := range c.Language.AllList {
+		lang = echo.NewLangCode(lang).Normalize()
+		c.Language.AllList[index] = lang
 	}
 	return c
 }
