@@ -58,7 +58,7 @@ func ErrorPageFunc(c echo.Context) error {
 func TrimPathSuffix(ignorePrefixes ...string) echo.MiddlewareFuncd {
 	return func(h echo.Handler) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			upath := c.Request().URL().Path()
+			upath := c.DispatchPath()
 			for _, ignorePrefix := range ignorePrefixes {
 				if strings.HasPrefix(upath, ignorePrefix) {
 					return h.Handle(c)
