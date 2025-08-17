@@ -52,12 +52,12 @@ var InitInstallConfig = &struct {
 	AdminUser      string
 	AdminPass      string
 	AdminEmail     string
-	Language       string // en / zh-cn
+	Language       string // en / zh-CN
 	AdminPwdRandom bool
 }{
 	Charset:   sdb.MySQLDefaultCharset,
 	AdminUser: `admin`,
-	Language:  `zh-cn`,
+	Language:  `zh-CN`,
 }
 
 var initCmd = &cobra.Command{
@@ -85,9 +85,10 @@ func ResetTranslator() {
 
 func BuildTranslator(c language.Config) *language.Translate {
 	c.SetFSFunc(bootconfig.LangFSFunc)
-	i18n := language.NewI18n(&c)
+	c.Reload = false
+	lng := language.New(&c)
 	tr := &language.Translate{}
-	tr.Reset(InitInstallConfig.Language, i18n)
+	tr.Reset(InitInstallConfig.Language, lng)
 	return tr
 }
 

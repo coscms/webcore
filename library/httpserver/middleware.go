@@ -74,9 +74,9 @@ func TrimPathSuffix(ignorePrefixes ...string) echo.MiddlewareFuncd {
 func FixedUploadURLPrefix() echo.MiddlewareFuncd {
 	return func(h echo.Handler) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			upath := c.Request().URL().Path()
+			upath := c.DispatchPath()
 			if strings.HasPrefix(upath, upload.UploadURLPath) {
-				c.Request().URL().SetPath(c.Echo().Prefix() + upath)
+				c.SetDispatchPath(c.Echo().Prefix() + upath)
 			}
 			return h.Handle(c)
 		}

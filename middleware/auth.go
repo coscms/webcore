@@ -104,7 +104,7 @@ func AuthCheck(h echo.Handler) echo.HandlerFunc {
 		}
 		checker, ok := role.SpecialAuths[rpath]
 		if !ok {
-			checker, ok = role.SpecialAuths[c.Request().URL().Path()]
+			checker, ok = role.SpecialAuths[c.DispatchPath()]
 		}
 		if ok {
 			var (
