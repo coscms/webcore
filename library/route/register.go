@@ -24,6 +24,7 @@ import (
 )
 
 func NewRegister(e *echo.Echo, groupNamers ...func(string) string) IRegister {
+	e.SetMultilingual(true)
 	return &Register{
 		echo:     e,
 		handlers: Registers{},
