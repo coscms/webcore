@@ -62,8 +62,8 @@ func Logger() logger.Logger {
 	return IRegister().Logger()
 }
 
-func Pre(middlewares ...interface{}) {
-	IRegister().Pre(middlewares...)
+func PreUse(middlewares ...interface{}) {
+	IRegister().PreUse(middlewares...)
 }
 
 func PreToGroup(groupName string, middlewares ...interface{}) {

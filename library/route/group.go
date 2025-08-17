@@ -36,6 +36,15 @@ func (g *Group) Pre(groupName string, middlewares ...interface{}) {
 	if _, ok := g.PreMiddlewares[groupName]; !ok {
 		g.PreMiddlewares[groupName] = []interface{}{}
 	}
+	m := make([]interface{}, len(middlewares))
+	copy(m, middlewares)
+	g.PreMiddlewares[groupName] = append(m, g.PreMiddlewares[groupName]...)
+}
+
+func (g *Group) PreUse(groupName string, middlewares ...interface{}) {
+	if _, ok := g.PreMiddlewares[groupName]; !ok {
+		g.PreMiddlewares[groupName] = []interface{}{}
+	}
 	g.PreMiddlewares[groupName] = append(g.PreMiddlewares[groupName], middlewares...)
 }
 

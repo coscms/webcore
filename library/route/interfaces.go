@@ -23,8 +23,10 @@ type IRegister interface {
 	RootGroup() string
 	Apply() IRegister
 	Pre(middlewares ...interface{}) IRegister
+	PreUse(middlewares ...interface{}) IRegister
 	Use(middlewares ...interface{}) IRegister
 	PreToGroup(groupName string, middlewares ...interface{}) IRegister
+	PreUseToGroup(groupName string, middlewares ...interface{}) IRegister
 	UseToGroup(groupName string, middlewares ...interface{}) IRegister
 	Register(fn func(echo.RouteRegister)) IRegister
 	RegisterToGroup(groupName string, fn func(echo.RouteRegister), middlewares ...interface{}) MetaSetter

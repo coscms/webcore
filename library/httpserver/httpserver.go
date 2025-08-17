@@ -161,12 +161,12 @@ func (h *HTTPServer) Apply() {
 	e.Extra().Set(ServerKindKey, h.Name)
 	//e.SetRenderDataWrapper(echo.DefaultRenderDataWrapper)
 	if len(h.HostCheckerRegexpKey) > 0 {
-		e.Pre(HostChecker(h.HostCheckerRegexpKey))
+		e.PreUse(HostChecker(h.HostCheckerRegexpKey))
 	}
 	if len(h.Router.Prefix()) > 0 {
-		e.Pre(FixedUploadURLPrefix())
+		e.PreUse(FixedUploadURLPrefix())
 	}
-	e.Pre(middleware.Recover())
+	e.PreUse(middleware.Recover())
 	e.Use(MaxRequestBodySize)
 	if len(h.Middlewares) == 0 {
 		if !config.FromFile().Sys.DisableHTTPLog {
@@ -178,14 +178,14 @@ func (h *HTTPServer) Apply() {
 
 	// 注册静态资源文件(网站素材文件)
 	if staticMW := h.GetStaticMW(); staticMW != nil {
-		e.Pre(staticMW)
+		e.PreUse(staticMW)
 	}
 
 	// 启用session
 	e.Use(session.Middleware(config.SessionOptions, config.AutoSecure))
 	// 启用多语言支持
 	h.language = language.New(&config.FromFile().Language)
-	e.Pre(h.language.Middleware())
+	e.PreUse(h.language.Middleware())
 
 	// 启用Validation
 	e.Use(validator.Middleware())
@@ -227,7 +227,7 @@ func (h *HTTPServer) Apply() {
 	if len(h.RouteDefaultExtension) > 0 {
 		e.SetDefaultExtension(h.RouteDefaultExtension)
 		if len(h.KeepExtensionPrefixes) > 0 {
-			e.Pre(TrimPathSuffix(h.KeepExtensionPrefixes...))
+			e.PreUse(TrimPathSuffix(h.KeepExtensionPrefixes...))
 		}
 	}
 }

@@ -152,6 +152,13 @@ func (r *Register) Apply() IRegister {
 }
 
 func (r *Register) Pre(middlewares ...interface{}) IRegister {
+	m := make([]interface{}, len(middlewares))
+	copy(m, middlewares)
+	r.preMiddlewares = append(m, r.preMiddlewares...)
+	return r
+}
+
+func (r *Register) PreUse(middlewares ...interface{}) IRegister {
 	r.preMiddlewares = append(r.preMiddlewares, middlewares...)
 	return r
 }
@@ -163,6 +170,11 @@ func (r *Register) Use(middlewares ...interface{}) IRegister {
 
 func (r *Register) PreToGroup(groupName string, middlewares ...interface{}) IRegister {
 	r.group.Pre(groupName, middlewares...)
+	return r
+}
+
+func (r *Register) PreUseToGroup(groupName string, middlewares ...interface{}) IRegister {
+	r.group.PreUse(groupName, middlewares...)
 	return r
 }
 
