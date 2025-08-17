@@ -23,8 +23,10 @@ import (
 	"github.com/webx-top/echo/logger"
 )
 
+var Multilingual = true
+
 func NewRegister(e *echo.Echo, groupNamers ...func(string) string) IRegister {
-	e.SetMultilingual(true)
+	e.SetMultilingual(Multilingual)
 	return &Register{
 		echo:     e,
 		handlers: Registers{},
