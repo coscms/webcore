@@ -125,6 +125,12 @@ func (u *userNotices) OnlineStatus(users ...string) map[string]bool {
 }
 
 func (u *userNotices) OpenClient(user string) (oUser IOnlineUser, clientID string) {
+	clientID = fmt.Sprint(time.Now().UnixMilli())
+	oUser = u.OpenClientWithID(user, clientID)
+	return
+}
+
+func (u *userNotices) OpenClientWithID(user string, clientID string) (oUser IOnlineUser) {
 	var exists bool
 	oUser, exists = u.users.GetOk(user)
 	if !exists {
@@ -134,7 +140,6 @@ func (u *userNotices) OpenClient(user string) (oUser IOnlineUser, clientID strin
 			fn(user)
 		}
 	}
-	clientID = fmt.Sprint(time.Now().UnixMilli())
 	oUser.OpenClient(clientID)
 	if u.Debug() {
 		msgbox.Info(`[NOTICE]`, `[OpenClient][ClientID]: `+clientID)
@@ -186,4 +191,13 @@ func (u *userNotices) MakeMessageGetter(username string, messageTypes ...string)
 	return func() {
 		u.CloseClient(username, clientID)
 	}, msgChan, err
+}
+
+func (u *userNotices) MakeMessageGetterWithClientID(username string, clientID string, messageTypes ...string) (func(), <-chan *Message) {
+	oUser := u.OpenClientWithID(username, clientID)
+	oUser.OpenMessageType(messageTypes...)
+	msgChan := oUser.Recv(clientID)
+	return func() {
+		u.CloseClient(username, clientID)
+	}, msgChan
 }

@@ -38,12 +38,14 @@ type UserMessageSystem interface {
 	IsOnline(user string) bool
 	OnlineStatus(users ...string) map[string]bool
 	OpenClient(user string) (oUser IOnlineUser, clientID string)
+	OpenClientWithID(user string, clientID string) (oUser IOnlineUser)
 	CloseMessage(user string, types ...string)
 	OpenMessage(user string, types ...string)
 	Clear()
 	Count() int
 	UserList(limit int) []string
 	MakeMessageGetter(username string, messageTypes ...string) (func(), <-chan *Message, error)
+	MakeMessageGetterWithClientID(username string, clientID string, messageTypes ...string) (func(), <-chan *Message)
 }
 
 type IOnlineUser interface {

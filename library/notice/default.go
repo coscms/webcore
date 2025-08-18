@@ -90,6 +90,10 @@ func OpenClient(user string) (oUser IOnlineUser, clientID string) {
 	return Default().OpenClient(user)
 }
 
+func OpenClientWithID(user string, clientID string) IOnlineUser {
+	return Default().OpenClientWithID(user, clientID)
+}
+
 func CloseMessage(user string, types ...string) {
 	Default().CloseMessage(user, types...)
 }
