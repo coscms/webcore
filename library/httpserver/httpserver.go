@@ -76,7 +76,7 @@ type HTTPServer struct {
 	GlobalFuncMap         map[string]interface{}
 	FuncSetters           []func(echo.Context) error
 	HostCheckerRegexpKey  string
-	DomainValidator       func(string) error
+	DomainValidator       func(echo.Context, string) error
 	renderOptions         *render.Config
 	language              *language.Language
 }
@@ -158,7 +158,7 @@ func (h *HTTPServer) GuestHandler(handler interface{}, meta ...echo.H) echo.Hand
 	return GuestHandler(h.Router, handler, meta...)
 }
 
-func (h *HTTPServer) ValidateDomain(domain string) (detected bool, err error) {
+func (h *HTTPServer) ValidateDomain(c echo.Context, domain string) (detected bool, err error) {
 	if len(h.HostCheckerRegexpKey) > 0 {
 		if re, ok := echo.Get(h.HostCheckerRegexpKey).(*regexp.Regexp); ok {
 			detected = true
@@ -171,7 +171,7 @@ func (h *HTTPServer) ValidateDomain(domain string) (detected bool, err error) {
 	}
 	if h.DomainValidator != nil {
 		detected = true
-		err = h.DomainValidator(domain)
+		err = h.DomainValidator(c, domain)
 	}
 	return
 }
