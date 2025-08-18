@@ -50,6 +50,7 @@ require (
 	github.com/admpub/service v0.0.8
 	github.com/admpub/snowflake v0.0.0-20250215093046-736db7f88827
 	github.com/admpub/sonyflake v0.0.1
+	github.com/admpub/sse v0.0.0-20160126180136-ee05b128a739
 	github.com/admpub/tail v1.1.1
 	github.com/admpub/timeago v1.3.0
 	github.com/admpub/web-terminal v0.2.1

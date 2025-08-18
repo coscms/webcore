@@ -545,6 +545,8 @@ github.com/admpub/snowflake v0.0.0-20250215093046-736db7f88827 h1:INuO1tkP23+5mh
 github.com/admpub/snowflake v0.0.0-20250215093046-736db7f88827/go.mod h1:n9cxDynuB5Uc1F8ecMoIf4bsDspc8TjBXVBzajkgHs8=
 github.com/admpub/sonyflake v0.0.1 h1:oKYRTf7gjbHHpDe9WQkueZuHsilLUVCpshDmWsh33Mc=
 github.com/admpub/sonyflake v0.0.1/go.mod h1:dWWC99nrhdpb3esJuB7NLWvACXcd1LouCGpYEuS0Pxc=
+github.com/admpub/sse v0.0.0-20160126180136-ee05b128a739 h1:vcNlstbRWkjZlyYBK9LUDSzTuaD29CwPdKhHl0/YDok=
+github.com/admpub/sse v0.0.0-20160126180136-ee05b128a739/go.mod h1:oNYi77yjU4GPJfuHg894uT7EGy1EmJzYFwZ+BQBptK8=
 github.com/admpub/tail v1.1.1 h1:cjdOErLhSOj6Fb/Pk3b2qiPprt2Uvq4Ax/NQz/RqMxQ=
 github.com/admpub/tail v1.1.1/go.mod h1:8aebgtKxe9Nj9HY5qxe7nEVn2EaLOH6yyaB6+amzjG0=
 github.com/admpub/timeago v1.3.0 h1:uFRJ5LZUS1gjNTRGgTRf10wbBycSJmxrqMm1x/JkN1w=
