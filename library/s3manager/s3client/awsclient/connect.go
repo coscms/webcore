@@ -19,31 +19,34 @@
 package awsclient
 
 import (
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3"
+	"context"
+
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/credentials"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/coscms/webcore/dbschema"
 )
 
-func Connect(m *dbschema.NgingCloudStorage, bucketName string) (client *AWSClient, err error) {
-	var sess *session.Session
-	sess, err = NewSession(m)
+func Connect(c context.Context, m *dbschema.NgingCloudStorage, bucketName string) (client *AWSClient, err error) {
+	cfg, err := NewConfig(c, m)
 	if err != nil {
-		return
+		return nil, err
 	}
-	return &AWSClient{S3: s3.New(sess), session: sess, bucketName: bucketName}, nil
+	return &AWSClient{Client: s3.NewFromConfig(cfg), bucketName: bucketName}, nil
 }
 
-func NewSession(m *dbschema.NgingCloudStorage) (*session.Session, error) {
-	isSecure := m.Secure == `Y`
-	config := &aws.Config{
-		DisableSSL:  aws.Bool(!isSecure),
-		Endpoint:    aws.String(m.Endpoint),
-		Credentials: credentials.NewStaticCredentials(m.Key, m.Secret, ""),
-	}
-	if len(m.Region) > 0 {
-		config.Region = aws.String(m.Region)
-	}
-	return session.NewSession(config)
+func NewConfig(c context.Context, m *dbschema.NgingCloudStorage) (aws.Config, error) {
+	return config.LoadDefaultConfig(
+		c,
+		// config.WithDisableSSL(m.Secure != `Y`),
+		// config.WithEndpoint(m.Endpoint),
+		config.WithRegion(m.Region),
+		config.WithCredentialsProvider(credentials.StaticCredentialsProvider{
+			Value: aws.Credentials{
+				AccessKeyID: m.Key, SecretAccessKey: m.Secret,
+				//Source: "provider",
+			},
+		}),
+	)
 }

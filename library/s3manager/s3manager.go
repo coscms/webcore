@@ -41,7 +41,7 @@ import (
 	"github.com/coscms/webcore/library/s3manager/s3client/awsclient"
 
 	"github.com/admpub/errors"
-	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	minio "github.com/minio/minio-go/v7"
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
@@ -540,14 +540,14 @@ func (s *S3Manager) ErrIsNotExist(err error) bool {
 		return false
 	}
 	if rawErr, ok := err.(minio.ErrorResponse); ok {
-		return rawErr.StatusCode == http.StatusNotFound || rawErr.Code == s3.ErrCodeNoSuchKey
+		return rawErr.StatusCode == http.StatusNotFound || rawErr.Code == `NoSuchKey`
 	}
 	if os.IsNotExist(err) {
 		return true
 	}
 	switch v := errors.Unwrap(err).(type) {
 	case minio.ErrorResponse:
-		return v.StatusCode == http.StatusNotFound || v.Code == s3.ErrCodeNoSuchKey
+		return v.StatusCode == http.StatusNotFound || v.Code == `NoSuchKey`
 	case nil:
 		if strings.Contains(err.Error(), ` key does not exist`) {
 			return true
@@ -598,7 +598,7 @@ func (s *S3Manager) listByMinio(ctx context.Context, objectPrefix string) (dirs 
 }
 
 func (s *S3Manager) uploadByAWS(ctx context.Context, reader io.Reader, objectName string, objectSize int64) error {
-	s3client, err := awsclient.Connect(s.config, s.bucketName)
+	s3client, err := awsclient.Connect(ctx, s.config, s.bucketName)
 	if err != nil {
 		return err
 	}
@@ -608,21 +608,21 @@ func (s *S3Manager) uploadByAWS(ctx context.Context, reader io.Reader, objectNam
 		reader = s.noticer.ProxyReader(reader)
 		defer reader.(io.Closer).Close()
 	}
-	_, err = s3client.Upload(reader, objectName)
+	_, err = s3client.Upload(ctx, reader, objectName)
 	return err
 }
 
 func (s *S3Manager) listByAWS(ctx echo.Context, objectPrefix string) (dirs []os.FileInfo, err error) {
 	var s3client *awsclient.AWSClient
-	s3client, err = awsclient.Connect(s.config, s.bucketName)
+	s3client, err = awsclient.Connect(ctx, s.config, s.bucketName)
 	if err != nil {
 		return
 	}
 	return s3client.ListPage(ctx, objectPrefix)
 }
 
-func (s *S3Manager) AWSClient() (*awsclient.AWSClient, error) {
-	return awsclient.Connect(s.config, s.bucketName)
+func (s *S3Manager) AWSClient(ctx context.Context) (*awsclient.AWSClient, error) {
+	return awsclient.Connect(ctx, s.config, s.bucketName)
 }
 
 func (s *S3Manager) List(ctx echo.Context, ppath string, sortBy ...string) (dirs []os.FileInfo, exit bool, err error) {
@@ -700,16 +700,16 @@ func (s *S3Manager) ListTransfer(dirs []os.FileInfo) (dirList []echo.H, fileList
 	return
 }
 
-func (s *S3Manager) GetCORSRules() ([]*s3.CORSRule, error) {
-	s3client, err := awsclient.Connect(s.config, s.bucketName)
+func (s *S3Manager) GetCORSRules(ctx context.Context) ([]types.CORSRule, error) {
+	s3client, err := awsclient.Connect(ctx, s.config, s.bucketName)
 	if err != nil {
 		return nil, err
 	}
-	return s3client.GetBucketCors()
+	return s3client.GetBucketCors(ctx)
 }
 
 func (s *S3Manager) PutCORSRule(ctx echo.Context) error {
-	s3client, err := awsclient.Connect(s.config, s.bucketName)
+	s3client, err := awsclient.Connect(ctx, s.config, s.bucketName)
 	if err != nil {
 		return err
 	}

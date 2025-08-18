@@ -19,16 +19,17 @@
 package awsclient
 
 import (
+	"context"
 	"encoding/json"
 	"io"
 	"os"
 	"strings"
 
 	"github.com/admpub/log"
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/aws/aws-sdk-go/service/s3/s3manager"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	s3manager "github.com/aws/aws-sdk-go-v2/feature/s3/manager"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/coscms/webcore/library/common"
 	"github.com/coscms/webcore/library/nerrors"
 	"github.com/coscms/webcore/library/s3manager/fileinfo"
@@ -38,8 +39,7 @@ import (
 )
 
 type AWSClient struct {
-	*s3.S3
-	session    *session.Session
+	*s3.Client
 	bucketName string
 }
 
@@ -49,7 +49,7 @@ func (s *AWSClient) SetBucketName(bucketName string) *AWSClient {
 }
 
 func (s *AWSClient) PutBucketCors(ctx echo.Context) error {
-	rules := []*s3.CORSRule{
+	rules := []types.CORSRule{
 		// AllowedHeaders: []*string{aws.String(`*`)},
 		// AllowedMethods: []*string{aws.String(`PUT`), aws.String(`POST`)},
 		// AllowedOrigins: []*string{aws.String(`*`)},
@@ -68,11 +68,11 @@ func (s *AWSClient) PutBucketCors(ctx echo.Context) error {
 	}
 	input := &s3.PutBucketCorsInput{
 		Bucket: aws.String(s.bucketName),
-		CORSConfiguration: &s3.CORSConfiguration{
+		CORSConfiguration: &types.CORSConfiguration{
 			CORSRules: rules,
 		},
 	}
-	output, err := s.S3.PutBucketCors(input)
+	output, err := s.Client.PutBucketCors(ctx, input)
 	if err != nil {
 		return err
 	}
@@ -80,11 +80,11 @@ func (s *AWSClient) PutBucketCors(ctx echo.Context) error {
 	return err
 }
 
-func (s *AWSClient) GetBucketCors() ([]*s3.CORSRule, error) {
+func (s *AWSClient) GetBucketCors(ctx context.Context) ([]types.CORSRule, error) {
 	input := &s3.GetBucketCorsInput{
 		Bucket: aws.String(s.bucketName),
 	}
-	output, err := s.S3.GetBucketCors(input)
+	output, err := s.Client.GetBucketCors(ctx, input)
 	if err != nil {
 		return nil, err
 	}
@@ -96,27 +96,27 @@ func (s *AWSClient) CompleteMultipartUpload(ctx echo.Context, objectName string,
 	input := &s3.CompleteMultipartUploadInput{
 		Bucket:          aws.String(s.bucketName),
 		Key:             aws.String(objectName),
-		MultipartUpload: &s3.CompletedMultipartUpload{},
+		MultipartUpload: &types.CompletedMultipartUpload{},
 		UploadId:        &uploadId,
 	}
-	input.MultipartUpload.Parts = []*s3.CompletedPart{}
+	input.MultipartUpload.Parts = []types.CompletedPart{}
 	etags := ctx.FormValues(`etags`)
-	var index int64
+	var index int32
 	for _, _etags := range etags {
 		for _, etag := range strings.Split(_etags, `,`) {
 			etag = strings.TrimSpace(etag)
 			if len(etag) == 0 {
 				continue
 			}
-			partNumber := int64(index) + 1
-			input.MultipartUpload.Parts = append(input.MultipartUpload.Parts, &s3.CompletedPart{
+			partNumber := index + 1
+			input.MultipartUpload.Parts = append(input.MultipartUpload.Parts, types.CompletedPart{
 				ETag:       aws.String(etag),
-				PartNumber: aws.Int64(partNumber),
+				PartNumber: aws.Int32(partNumber),
 			})
 			index++
 		}
 	}
-	output, err := s.S3.CompleteMultipartUpload(input)
+	output, err := s.Client.CompleteMultipartUpload(ctx, input)
 	if err != nil {
 		return err
 	}
@@ -137,19 +137,31 @@ func (s *AWSClient) ListPage(ctx echo.Context, objectPrefix string) (dirs []os.F
 	q.Del(`prev`)
 	q.Del(`_pjax`)
 	pagination.SetURL(ctx.Request().URL().Path() + `?` + q.Encode() + `&offset={next}&prev={prev}`)
-	input := &s3.ListObjectsInput{
-		Bucket:    aws.String(s.bucketName),
-		Prefix:    aws.String(objectPrefix),
-		MaxKeys:   aws.Int64(int64(limit)),
-		Delimiter: aws.String(`/`),
-		Marker:    aws.String(offset),
+
+	params := &s3.ListObjectsV2Input{
+		Bucket:     aws.String(s.bucketName),
+		Prefix:     aws.String(objectPrefix),
+		MaxKeys:    aws.Int32(int32(limit)),
+		Delimiter:  aws.String(`/`),
+		StartAfter: aws.String(offset),
 	}
+
+	paginator := s3.NewListObjectsV2Paginator(s.Client, params, func(o *s3.ListObjectsV2PaginatorOptions) {
+		o.Limit = int32(limit)
+	})
+
 	var n int
-	err = s.S3.ListObjectsPagesWithContext(ctx, input, func(p *s3.ListObjectsOutput, lastPage bool) bool {
-		if p.NextMarker != nil {
-			nextOffset = *p.NextMarker
+
+	for paginator.HasMorePages() && n <= limit {
+		var output *s3.ListObjectsV2Output
+		output, err = paginator.NextPage(ctx)
+		if err != nil {
+			return
 		}
-		for _, object := range p.CommonPrefixes {
+		if output.StartAfter != nil {
+			nextOffset = *output.StartAfter
+		}
+		for _, object := range output.CommonPrefixes {
 			if object.Prefix == nil {
 				continue
 			}
@@ -163,7 +175,7 @@ func (s *AWSClient) ListPage(ctx echo.Context, objectPrefix string) (dirs []os.F
 			obj := fileinfo.NewStr(*object.Prefix)
 			dirs = append(dirs, obj)
 		}
-		for _, object := range p.Contents {
+		for _, object := range output.Contents {
 			if object.Key == nil {
 				continue
 			}
@@ -178,16 +190,16 @@ func (s *AWSClient) ListPage(ctx echo.Context, objectPrefix string) (dirs []os.F
 			dirs = append(dirs, obj)
 		}
 		n += len(dirs)
-		return n <= limit // continue paging
-	})
+	}
+
 	pagination.SetPosition(prevOffset, nextOffset, offset)
 	ctx.Set(`pagination`, pagination)
 	return
 }
 
-func (s *AWSClient) Upload(reader io.Reader, objectName string) (*s3manager.UploadOutput, error) {
-	uploader := s3manager.NewUploader(s.session)
-	return uploader.Upload(&s3manager.UploadInput{
+func (s *AWSClient) Upload(ctx context.Context, reader io.Reader, objectName string) (*s3manager.UploadOutput, error) {
+	uploader := s3manager.NewUploader(s.Client)
+	return uploader.Upload(ctx, &s3.PutObjectInput{
 		Body:   reader,
 		Bucket: aws.String(s.bucketName),
 		Key:    aws.String(objectName),

@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/coscms/webcore/dbschema"
 	"github.com/coscms/webcore/library/common"
 	"github.com/coscms/webcore/library/notice"
@@ -109,18 +109,23 @@ func (s *StorageS3) Restore(ctx context.Context, ppath string, destpath string, 
 		}
 		objectPrefix += `/`
 	}
-	awsclient, err := s.conn.AWSClient()
+	awsclient, err := s.conn.AWSClient(ctx)
 	if err != nil {
 		return err
 	}
-	input := &s3.ListObjectsInput{
+	params := &s3.ListObjectsV2Input{
 		Bucket:  aws.String(s.conn.BucketName()),
 		Prefix:  aws.String(objectPrefix),
-		MaxKeys: aws.Int64(200),
+		MaxKeys: aws.Int32(200),
 	}
-	var _err error
-	err = awsclient.ListObjectsPagesWithContext(ctx, input, func(p *s3.ListObjectsOutput, lastPage bool) bool {
-		for _, object := range p.CommonPrefixes {
+	paginator := s3.NewListObjectsV2Paginator(awsclient, params)
+	for paginator.HasMorePages() {
+		var output *s3.ListObjectsV2Output
+		output, err = paginator.NextPage(ctx)
+		if err != nil {
+			return err
+		}
+		for _, object := range output.CommonPrefixes {
 			if object.Prefix == nil {
 				continue
 			}
@@ -135,18 +140,18 @@ func (s *StorageS3) Restore(ctx context.Context, ppath string, destpath string, 
 			dest := filepath.Join(destpath, obj.Name())
 			spath := filepath.Join(objectPrefix, obj.Name())
 			if obj.IsDir() {
-				_err = com.MkdirAll(dest, os.ModePerm)
+				err = com.MkdirAll(dest, os.ModePerm)
 			} else {
 				if callback != nil {
 					callback(spath, dest)
 				}
-				_err = DownloadFile(s, ctx, spath, dest)
+				err = DownloadFile(s, ctx, spath, dest)
 			}
-			if _err != nil {
-				return false
+			if err != nil {
+				return err
 			}
 		}
-		for _, object := range p.Contents {
+		for _, object := range output.Contents {
 			if object.Key == nil {
 				continue
 			}
@@ -161,21 +166,17 @@ func (s *StorageS3) Restore(ctx context.Context, ppath string, destpath string, 
 			dest := filepath.Join(destpath, obj.Name())
 			spath := filepath.Join(objectPrefix, obj.Name())
 			if obj.IsDir() {
-				_err = com.MkdirAll(dest, os.ModePerm)
+				err = com.MkdirAll(dest, os.ModePerm)
 			} else {
 				if callback != nil {
 					callback(spath, dest)
 				}
-				_err = DownloadFile(s, ctx, spath, dest)
+				err = DownloadFile(s, ctx, spath, dest)
 			}
-			if _err != nil {
-				return false
+			if err != nil {
+				return err
 			}
 		}
-		return true // continue paging
-	})
-	if _err != nil {
-		err = _err
 	}
 	return err
 }

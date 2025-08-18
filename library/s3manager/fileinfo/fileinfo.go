@@ -23,7 +23,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	minio "github.com/minio/minio-go/v7"
 )
 
@@ -39,7 +39,7 @@ func NewStr(prefix string) os.FileInfo {
 	}
 }
 
-func NewS3(object *s3.Object) os.FileInfo {
+func NewS3(object types.Object) os.FileInfo {
 	objectInfo := minio.ObjectInfo{}
 	if object.ETag != nil {
 		objectInfo.ETag = *object.ETag
@@ -61,9 +61,7 @@ func NewS3(object *s3.Object) os.FileInfo {
 	if object.Size != nil {
 		objectInfo.Size = *object.Size
 	}
-	if object.StorageClass != nil {
-		objectInfo.StorageClass = *object.StorageClass
-	}
+	objectInfo.StorageClass = string(object.StorageClass)
 	return &fileInfo{
 		objectInfo: objectInfo,
 	}
