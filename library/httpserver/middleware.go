@@ -112,8 +112,23 @@ func HostChecker(key string) echo.MiddlewareFuncd {
 			if re.MatchString(c.Host()) {
 				return h.Handle(c)
 			}
-			c.Response().NotFound()
-			return nil
+			return echo.ErrNotFound
+		}
+	}
+}
+
+func ValidateDomain(domainValidator func(string) error) echo.MiddlewareFuncd {
+	return func(h echo.Handler) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			if domainValidator == nil {
+				return h.Handle(c)
+			}
+			// c.Domain() 不含端口号
+			err := domainValidator(c.Domain())
+			if err != nil {
+				return err
+			}
+			return h.Handle(c)
 		}
 	}
 }

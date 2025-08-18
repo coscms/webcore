@@ -75,6 +75,7 @@ type HTTPServer struct {
 	GlobalFuncMap         map[string]interface{}
 	FuncSetters           []func(echo.Context) error
 	HostCheckerRegexpKey  string
+	DomainValidator       func(string) error
 	renderOptions         *render.Config
 	language              *language.Language
 }
@@ -162,6 +163,9 @@ func (h *HTTPServer) Apply() {
 	//e.SetRenderDataWrapper(echo.DefaultRenderDataWrapper)
 	if len(h.HostCheckerRegexpKey) > 0 {
 		e.PreUse(HostChecker(h.HostCheckerRegexpKey))
+	}
+	if h.DomainValidator != nil {
+		e.PreUse(ValidateDomain(h.DomainValidator))
 	}
 	if len(h.Router.Prefix()) > 0 {
 		e.PreUse(FixedUploadURLPrefix())
