@@ -8,6 +8,8 @@ import (
 	sseRenderUtils "github.com/webx-top/echo/middleware/render/sse"
 )
 
+const SSEventName = `notice`
+
 var SSERender = &sseRender{
 	ServerSentEvents: sseRenderUtils.New(),
 }
