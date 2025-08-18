@@ -158,19 +158,22 @@ func (h *HTTPServer) GuestHandler(handler interface{}, meta ...echo.H) echo.Hand
 	return GuestHandler(h.Router, handler, meta...)
 }
 
-func (h *HTTPServer) ValidateDomain(domain string) error {
+func (h *HTTPServer) ValidateDomain(domain string) (detected bool, err error) {
 	if len(h.HostCheckerRegexpKey) > 0 {
 		if re, ok := echo.Get(h.HostCheckerRegexpKey).(*regexp.Regexp); ok {
+			detected = true
 			if re.MatchString(domain) {
-				return nil
+				return
 			}
-			return echo.ErrNotFound
+			err = echo.ErrNotFound
+			return
 		}
 	}
 	if h.DomainValidator != nil {
-		return h.DomainValidator(domain)
+		detected = true
+		err = h.DomainValidator(domain)
 	}
-	return nil
+	return
 }
 
 func (h *HTTPServer) Apply() {
