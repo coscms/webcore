@@ -2,6 +2,7 @@ package httpserver
 
 import (
 	"net/http"
+	"regexp"
 
 	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webcore/library/dashboard"
@@ -155,6 +156,21 @@ func (h *HTTPServer) PublicHandler(handler interface{}, meta ...echo.H) echo.Han
 
 func (h *HTTPServer) GuestHandler(handler interface{}, meta ...echo.H) echo.Handler {
 	return GuestHandler(h.Router, handler, meta...)
+}
+
+func (h *HTTPServer) ValidateDomain(domain string) error {
+	if len(h.HostCheckerRegexpKey) > 0 {
+		if re, ok := echo.Get(h.HostCheckerRegexpKey).(*regexp.Regexp); ok {
+			if re.MatchString(domain) {
+				return nil
+			}
+			return echo.ErrNotFound
+		}
+	}
+	if h.DomainValidator != nil {
+		return h.DomainValidator(domain)
+	}
+	return nil
 }
 
 func (h *HTTPServer) Apply() {
