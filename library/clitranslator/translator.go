@@ -24,11 +24,15 @@ func ResetTranslator() {
 	translock.Reset()
 }
 
-func BuildTranslator(c language.Config, langCode string) *language.Translate {
+func NewLanguage(c language.Config) *language.Language {
 	c.SetFSFunc(bootconfig.LangFSFunc)
 	c.Reload = false
-	lng := language.New(&c)
+	return language.New(&c)
+}
+
+func BuildTranslator(c language.Config, langCode string) *language.Translate {
 	tr := &language.Translate{}
+	lng := NewLanguage(c)
 	tr.Reset(langCode, lng)
 	return tr
 }
