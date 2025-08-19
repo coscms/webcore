@@ -180,6 +180,7 @@ func (h *HTTPServer) Apply() {
 	e := h.Router.Echo()
 	e.Extra().Set(ServerKindKey, h.Name)
 	//e.SetRenderDataWrapper(echo.DefaultRenderDataWrapper)
+	e.PreUse(middleware.Recover())
 	if len(h.HostCheckerRegexpKey) > 0 {
 		e.PreUse(HostChecker(h.HostCheckerRegexpKey))
 	}
@@ -189,7 +190,6 @@ func (h *HTTPServer) Apply() {
 	if len(h.Router.Prefix()) > 0 {
 		e.PreUse(FixedUploadURLPrefix())
 	}
-	e.PreUse(middleware.Recover())
 	e.Use(MaxRequestBodySize)
 	if len(h.Middlewares) == 0 {
 		if !config.FromFile().Sys.DisableHTTPLog {
