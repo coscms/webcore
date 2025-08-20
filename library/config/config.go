@@ -329,27 +329,3 @@ func (c *Config) SetDefaults() *Config {
 	}
 	return c.initLanguage()
 }
-
-func (c *Config) initLanguage() *Config {
-	if len(c.Language.Default) > 0 {
-		c.Language.Default = echo.NewLangCode(c.Language.Default).Normalize()
-	}
-	if len(c.Language.Fallback) > 0 {
-		c.Language.Fallback = echo.NewLangCode(c.Language.Fallback).Normalize()
-	}
-	if len(c.Language.AllList) == 0 {
-		if len(c.Language.Default) == 0 {
-			c.Language.Default = `en`
-		}
-		c.Language.AllList = []string{c.Language.Default}
-		return c
-	}
-	for index, lang := range c.Language.AllList {
-		lang = echo.NewLangCode(lang).Normalize()
-		if index == 0 && len(c.Language.Default) == 0 {
-			c.Language.Default = lang
-		}
-		c.Language.AllList[index] = lang
-	}
-	return c
-}
