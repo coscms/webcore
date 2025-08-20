@@ -35,9 +35,10 @@ func (c *Config) GetTranslator(ctx echo.Context) echo.Translator {
 }
 
 func (c *Config) NewLanguage() *language.Language {
-	c.Language.SetFSFunc(bootconfig.LangFSFunc)
-	c.Language.Reload = false
-	return language.New(&c.Language)
+	cfg := c.Language
+	cfg.SetFSFunc(bootconfig.LangFSFunc)
+	cfg.Reload = false
+	return language.New(&cfg)
 }
 
 func (c *Config) BuildTranslator(langCode string) *language.Translate {
