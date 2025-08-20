@@ -24,8 +24,9 @@ import (
 	"github.com/webx-top/echo"
 )
 
-func NewP(eCtx echo.Context, noticeType string, user string, ctx context.Context, opts ...func(*HTTPNoticerConfig)) *NoticeAndProgress {
-	return New(eCtx, noticeType, user, ctx, opts...).WithProgress(NewProgress())
+func NewP(eCtx echo.Context, noticeType string, user string, ctx context.Context, opts ...func(*Config)) *NoticeAndProgress {
+	config := NewConfigByContext(eCtx, noticeType, user, opts...)
+	return NewNoticerByConfig(ctx, config).WithProgress(config.Progress())
 }
 
 func GetClientID(eCtx echo.Context) string {
@@ -52,25 +53,21 @@ func GetNoticeMode(eCtx echo.Context) string {
 	return noticeMode
 }
 
-func New(eCtx echo.Context, noticeType string, user string, ctx context.Context, opts ...func(*HTTPNoticerConfig)) Noticer {
+func New(eCtx echo.Context, noticeType string, user string, ctx context.Context, opts ...func(*Config)) Noticer {
 	clientID := GetClientID(eCtx)
 	var noticer Noticer
 	if len(user) > 0 && len(clientID) > 0 {
-		noticeID := GetNoticeID(eCtx)
-		noticeMode := GetNoticeMode(eCtx)
-		noticerConfig := &HTTPNoticerConfig{
-			User:     user,
-			Type:     noticeType,
-			ClientID: clientID,
-			ID:       noticeID,
-			Mode:     noticeMode,
-		}
-		for _, opt := range opts {
-			opt(noticerConfig)
-		}
-		noticer = noticerConfig.Noticer(ctx)
+		confg := NewConfigByContext(eCtx, noticeType, user, opts...)
+		noticer = confg.Noticer(ctx)
 	} else {
 		noticer = DefaultNoticer
 	}
 	return noticer
+}
+
+func NewNoticerByConfig(ctx context.Context, config *Config) Noticer {
+	if len(config.User) > 0 && len(config.ClientID) > 0 {
+		return config.Noticer(ctx)
+	}
+	return DefaultNoticer
 }

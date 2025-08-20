@@ -37,10 +37,13 @@ func (p *ProgressInfo) reset() {
 	p.Complete = false
 }
 
-func NewProgress() *Progress {
+func NewProgress(autoComplete ...bool) *Progress {
 	p := &Progress{}
 	p.total.Store(-1)
 	p.finish.Store(-1)
+	if len(autoComplete) > 0 && autoComplete[0] {
+		p.autoComplete.Store(true)
+	}
 	return p
 }
 
