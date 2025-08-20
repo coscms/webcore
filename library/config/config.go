@@ -104,7 +104,7 @@ func (c *Config) ConnectedDB(autoConn ...bool) bool {
 	if n == 0 || (n > 0 && autoConn[0]) {
 		err := c.connectDB()
 		if err != nil {
-			log.Error(err)
+			log.Errorf(`failed to connect database: %v`, err)
 		}
 	}
 	return c.connectedDB

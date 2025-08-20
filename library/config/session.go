@@ -110,7 +110,7 @@ func InitSessionOptions(c *Config) {
 	}
 	changed, err := ss.X(c, sessionStoreCookieOptions, sessionConfig)
 	if err != nil {
-		log.Error(err)
+		log.Errorf(`failed to apply session config: %v`, err)
 		return
 	}
 	log.Okayf(`session uses store engine: %s`, sessionEngine)
