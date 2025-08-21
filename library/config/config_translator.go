@@ -35,19 +35,9 @@ func (c *Config) GetTranslator(ctx echo.Context) echo.Translator {
 }
 
 func (c *Config) CloneLanguageConfig() language.Config {
-	cfg := language.Config{
-		Project:      c.Language.Project,
-		Default:      c.Language.Default,
-		Fallback:     c.Language.Fallback,
-		AllList:      make([]string, len(c.Language.AllList)),
-		RulesPath:    make([]string, len(c.Language.RulesPath)),
-		MessagesPath: make([]string, len(c.Language.MessagesPath)),
-		Reload:       false,
-	}
-	copy(cfg.AllList, c.Language.AllList)
-	copy(cfg.RulesPath, c.Language.RulesPath)
-	copy(cfg.MessagesPath, c.Language.MessagesPath)
+	cfg := c.Language.Clone()
 	cfg.SetFSFunc(bootconfig.LangFSFunc)
+	cfg.Reload = false
 	return cfg
 }
 
