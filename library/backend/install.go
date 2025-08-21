@@ -6,6 +6,8 @@ import (
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/code"
+
+	"github.com/coscms/webcore/library/config/startup"
 )
 
 var onInstalled []func(ctx echo.Context) error
@@ -25,5 +27,6 @@ func FireInstalled(ctx echo.Context) error {
 			return ctx.NewError(code.Failure, err.Error())
 		}
 	}
+	startup.FireAfter(`web.installed`)
 	return err
 }
