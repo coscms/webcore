@@ -1,6 +1,7 @@
 package backend
 
 import (
+	"strings"
 	"sync"
 	"time"
 
@@ -184,9 +185,16 @@ func getBackendURL(paths ...string) (r string) {
 	//return subdomains.Default.URL(r, `backend`)
 }
 
+func SetFrontendURL(url string) {
+	echo.Set(`frontend.url`, strings.TrimRight(url, `/`))
+}
+
 func getFrontendURL(paths ...string) (r string) {
 	for _, ppath := range paths {
 		r += ppath
+	}
+	if baseURL := echo.String(`frontend.url`); len(baseURL) > 0 {
+		return baseURL + subdomains.Default.RelativeURL(r, `frontend`)
 	}
 	return subdomains.Default.URL(r, `frontend`)
 }
@@ -203,6 +211,9 @@ func getFrontendURLByName(name string, params ...interface{}) string {
 	info := subdomains.Default.Get(`frontend`)
 	if info == nil {
 		return `/not-found:` + name
+	}
+	if baseURL := echo.String(`frontend.url`); len(baseURL) > 0 {
+		return baseURL + info.RelativeURLByName(name, params...)
 	}
 	return info.URLByName(subdomains.Default, name, params...)
 }
