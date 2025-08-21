@@ -77,7 +77,8 @@ type HTTPServer struct {
 	FuncSetters           []func(echo.Context) error
 	HostCheckerRegexpKey  string
 	DomainValidator       func(echo.Context, string) error
-	renderOptions         *render.Config
+	RenderOptions         []func(*render.Config)
+	renderConfig          *render.Config
 	language              *language.Language
 }
 
@@ -120,10 +121,10 @@ func (h *HTTPServer) SetKeepExtensionPrefixes(keepExtensionPrefixes []string) *H
 }
 
 func (h *HTTPServer) Renderer() driver.Driver {
-	if h.renderOptions == nil {
+	if h.renderConfig == nil {
 		return nil
 	}
-	return h.renderOptions.Renderer()
+	return h.renderConfig.Renderer()
 }
 
 func (h *HTTPServer) I18n() *language.Language {
@@ -216,7 +217,7 @@ func (h *HTTPServer) Apply() {
 	// 事物支持
 	e.Use(Transaction())
 	// 注册模板引擎
-	h.renderOptions = &render.Config{
+	h.renderConfig = &render.Config{
 		TmplDir: h.TemplateDir,
 		Engine:  `standard`,
 		ParseStrings: map[string]string{
@@ -230,22 +231,24 @@ func (h *HTTPServer) Apply() {
 		CustomParser:         h.TmplCustomParser,
 	}
 	for key, val := range h.ParseStrings {
-		h.renderOptions.ParseStrings[key] = val
+		h.renderConfig.ParseStrings[key] = val
 	}
 	for key, val := range h.ParseStringFuncs {
-		h.renderOptions.ParseStringFuncs[key] = val
+		h.renderConfig.ParseStringFuncs[key] = val
 	}
 	if h.RendererDo != nil {
-		h.renderOptions.AddRendererDo(h.RendererDo)
+		h.renderConfig.AddRendererDo(h.RendererDo)
 	}
 	funcSetters := make([]echo.HandlerFunc, 0, len(h.FuncSetters)+1)
 	for _, f := range h.FuncSetters {
 		funcSetters = append(funcSetters, f)
 	}
 	funcSetters = append(funcSetters, ErrorPageFunc)
-	h.renderOptions.AddFuncSetter(funcSetters...)
-
-	h.renderOptions.ApplyTo(e, h.TmplMgr)
+	h.renderConfig.AddFuncSetter(funcSetters...)
+	for _, opt := range h.RenderOptions {
+		opt(h.renderConfig)
+	}
+	h.renderConfig.ApplyTo(e, h.TmplMgr)
 
 	if len(h.RouteDefaultExtension) > 0 {
 		e.SetDefaultExtension(h.RouteDefaultExtension)
