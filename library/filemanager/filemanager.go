@@ -25,6 +25,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/coscms/webcore/library/charset"
@@ -136,6 +137,36 @@ func (f *fileManager) Rename(absPath string, newName string) (err error) {
 	} else {
 		err = errors.New(f.T(`请输入有效的文件名称`))
 	}
+	return
+}
+
+func (f *fileManager) Chmod(absPath string, owner Perm, group Perm, otherUser Perm) (err error) {
+	return f.ChmodByCodes(absPath, owner.ToCodes(), group.ToCodes(), otherUser.ToCodes())
+}
+
+func (f *fileManager) ChmodByCodes(absPath string, owner [3]uint32, group [3]uint32, otherUser [3]uint32) (err error) {
+	ownerP := owner[0] + owner[1] + owner[2]
+	if !ValidatePermNumber(ownerP) || !ValidatePermCodes(owner) {
+		err = fmt.Errorf(`invalid owner permission number: %+v`, owner)
+		return
+	}
+	groupP := group[0] + group[1] + group[2]
+	if !ValidatePermNumber(groupP) || !ValidatePermCodes(group) {
+		err = fmt.Errorf(`invalid group permission number: %+v`, group)
+		return
+	}
+	otherUserP := otherUser[0] + otherUser[1] + otherUser[2]
+	if ValidatePermNumber(otherUserP) || !ValidatePermCodes(otherUser) {
+		err = fmt.Errorf(`invalid otherUser permission number: %+v`, otherUser)
+		return
+	}
+	v := fmt.Sprintf(`%d%d%d`, ownerP, groupP, otherUserP)
+	var n uint64
+	n, err = strconv.ParseUint(v, 8, 32)
+	if err != nil {
+		return
+	}
+	err = os.Chmod(absPath, os.FileMode(uint32(n)))
 	return
 }
 
