@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"os/user"
 	"path/filepath"
 	"sort"
 	"strconv"
@@ -33,6 +34,7 @@ import (
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/code"
+	"github.com/webx-top/echo/param"
 )
 
 var (
@@ -140,7 +142,7 @@ func (f *fileManager) Rename(absPath string, newName string) (err error) {
 	return
 }
 
-func (f *fileManager) Chmod(absPath string, owner Perm, group Perm, otherUser Perm) (err error) {
+func (f *fileManager) Chmod(absPath string, owner Perm, group Perm, otherUser Perm) error {
 	return f.ChmodByCodes(absPath, owner.ToCodes(), group.ToCodes(), otherUser.ToCodes())
 }
 
@@ -167,6 +169,45 @@ func (f *fileManager) ChmodByCodes(absPath string, owner [3]uint32, group [3]uin
 		return
 	}
 	err = os.Chmod(absPath, os.FileMode(uint32(n)))
+	return
+}
+
+func (f *fileManager) Chown(absPath string, username string, groupName ...string) (err error) {
+	var u *user.User
+	u, err = user.Lookup(username)
+	if err != nil {
+		return
+	}
+	uid := param.AsInt(u.Uid)
+	if uid <= 0 {
+		err = fmt.Errorf(`failed to parse uid of %s: %s`, username, u.Uid)
+		return
+	}
+	var gid int
+	if len(groupName) == 0 || len(groupName[0]) == 0 {
+		gid = param.AsInt(u.Gid)
+		if gid <= 0 {
+			err = fmt.Errorf(`failed to parse gid of %s: %s`, username, u.Gid)
+			return
+		}
+	} else {
+		var g *user.Group
+		g, err = user.LookupGroup(groupName[0])
+		if err != nil {
+			return err
+		}
+		gid = param.AsInt(g.Gid)
+		if gid <= 0 {
+			err = fmt.Errorf(`failed to parse gid of %s: %s`, groupName, u.Gid)
+			return
+		}
+	}
+	err = os.Chown(absPath, uid, gid)
+	return
+}
+
+func (f *fileManager) ChownByID(absPath string, uid int, gid int) (err error) {
+	err = os.Chown(absPath, uid, gid)
 	return
 }
 
