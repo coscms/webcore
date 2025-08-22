@@ -194,7 +194,7 @@ func (f *fileManager) Chown(absPath string, username string, groupName ...string
 		var g *user.Group
 		g, err = user.LookupGroup(groupName[0])
 		if err != nil {
-			return err
+			return
 		}
 		gid = param.AsInt(g.Gid)
 		if gid <= 0 {
