@@ -95,6 +95,13 @@ func (c *Config) GetMaxRequestBodySize() int {
 	return c.Sys.MaxRequestBodySizeBytes()
 }
 
+func (c *Config) GetUploadFileMaxSize() int {
+	if c.settings.UploadFileMaxSizeBytes() > 0 {
+		return c.settings.UploadFileMaxSizeBytes()
+	}
+	return c.Sys.UploadFileMaxSizeBytes()
+}
+
 // ConnectedDB 数据库是否已连接，如果没有连接则自动连接
 func (c *Config) ConnectedDB(autoConn ...bool) bool {
 	if c.connectedDB {

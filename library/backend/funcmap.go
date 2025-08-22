@@ -55,6 +55,7 @@ func init() {
 	tplfunc.TplFuncMap[`BuildTime`] = func() string { return config.Version.BuildTime }
 	tplfunc.TplFuncMap[`Config`] = getConfig
 	tplfunc.TplFuncMap[`MaxRequestBodySize`] = getMaxRequestBodySize
+	tplfunc.TplFuncMap[`UploadFileMaxSize`] = getUploadFileMaxSize
 	tplfunc.TplFuncMap[`IndexStrSlice`] = indexStrSlice
 	tplfunc.TplFuncMap[`HasString`] = hasString
 	tplfunc.TplFuncMap[`Date`] = date
@@ -119,6 +120,10 @@ func getConfig(args ...string) echo.H {
 
 func getMaxRequestBodySize() int {
 	return config.FromFile().GetMaxRequestBodySize()
+}
+
+func getUploadFileMaxSize() int {
+	return config.FromFile().GetUploadFileMaxSize()
 }
 
 func getAvatar(avatar string, defaults ...string) string {

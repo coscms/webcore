@@ -43,14 +43,18 @@ func NewSettings(config *Config) *Settings {
 }
 
 type Settings struct {
-	Email                   Email  `json:"email"`
-	Log                     Log    `json:"log"`
-	APIKey                  string `json:"-"` //API密钥
-	Debug                   bool   `json:"debug"`
+	Email  Email  `json:"email"`
+	Log    Log    `json:"log"`
+	APIKey string `json:"-"` //API密钥
+	Debug  bool   `json:"debug"`
+
 	MaxRequestBodySize      string `json:"maxRequestBodySize"`
 	maxRequestBodySizeBytes int
-	Base                    echo.H `json:"base"`
-	config                  *Config
+
+	UploadFileMaxSize      string `json:"uploadFileMaxSize"`
+	uploadFileMaxSizeBytes int
+	Base                   echo.H `json:"base"`
+	config                 *Config
 }
 
 func (c *Settings) SetBy(r echo.H, defaults echo.H) *Settings {
@@ -62,11 +66,17 @@ func (c *Settings) SetBy(r echo.H, defaults echo.H) *Settings {
 	c.Debug = c.Base.Bool(`debug`)
 	c.MaxRequestBodySize = c.Base.String(`maxRequestBodySize`)
 	c.maxRequestBodySizeBytes, _ = ssystem.ParseBytes(c.MaxRequestBodySize)
+	c.UploadFileMaxSize = c.Base.String(`uploadFileMaxSize`)
+	c.uploadFileMaxSizeBytes, _ = ssystem.ParseBytes(c.UploadFileMaxSize)
 	return c
 }
 
 func (c *Settings) MaxRequestBodySizeBytes() int {
 	return c.maxRequestBodySizeBytes
+}
+
+func (c *Settings) UploadFileMaxSizeBytes() int {
+	return c.uploadFileMaxSizeBytes
 }
 
 func (c *Settings) SetDebug(on bool) {
