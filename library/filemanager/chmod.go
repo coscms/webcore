@@ -1,5 +1,10 @@
 package filemanager
 
+import (
+	"os"
+	"strconv"
+)
+
 const (
 	PermRead  = 4
 	PermWrite = 2
@@ -24,6 +29,45 @@ func (p *Perm) ToCodes() [3]uint32 {
 		v[2] = PermExec
 	}
 	return v
+}
+
+func toPerm(n byte) Perm {
+	switch n {
+	case '7':
+		return Perm{Read: true, Write: true, Exec: true}
+	case '6':
+		return Perm{Read: true, Write: true, Exec: false}
+	case '5':
+		return Perm{Read: true, Write: false, Exec: true}
+	case '4':
+		return Perm{Read: true, Write: false, Exec: false}
+	case '3':
+		return Perm{Read: false, Write: true, Exec: true}
+	case '2':
+		return Perm{Read: false, Write: true, Exec: false}
+	case '1':
+		return Perm{Read: false, Write: false, Exec: true}
+	default:
+		return Perm{}
+	}
+}
+
+func FileModeToPerms(mode os.FileMode) Perms {
+	v := strconv.FormatUint(uint64(mode), 8)
+	if len(v) == 3 {
+		return Perms{
+			Owner: toPerm(v[0]),
+			Group: toPerm(v[1]),
+			Other: toPerm(v[2]),
+		}
+	}
+	return Perms{}
+}
+
+type Perms struct {
+	Owner Perm
+	Group Perm
+	Other Perm
 }
 
 func ValidatePermCodes(n [3]uint32) bool {
