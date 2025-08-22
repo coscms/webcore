@@ -16,4 +16,11 @@ func TestChmod(t *testing.T) {
 	//num, _ := strconv.ParseUint(fmt.Sprintf(`%d`, n), 8, 32)
 	t.Logf(`===%v`, strconv.FormatUint(n, 8))
 	t.Logf(`===%+v`, FileModeToPerms(os.ModePerm))
+
+	fi, err := os.Stat(`..`)
+	if err == nil {
+		md := fi.Mode()
+		str := strconv.FormatUint(uint64(md), 8)
+		t.Logf(`===%v %s %+v`, str, md, FileModeToPerms(md))
+	}
 }

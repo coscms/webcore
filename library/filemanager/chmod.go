@@ -54,7 +54,8 @@ func toPerm(n byte) Perm {
 
 func FileModeToPerms(mode os.FileMode) Perms {
 	v := strconv.FormatUint(uint64(mode), 8)
-	if len(v) == 3 {
+	if len(v) >= 3 {
+		v = v[len(v)-3:]
 		return Perms{
 			Owner: toPerm(v[0]),
 			Group: toPerm(v[1]),
@@ -84,5 +85,5 @@ func ValidatePermCodes(n [3]uint32) bool {
 }
 
 func ValidatePermNumber(n uint32) bool {
-	return n >= 1 && n <= 7
+	return n >= 0 && n <= 7
 }
