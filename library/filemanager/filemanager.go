@@ -158,7 +158,7 @@ func (f *fileManager) ChmodByCodes(absPath string, owner [3]uint32, group [3]uin
 		return
 	}
 	otherUserP := otherUser[0] + otherUser[1] + otherUser[2]
-	if ValidatePermNumber(otherUserP) || !ValidatePermCodes(otherUser) {
+	if !ValidatePermNumber(otherUserP) || !ValidatePermCodes(otherUser) {
 		err = fmt.Errorf(`invalid otherUser permission number: %+v`, otherUser)
 		return
 	}

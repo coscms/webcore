@@ -5,6 +5,8 @@ import (
 	"os"
 	"strconv"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestChmod(t *testing.T) {
@@ -23,4 +25,7 @@ func TestChmod(t *testing.T) {
 		str := strconv.FormatUint(uint64(md), 8)
 		t.Logf(`===%v %s %+v`, str, md, FileModeToPerms(md))
 	}
+
+	assert.True(t, ValidatePermCodes([3]uint32{4, 0, 0}))
+	assert.True(t, ValidatePermNumber(4))
 }
