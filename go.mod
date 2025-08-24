@@ -33,7 +33,7 @@ require (
 	github.com/admpub/httpscerts v0.0.0-20180907121630-a2990e2af45c
 	github.com/admpub/imageproxy v0.10.1
 	github.com/admpub/ip2region/v2 v2.0.1
-	github.com/admpub/license_gen v0.1.1
+	github.com/admpub/license_gen v0.1.2
 	github.com/admpub/log v1.4.0
 	github.com/admpub/mahonia v0.0.0-20151019004008-c528b747d92d
 	github.com/admpub/mail v0.0.0-20170408110349-d63147b0317b
@@ -113,6 +113,7 @@ require (
 	github.com/admpub/identicon v1.0.2 // indirect
 	github.com/admpub/imaging v1.6.3 // indirect
 	github.com/admpub/json5 v0.0.1 // indirect
+	github.com/admpub/machineid v1.0.2 // indirect
 	github.com/admpub/redistore v1.2.2 // indirect
 	github.com/admpub/safesvg v0.0.8 // indirect
 	github.com/admpub/sessions v0.3.0 // indirect
