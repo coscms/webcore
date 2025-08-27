@@ -44,7 +44,7 @@ func RegisterSessionStore(name string, title string, initFn SessionStoreInit) {
 	SessionStores.Add(name, title, echo.KVxOptX[SessionStoreInit, any](initFn))
 }
 
-func InitSessionOptions(c *Config, applyEngnie bool) {
+func InitSessionOptions(c *Config, applyEngine bool) {
 
 	//==================================
 	// session基础设置
@@ -92,7 +92,7 @@ func InitSessionOptions(c *Config, applyEngnie bool) {
 		}
 	}
 
-	if !applyEngnie {
+	if !applyEngine {
 		return
 	}
 
