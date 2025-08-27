@@ -113,7 +113,7 @@ func ParseConfig() error {
 	if err != nil {
 		return err
 	}
-	InitSessionOptions(conf)
+	InitSessionOptions(conf, bootconfig.IsWeb())
 	if IsInstalled() {
 		if FromFile() != nil {
 			if !FromFile().connectedDB || !reflect.DeepEqual(conf.DB, FromFile().DB) {

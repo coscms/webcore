@@ -151,13 +151,21 @@ func (c *Config) PrintExtend() {
 }
 
 func (c *Config) registerExtend(key string, recv interface{}) {
-	fmt.Printf(color.YellowString(`[Register Extend Config]`)+` `+color.MagentaString(`P%d`, FromCLI().Pid())+` %s: %T`+"\n", key, recv)
+	if c.IsEnvDev() {
+		fmt.Printf(color.YellowString(`[RegisterExtendConfig]`)+` `+color.MagentaString(`P%d`, FromCLI().Pid())+` %s: %T`+"\n", key, recv)
+	} else {
+		log.Debugf(`[RegisterExtendConfig]%s: %T`, key, recv)
+	}
 	c.Extend[key] = recv
 }
 
 func (c *Config) UnregisterExtend(key string) {
 	if recv, ok := c.Extend[key]; ok {
-		fmt.Printf(color.YellowString(`[Unregister Extend Config]`)+` `+color.MagentaString(`P%d`, FromCLI().Pid())+` %s: %T`+"\n", key, recv)
+		if c.IsEnvDev() {
+			fmt.Printf(color.YellowString(`[UnregisterExtendConfig]`)+` `+color.MagentaString(`P%d`, FromCLI().Pid())+` %s: %T`+"\n", key, recv)
+		} else {
+			log.Debugf(`[UnregisterExtendConfig]%s: %T`, key, recv)
+		}
 		delete(c.Extend, key)
 	}
 }
