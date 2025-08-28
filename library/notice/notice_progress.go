@@ -71,6 +71,11 @@ func (a *NoticeAndProgress) Add(n int64) NProgressor {
 	return a
 }
 
+func (a *NoticeAndProgress) OnlyAdd(n int64) NProgressor {
+	a.prog.OnlyAdd(n)
+	return a
+}
+
 func (a *NoticeAndProgress) Done(n int64) NProgressor {
 	a.prog.Done(n)
 	if last, ok := a.last.Load().(MessageWithStatus); ok {

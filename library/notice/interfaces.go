@@ -15,6 +15,7 @@ type Notifier interface {
 
 type Progressor interface {
 	Add(n int64) NProgressor
+	OnlyAdd(n int64) NProgressor
 	Done(n int64) NProgressor
 	AutoComplete(on bool) NProgressor
 	Complete() NProgressor
