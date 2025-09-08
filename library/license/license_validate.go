@@ -19,7 +19,8 @@ func Check(ctx echo.Context) error {
 	if SkipLicenseCheck {
 		return nil
 	}
-	err := Validate()
+	License()
+	err := Error()
 	if err != nil {
 		return fmt.Errorf(`[L] %w`, err)
 	}

@@ -76,6 +76,7 @@ var (
 	packageName string //free
 	machineID   string
 	domain      string
+	licenseOnce once.Once
 )
 
 func Version() string {
@@ -167,7 +168,18 @@ func Error() error {
 	return licenseError
 }
 
+func initLicense() {
+	err := Validate()
+	SetError(err)
+}
+
+func ReloadLicense() {
+	licenseOnce.Reset()
+	licenseOnce.Do(initLicense)
+}
+
 func License() lib.LicenseData {
+	licenseOnce.Do(initLicense)
 	lock4data.RLock()
 	defer lock4data.RUnlock()
 	if licenseData == nil {
