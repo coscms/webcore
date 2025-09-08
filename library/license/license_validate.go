@@ -204,3 +204,10 @@ func HasAnyFeature(feature ...string) bool {
 	}
 	return License().Info.HasAnyFeature(feature...)
 }
+
+func FeatureList() []string {
+	if SkipLicenseCheck {
+		return nil
+	}
+	return License().Info.Feature
+}

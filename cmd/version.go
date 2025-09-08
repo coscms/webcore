@@ -20,8 +20,10 @@ package cmd
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/coscms/webcore/library/config"
+	"github.com/coscms/webcore/library/license"
 	"github.com/spf13/cobra"
 )
 
@@ -37,6 +39,14 @@ func versionRunE(cmd *cobra.Command, args []string) error {
 	fmt.Println(config.Version.String())
 	fmt.Printf("Schema: v%v\n", config.Version.DBSchema)
 	fmt.Printf("Build: %v\n", config.Version.BuildTime)
+
+	var feature string
+	if license.SkipLicenseCheck {
+		feature = `<ALL>`
+	} else {
+		feature = strings.Join(license.FeatureList(), `,`)
+	}
+	fmt.Printf("Feature: %v\n", feature)
 	return nil
 }
 
