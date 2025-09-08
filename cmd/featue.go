@@ -39,7 +39,6 @@ func featureRunE(cmd *cobra.Command, args []string) error {
 		fmt.Println(`<ALL>`)
 		return nil
 	}
-	license.Validate()
 	feature := strings.Join(license.FeatureList(), `,`)
 	if len(feature) == 0 {
 		feature = `<N/A>`
