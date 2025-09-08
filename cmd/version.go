@@ -44,7 +44,11 @@ func versionRunE(cmd *cobra.Command, args []string) error {
 	if license.SkipLicenseCheck {
 		feature = `<ALL>`
 	} else {
+		license.Validate()
 		feature = strings.Join(license.FeatureList(), `,`)
+		if len(feature) == 0 {
+			feature = `<N/A>`
+		}
 	}
 	fmt.Printf("Feature: %v\n", feature)
 	return nil
