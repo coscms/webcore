@@ -26,11 +26,12 @@ import (
 
 	"github.com/admpub/log"
 	"github.com/webx-top/com"
+	"github.com/webx-top/echo"
 )
 
 func Run(options *Options, action string) error {
 	conf := &Config{}
-	conf.Dir = com.SelfDir()
+	conf.Dir = echo.Wd()
 	var err error
 	conf.Exec, err = filepath.Abs(os.Args[0])
 	if err != nil {
@@ -58,7 +59,7 @@ const (
 )
 
 func ServiceLogDir() string {
-	return filepath.Join(com.SelfDir(), `data`, `logs`)
+	return filepath.Join(echo.Wd(), `data`, `logs`)
 }
 
 func initServiceLog(conf *Config) error {

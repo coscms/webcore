@@ -24,10 +24,11 @@ import (
 	"path/filepath"
 
 	"github.com/webx-top/com"
+	"github.com/webx-top/echo"
 )
 
 func createPidFile() string {
-	pidFile := filepath.Join(com.SelfDir(), `data/pid`)
+	pidFile := filepath.Join(echo.Wd(), `data/pid`)
 	err := com.MkdirAll(pidFile, os.ModePerm)
 	if err != nil {
 		stdLog.Println(err)
@@ -38,7 +39,7 @@ func createPidFile() string {
 
 func getPidFiles() []string {
 	pidFile := []string{}
-	pidFilePath := filepath.Join(com.SelfDir(), `data/pid`)
+	pidFilePath := filepath.Join(echo.Wd(), `data/pid`)
 	err := filepath.Walk(pidFilePath, func(pidPath string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
