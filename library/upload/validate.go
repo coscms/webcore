@@ -35,7 +35,7 @@ var (
 
 // IsRightUploadFile 是否是正确的上传文件
 var IsRightUploadFile = func(ctx echo.Context, src string) error {
-	src = path.Clean(src)
+	src = echo.CleanPath(src)
 	ext := strings.ToLower(path.Ext(src))
 	cfg := Get()
 	if !com.InSlice(ext, cfg.AllowedExtensions) {
