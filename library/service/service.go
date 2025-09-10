@@ -77,40 +77,10 @@ func New(cfg *Config, action string) error {
 	return s.Run()
 }
 
-func getPidFiles() []string {
-	pidFile := []string{}
-	pidFilePath := filepath.Join(com.SelfDir(), `data/pid`)
-	err := filepath.Walk(pidFilePath, func(pidPath string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		if info.IsDir() {
-			if info.Name() == `daemon` { // 忽略进程值守创建的进程ID，避免被清理
-				err = filepath.SkipDir
-			}
-			return err
-		}
-		if filepath.Ext(pidPath) == `.pid` {
-			pidFile = append(pidFile, pidPath)
-		}
-		return nil
-	})
-	if err != nil {
-		stdLog.Println(err)
-	}
-	return pidFile
-}
-
 func NewProgram(cfg *Config) *program {
-	pidFile := filepath.Join(com.SelfDir(), `data/pid`)
-	err := com.MkdirAll(pidFile, os.ModePerm)
-	if err != nil {
-		stdLog.Println(err)
-	}
-	pidFile = filepath.Join(pidFile, `nging.pid`)
 	return &program{
 		Config:  cfg,
-		pidFile: pidFile,
+		pidFile: createPidFile(),
 	}
 }
 
