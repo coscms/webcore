@@ -67,9 +67,9 @@ func (h FileManagerHandler) Handle(ctx echo.Context) error {
 	if len(filePath) > 0 {
 		filePath = filepath.Clean(`/` + filePath)
 		filePath = strings.TrimPrefix(filePath, `/`)
-		if len(filePath) == 0 {
-			filePath = `.`
-		}
+	}
+	if len(filePath) == 0 {
+		filePath = `.`
 	}
 
 	user := backend.User(ctx)
