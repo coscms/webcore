@@ -243,6 +243,11 @@ func (f *fileManager) Upload(fpath string,
 	if !fi.IsDir() {
 		return errors.New(f.T(`路径不正确: %s`, fpath))
 	}
+	absPath := filepath.Join(f.Root.Name(), filepath.Clean(`/`+fpath))
+	absPath, err = filepath.Abs(absPath)
+	if err != nil {
+		return
+	}
 	var filePath string
 	var chunked bool // 是否支持分片
 	if chunkUpload != nil {
@@ -263,7 +268,6 @@ func (f *fileManager) Upload(fpath string,
 			filePath = chunkUpload.GetSavePath()
 		}
 	}
-	absPath := filepath.Join(f.Root.Name(), filepath.Clean(`/`+fpath))
 	if !chunked {
 		fileHdr, err := f.SaveUploadedFile(`file`, absPath)
 		if err != nil {
