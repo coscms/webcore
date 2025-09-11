@@ -280,7 +280,11 @@ func (f *fileManager) Upload(fpath string,
 	pipe := f.Form(`pipe`)
 	switch pipe {
 	case `unzip`:
-		err = com.Unzip(filePath, absPath)
+		if strings.HasSuffix(filePath, `.tar.gz`) {
+			_, err = com.UnTarGz(filePath, absPath)
+		} else {
+			err = com.Unzip(filePath, absPath)
+		}
 		if err == nil {
 			err = os.Remove(filePath)
 			if err != nil {
