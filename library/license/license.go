@@ -126,7 +126,7 @@ func ProductDetailURL() (url string) {
 	case ModeMachineID:
 		mid, err := MachineID()
 		if err != nil {
-			panic(err)
+			log.Errorf(`failed to get MachineID: %v`, err)
 		}
 		url += `&machineID=` + mid
 	case ModeDomain:
