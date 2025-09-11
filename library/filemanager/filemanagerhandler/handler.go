@@ -135,7 +135,7 @@ func (h FileManagerHandler) Handle(ctx echo.Context) error {
 		data := ctx.Data()
 		newName := ctx.Form(`name`)
 		newName = echo.CleanFilePath(newName)
-		newName = filepath.Join(filePath, newName)
+		newName = filepath.Join(filepath.Dir(filePath), newName)
 		oldName := filePath
 		err = mgr.Rename(oldName, newName)
 		if err != nil {
