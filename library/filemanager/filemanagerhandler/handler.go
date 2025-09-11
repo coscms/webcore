@@ -58,13 +58,12 @@ func (h *FileManagerHandler) SetCanChown(can bool) {
 }
 
 func (h FileManagerHandler) Handle(ctx echo.Context) error {
-	filePath := ctx.Form(`path`)
-	do := ctx.Form(`do`)
 	mgr, err := filemanager.New(h.root, config.FromFile().Sys.EditableFileMaxBytes(), ctx)
 	if err != nil {
 		return err
 	}
 	defer mgr.Close()
+	filePath := ctx.Form(`path`)
 	if len(filePath) > 0 {
 		filePath = filepath.Clean(`/` + filePath)
 		filePath = strings.TrimPrefix(filePath, `/`)
@@ -74,6 +73,7 @@ func (h FileManagerHandler) Handle(ctx echo.Context) error {
 	}
 
 	user := backend.User(ctx)
+	do := ctx.Form(`do`)
 	switch do {
 	case `chmod`:
 		if !h.canChmod {
