@@ -235,14 +235,8 @@ func (f *fileManager) Upload(fpath string,
 	if len(fpath) == 0 {
 		fpath = `.`
 	}
-	var (
-		d  http.File
-		fi os.FileInfo
-	)
-	d, fi, err = f.enterPath(fpath)
-	if d != nil {
-		defer d.Close()
-	}
+	var fi os.FileInfo
+	fi, err = f.Root.Stat(fpath)
 	if err != nil {
 		return
 	}
