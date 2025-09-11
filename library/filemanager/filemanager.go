@@ -43,31 +43,39 @@ var (
 	EncodedSepa  = com.URLEncode(echo.FilePathSeparator)
 )
 
-func New(root string, editableMaxSize int, ctx echo.Context) *fileManager {
+func New(root string, editableMaxSize int, ctx echo.Context) (*fileManager, error) {
+	rootFS, err := os.OpenRoot(root)
+	if err != nil {
+		return nil, err
+	}
 	return &fileManager{
 		Context:         ctx,
-		Root:            root,
+		Root:            rootFS,
 		EditableMaxSize: editableMaxSize,
-	}
+	}, err
 }
 
 type fileManager struct {
 	echo.Context
-	Root            string
+	Root            *os.Root
 	EditableMaxSize int
 }
 
+func (f *fileManager) Close() error {
+	return f.Root.Close()
+}
+
 func (f *fileManager) RealPath(filePath string) string {
-	absPath := f.Root
+	absPath := f.Root.Name()
 	if len(filePath) > 0 {
-		filePath = filepath.Clean(filePath)
-		absPath = filepath.Join(f.Root, filePath)
+		filePath = filepath.Clean(`/` + filePath)
+		absPath = filepath.Join(f.Root.Name(), filePath)
 	}
 	return absPath
 }
 
-func (f *fileManager) Edit(absPath string, content string, encoding string) (interface{}, error) {
-	fi, err := os.Stat(absPath)
+func (f *fileManager) Edit(file string, content string, encoding string) (interface{}, error) {
+	fi, err := f.Root.Stat(file)
 	if err != nil {
 		return nil, err
 	}
@@ -87,18 +95,18 @@ func (f *fileManager) Edit(absPath string, content string, encoding string) (int
 				return ``, err
 			}
 		}
-		err = os.WriteFile(absPath, b, fi.Mode())
+		err = f.Root.WriteFile(file, b, fi.Mode())
 		return nil, err
 	}
-	b, err := os.ReadFile(absPath)
+	b, err := f.Root.ReadFile(file)
 	if err == nil && !isUTF8 {
 		b, err = charset.Convert(encoding, `utf-8`, b)
 	}
 	return string(b), err
 }
 
-func (f *fileManager) CreateFile(absPath string, content string, encoding string) error {
-	_, err := os.Stat(absPath)
+func (f *fileManager) CreateFile(file string, content string, encoding string) error {
+	_, err := f.Root.Stat(file)
 	if err == nil {
 		return f.NewError(code.DataAlreadyExists, `新建文件失败，文件已经存在`)
 	}
@@ -114,39 +122,39 @@ func (f *fileManager) CreateFile(absPath string, content string, encoding string
 			return err
 		}
 	}
-	err = os.WriteFile(absPath, b, 0664)
+	err = f.Root.WriteFile(file, b, 0664)
 	return err
 }
 
-func (f *fileManager) Remove(absPath string) error {
-	fi, err := os.Stat(absPath)
+func (f *fileManager) Remove(file string) error {
+	fi, err := f.Root.Stat(file)
 	if err != nil {
 		return err
 	}
 	if fi.IsDir() {
-		return os.RemoveAll(absPath)
+		return f.Root.RemoveAll(file)
 	}
-	return os.Remove(absPath)
+	return f.Root.Remove(file)
 }
 
-func (f *fileManager) Mkdir(absPath string, mode os.FileMode) error {
-	return com.MkdirAll(absPath, mode)
+func (f *fileManager) Mkdir(dir string, mode os.FileMode) error {
+	return f.Root.MkdirAll(dir, mode)
 }
 
-func (f *fileManager) Rename(absPath string, newName string) (err error) {
+func (f *fileManager) Rename(oldName string, newName string) (err error) {
 	if len(newName) > 0 {
-		err = com.Rename(absPath, filepath.Join(filepath.Dir(absPath), filepath.Base(newName)))
+		err = f.Root.Rename(oldName, newName)
 	} else {
 		err = errors.New(f.T(`请输入有效的文件名称`))
 	}
 	return
 }
 
-func (f *fileManager) Chmod(absPath string, owner Perm, group Perm, otherUser Perm) error {
-	return f.ChmodByCodes(absPath, owner.ToCodes(), group.ToCodes(), otherUser.ToCodes())
+func (f *fileManager) Chmod(file string, owner Perm, group Perm, otherUser Perm) error {
+	return f.ChmodByCodes(file, owner.ToCodes(), group.ToCodes(), otherUser.ToCodes())
 }
 
-func (f *fileManager) ChmodByCodes(absPath string, owner [3]uint32, group [3]uint32, otherUser [3]uint32) (err error) {
+func (f *fileManager) ChmodByCodes(file string, owner [3]uint32, group [3]uint32, otherUser [3]uint32) (err error) {
 	ownerP := owner[0] + owner[1] + owner[2]
 	if !ValidatePermNumber(ownerP) || !ValidatePermCodes(owner) {
 		err = fmt.Errorf(`invalid owner permission number: %+v`, owner)
@@ -168,11 +176,11 @@ func (f *fileManager) ChmodByCodes(absPath string, owner [3]uint32, group [3]uin
 	if err != nil {
 		return
 	}
-	err = os.Chmod(absPath, os.FileMode(uint32(n)))
+	err = f.Root.Chmod(file, os.FileMode(uint32(n)))
 	return
 }
 
-func (f *fileManager) Chown(absPath string, username string, groupName ...string) (err error) {
+func (f *fileManager) Chown(file string, username string, groupName ...string) (err error) {
 	var u *user.User
 	u, err = user.Lookup(username)
 	if err != nil {
@@ -202,23 +210,17 @@ func (f *fileManager) Chown(absPath string, username string, groupName ...string
 			return
 		}
 	}
-	err = os.Chown(absPath, uid, gid)
+	err = f.Root.Chown(file, uid, gid)
 	return
 }
 
-func (f *fileManager) ChownByID(absPath string, uid int, gid int) (err error) {
-	err = os.Chown(absPath, uid, gid)
+func (f *fileManager) ChownByID(file string, uid int, gid int) (err error) {
+	err = f.Root.Chown(file, uid, gid)
 	return
 }
 
-func (f *fileManager) enterPath(absPath string) (d http.File, fi os.FileInfo, err error) {
-	if absPath != `/` {
-		absPath = strings.TrimRight(absPath, `/`)
-		absPath = strings.TrimRight(absPath, `\`)
-	}
-	fs := http.Dir(filepath.Dir(absPath))
-	fileName := filepath.Base(absPath)
-	d, err = fs.Open(fileName)
+func (f *fileManager) enterPath(file string) (d http.File, fi os.FileInfo, err error) {
+	d, err = f.Root.Open(file)
 	if err != nil {
 		return
 	}
@@ -227,14 +229,14 @@ func (f *fileManager) enterPath(absPath string) (d http.File, fi os.FileInfo, er
 	return
 }
 
-func (f *fileManager) Upload(absPath string,
+func (f *fileManager) Upload(fpath string,
 	chunkUpload *uploadClient.ChunkUpload,
 	chunkOpts ...uploadClient.ChunkInfoOpter) (err error) {
 	var (
 		d  http.File
 		fi os.FileInfo
 	)
-	d, fi, err = f.enterPath(absPath)
+	d, fi, err = f.enterPath(fpath)
 	if d != nil {
 		defer d.Close()
 	}
@@ -242,7 +244,7 @@ func (f *fileManager) Upload(absPath string,
 		return
 	}
 	if !fi.IsDir() {
-		return errors.New(f.T(`路径不正确: %s`, absPath))
+		return errors.New(f.T(`路径不正确: %s`, fpath))
 	}
 	var filePath string
 	var chunked bool // 是否支持分片
@@ -264,12 +266,13 @@ func (f *fileManager) Upload(absPath string,
 			filePath = chunkUpload.GetSavePath()
 		}
 	}
+	absPath := filepath.Join(f.Root.Name(), filepath.Clean(`/`+fpath))
 	if !chunked {
 		fileHdr, err := f.SaveUploadedFile(`file`, absPath)
 		if err != nil {
 			return err
 		}
-		filePath = filepath.Join(absPath, fileHdr.Filename)
+		filePath = filepath.Join(absPath, filepath.Base(fileHdr.Filename))
 	}
 	pipe := f.Form(`pipe`)
 	switch pipe {

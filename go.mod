@@ -1,6 +1,6 @@
 module github.com/coscms/webcore
 
-go 1.24.5
+go 1.25.1
 
 require (
 	gitee.com/admpub/certmagic v0.8.9
@@ -85,7 +85,7 @@ require (
 	github.com/webx-top/codec v0.3.0
 	github.com/webx-top/com v1.4.0
 	github.com/webx-top/db v1.28.9
-	github.com/webx-top/echo v1.22.3-0.20250910195354-d6a202751f73
+	github.com/webx-top/echo v1.22.3
 	github.com/webx-top/image v0.1.2
 	github.com/webx-top/restyclient v0.0.6
 	github.com/webx-top/validation v0.0.3
