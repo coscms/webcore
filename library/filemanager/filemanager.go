@@ -232,6 +232,9 @@ func (f *fileManager) enterPath(file string) (d http.File, fi os.FileInfo, err e
 func (f *fileManager) Upload(fpath string,
 	chunkUpload *uploadClient.ChunkUpload,
 	chunkOpts ...uploadClient.ChunkInfoOpter) (err error) {
+	if len(fpath) == 0 {
+		fpath = `.`
+	}
 	var (
 		d  http.File
 		fi os.FileInfo
@@ -305,12 +308,15 @@ func (f *fileManager) Upload(fpath string,
 	}
 }
 
-func (f *fileManager) List(absPath string, sortBy ...string) (err error, exit bool, dirs []os.FileInfo) {
+func (f *fileManager) List(fpath string, sortBy ...string) (err error, exit bool, dirs []os.FileInfo) {
+	if len(fpath) == 0 {
+		fpath = `.`
+	}
 	var (
 		d  http.File
 		fi os.FileInfo
 	)
-	d, fi, err = f.enterPath(absPath)
+	d, fi, err = f.enterPath(fpath)
 	if d != nil {
 		defer d.Close()
 	}
@@ -318,7 +324,7 @@ func (f *fileManager) List(absPath string, sortBy ...string) (err error, exit bo
 		return
 	}
 	if !fi.IsDir() {
-		fileName := filepath.Base(absPath)
+		fileName := filepath.Base(fpath)
 		inline := f.Formx(`inline`).Bool()
 		return f.Attachment(d, fileName, fi.ModTime(), inline), true, nil
 	}
