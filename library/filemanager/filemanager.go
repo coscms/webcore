@@ -279,14 +279,15 @@ func (f *fileManager) Upload(fpath string,
 		} else {
 			err = com.Unzip(filePath, absPath)
 		}
-		if err == nil {
-			err = os.Remove(filePath)
-			if err != nil {
-				if !os.IsNotExist(err) {
-					err = errors.New(f.T(`压缩包已经成功解压，但是删除压缩包失败：`) + err.Error())
+		if rmErr := os.Remove(filePath); rmErr != nil {
+			if !os.IsNotExist(rmErr) {
+				if err != nil {
+					err = errors.Join(err, errors.New(f.T(`删除压缩包失败：`)+rmErr.Error()))
 				} else {
-					err = nil
+					rmErr = errors.New(f.T(`压缩包已经成功解压，但是删除压缩包失败：`) + rmErr.Error())
 				}
+			} else {
+				rmErr = nil
 			}
 		}
 		return err
