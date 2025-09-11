@@ -64,6 +64,7 @@ func (h FileManagerHandler) Handle(ctx echo.Context) error {
 	if err != nil {
 		return err
 	}
+	defer mgr.Close()
 	if len(filePath) > 0 {
 		filePath = filepath.Clean(`/` + filePath)
 		filePath = strings.TrimPrefix(filePath, `/`)
