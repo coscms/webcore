@@ -230,6 +230,8 @@ func (h FileManagerHandler) Handle(ctx echo.Context) error {
 	ctx.Set(`canUpload`, h.canUpload)
 	ctx.Set(`canEdit`, h.canEdit)
 	ctx.Set(`canDelete`, h.canDelete)
+	ctx.Set(`canChmod`, h.canChmod)
+	ctx.Set(`canChown`, h.canChown)
 
 	ctx.SetFunc(`Editable`, func(fileName string) bool {
 		if !h.canEdit {
