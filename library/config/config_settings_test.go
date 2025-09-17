@@ -22,6 +22,23 @@ func _newTestConfig() echo.H {
 	}
 }
 
+func TestCloneLanguageConfig(t *testing.T) {
+	c := NewConfig()
+	c.Language.Project = `test`
+	c.Language.Default = `zh-CN`
+	c.Language.Fallback = `en-US`
+	c.Language.AllList = []string{`zh-CN`, `en-US`}
+	c.Language.RulesPath = []string{`/rules`}
+	c.Language.MessagesPath = []string{`/messages`}
+	cfg := c.CloneLanguageConfig()
+	assert.Equal(t, `test`, cfg.Project)
+	assert.Equal(t, `zh-CN`, cfg.Default)
+	assert.Equal(t, `en-US`, cfg.Fallback)
+	assert.Equal(t, []string{`zh-CN`, `en-US`}, cfg.AllList)
+	assert.Equal(t, []string{`/rules`}, cfg.RulesPath)
+	assert.Equal(t, []string{`/messages`}, cfg.MessagesPath)
+}
+
 func TestSettings(t *testing.T) {
 	buf := bytes.NewBuffer(nil)
 	OnGroupSetSettings(`test`, func(diffs Diffs) error {

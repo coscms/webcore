@@ -44,7 +44,7 @@ func RegisterSessionStore(name string, title string, initFn SessionStoreInit) {
 	SessionStores.Add(name, title, echo.KVxOptX[SessionStoreInit, any](initFn))
 }
 
-func InitSessionOptions(c *Config) {
+func InitSessionOptions(c *Config, applyEngine bool) {
 
 	//==================================
 	// session基础设置
@@ -92,6 +92,10 @@ func InitSessionOptions(c *Config) {
 		}
 	}
 
+	if !applyEngine {
+		return
+	}
+
 	//==================================
 	// 注册session存储引擎
 	//==================================
@@ -110,7 +114,7 @@ func InitSessionOptions(c *Config) {
 	}
 	changed, err := ss.X(c, sessionStoreCookieOptions, sessionConfig)
 	if err != nil {
-		log.Error(err)
+		log.Errorf(`failed to apply session config: %v`, err)
 		return
 	}
 	log.Okayf(`session uses store engine: %s`, sessionEngine)

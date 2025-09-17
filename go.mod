@@ -1,6 +1,6 @@
 module github.com/coscms/webcore
 
-go 1.24.5
+go 1.25.1
 
 require (
 	gitee.com/admpub/certmagic v0.8.9
@@ -33,7 +33,7 @@ require (
 	github.com/admpub/httpscerts v0.0.0-20180907121630-a2990e2af45c
 	github.com/admpub/imageproxy v0.10.1
 	github.com/admpub/ip2region/v2 v2.0.1
-	github.com/admpub/license_gen v0.1.1
+	github.com/admpub/license_gen v0.1.2
 	github.com/admpub/log v1.4.0
 	github.com/admpub/mahonia v0.0.0-20151019004008-c528b747d92d
 	github.com/admpub/mail v0.0.0-20170408110349-d63147b0317b
@@ -59,7 +59,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/credentials v1.18.4
 	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.18.4
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.87.0
-	github.com/caddy-plugins/webdav v1.2.10
+	github.com/caddy-plugins/webdav v1.2.12
 	github.com/coscms/captcha v0.2.3
 	github.com/coscms/forms v1.13.10
 	github.com/coscms/go-imgparse v0.0.1
@@ -78,27 +78,27 @@ require (
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/minio/minio-go/v7 v7.0.95
 	github.com/pkg/sftp v1.13.9
-	github.com/shirou/gopsutil/v4 v4.25.7
-	github.com/spf13/cobra v1.9.1
-	github.com/spf13/pflag v1.0.7
-	github.com/stretchr/testify v1.10.0
+	github.com/shirou/gopsutil/v4 v4.25.8
+	github.com/spf13/cobra v1.10.1
+	github.com/spf13/pflag v1.0.9
+	github.com/stretchr/testify v1.11.1
 	github.com/studio-b12/gowebdav v0.10.0
 	github.com/syndtr/goleveldb v1.0.0
 	github.com/webx-top/chardet v0.0.2
 	github.com/webx-top/client v0.9.6
 	github.com/webx-top/codec v0.3.0
 	github.com/webx-top/com v1.4.0
-	github.com/webx-top/db v1.28.6
-	github.com/webx-top/echo v1.18.2
+	github.com/webx-top/db v1.28.9
+	github.com/webx-top/echo v1.22.3
 	github.com/webx-top/image v0.1.2
 	github.com/webx-top/restyclient v0.0.6
 	github.com/webx-top/validation v0.0.3
 	github.com/webx-top/validator v0.3.0
-	golang.org/x/crypto v0.41.0
-	golang.org/x/net v0.43.0
-	golang.org/x/oauth2 v0.30.0
-	golang.org/x/sync v0.16.0
-	golang.org/x/text v0.28.0
+	golang.org/x/crypto v0.42.0
+	golang.org/x/net v0.44.0
+	golang.org/x/oauth2 v0.31.0
+	golang.org/x/sync v0.17.0
+	golang.org/x/text v0.29.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -106,6 +106,7 @@ require (
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/admpub/boltstore v1.2.0 // indirect
 	github.com/admpub/caddy v1.2.9 // indirect
+	github.com/admpub/dateparse v0.0.0-20250903020633-d86d3f2a4cfd // indirect
 	github.com/admpub/fasthttp v0.0.7 // indirect
 	github.com/admpub/fsnotify v1.7.1 // indirect
 	github.com/admpub/gifresize v1.0.2 // indirect
@@ -117,10 +118,11 @@ require (
 	github.com/admpub/identicon v1.0.2 // indirect
 	github.com/admpub/imaging v1.6.3 // indirect
 	github.com/admpub/json5 v0.0.1 // indirect
+	github.com/admpub/machineid v1.0.2 // indirect
 	github.com/admpub/redistore v1.2.2 // indirect
 	github.com/admpub/safesvg v0.0.8 // indirect
 	github.com/admpub/sessions v0.3.0 // indirect
-	github.com/admpub/webdav/v4 v4.1.3 // indirect
+	github.com/admpub/webdav/v4 v4.1.5 // indirect
 	github.com/admpub/websocket v1.0.4 // indirect
 	github.com/admpub/xencoding v0.0.3 // indirect
 	github.com/andybalholm/brotli v1.2.0 // indirect
@@ -150,7 +152,7 @@ require (
 	github.com/fcjr/aia-transport-go v1.3.0 // indirect
 	github.com/flynn/go-shlex v0.0.0-20150515145356-3f9db97f8568 // indirect
 	github.com/francoispqt/gojay v1.2.13 // indirect
-	github.com/gabriel-vasile/mimetype v1.4.9 // indirect
+	github.com/gabriel-vasile/mimetype v1.4.10 // indirect
 	github.com/geoffgarside/ber v1.2.0 // indirect
 	github.com/glebarez/go-sqlite v1.22.0 // indirect
 	github.com/go-acme/lego/v4 v4.25.2 // indirect
@@ -186,7 +188,7 @@ require (
 	github.com/kr/fs v0.1.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/linxGnu/gumble v1.0.6 // indirect
-	github.com/lufia/plan9stats v0.0.0-20250317134145-8bc96cf8fc35 // indirect
+	github.com/lufia/plan9stats v0.0.0-20250827001030-24949be3fa54 // indirect
 	github.com/maruel/rs v1.1.0 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
@@ -228,7 +230,7 @@ require (
 	github.com/tidwall/pretty v1.2.1 // indirect
 	github.com/tidwall/rtred v0.1.2 // indirect
 	github.com/tidwall/tinyqueue v0.1.1 // indirect
-	github.com/tinylib/msgp v1.3.0 // indirect
+	github.com/tinylib/msgp v1.4.0 // indirect
 	github.com/tklauser/go-sysconf v0.3.15 // indirect
 	github.com/tklauser/numcpus v0.10.0 // indirect
 	github.com/tuotoo/qrcode v0.0.0-20220425170535-52ccc2bebf5d // indirect
@@ -238,17 +240,17 @@ require (
 	github.com/webx-top/poolx v0.0.0-20210912044716-5cfa2d58e380 // indirect
 	github.com/webx-top/tagfast v0.0.1 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
-	go.etcd.io/bbolt v1.4.2 // indirect
-	go.uber.org/mock v0.5.2 // indirect
-	golang.org/x/exp v0.0.0-20250813145105-42675adae3e6 // indirect
+	go.etcd.io/bbolt v1.4.3 // indirect
+	go.uber.org/mock v0.6.0 // indirect
+	golang.org/x/exp v0.0.0-20250819193227-8b4c13bb791b // indirect
 	golang.org/x/image v0.30.0 // indirect
 	golang.org/x/mod v0.27.0 // indirect
-	golang.org/x/sys v0.35.0 // indirect
+	golang.org/x/sys v0.36.0 // indirect
 	golang.org/x/tools v0.36.0 // indirect
-	google.golang.org/protobuf v1.36.7 // indirect
+	google.golang.org/protobuf v1.36.8 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
-	modernc.org/libc v1.66.7 // indirect
+	modernc.org/libc v1.66.8 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect
 	modernc.org/sqlite v1.38.2 // indirect

@@ -37,10 +37,13 @@ func (p *ProgressInfo) reset() {
 	p.Complete = false
 }
 
-func NewProgress() *Progress {
+func NewProgress(autoComplete ...bool) *Progress {
 	p := &Progress{}
 	p.total.Store(-1)
 	p.finish.Store(-1)
+	if len(autoComplete) > 0 && autoComplete[0] {
+		p.autoComplete.Store(true)
+	}
 	return p
 }
 
@@ -135,6 +138,10 @@ func (p *Progress) Add(n int64) *Progress {
 	if p.Finish() > 0 {
 		p.finish.Store(0)
 	}
+	return p.OnlyAdd(n)
+}
+
+func (p *Progress) OnlyAdd(n int64) *Progress {
 	p.total.CompareAndSwap(-1, 0)
 	p.total.Add(n)
 	return p

@@ -30,33 +30,38 @@ import (
 )
 
 type System struct {
-	Env                     string            `json:"env"` // prod/dev/test
-	AllowIP                 []string          `json:"allowIP"`
-	SSLAuto                 bool              `json:"sslAuto"`
-	SSLEmail                string            `json:"sslEmail"`
-	SSLHosts                []string          `json:"sslHosts"`
-	SSLCacheDir             string            `json:"sslCacheDir"`
-	SSLKeyFile              string            `json:"sslKeyFile"`
-	SSLCertFile             string            `json:"sslCertFile"`
-	ReusePort               bool              `json:"reusePort"`
-	RealIPTrustedProxies    []string          `json:"realIPTrustedProxies"`
-	RealIPProxyType         string            `json:"realIPProxyType"`
-	RealIPHeaders           []string          `json:"realIPHeaders"`
-	EditableFileExtensions  map[string]string `json:"editableFileExtensions"`
-	EditableFileMaxSize     string            `json:"editableFileMaxSize"`
-	editableFileMaxBytes    int
-	PlayableFileExtensions  map[string]string `json:"playableFileExtensions"`
-	ErrorPages              map[int]string    `json:"errorPages"`
-	CmdTimeout              string            `json:"cmdTimeout"`
-	CmdTimeoutDuration      time.Duration     `json:"-"`
-	ShowExpirationTime      int64             `json:"showExpirationTime"` //显示过期时间：0为始终显示；大于0为距离剩余到期时间多少秒的时候显示；小于0为不显示
-	SessionName             string            `json:"sessionName"`
-	SessionEngine           string            `json:"sessionEngine"`
-	SessionConfig           echo.H            `json:"sessionConfig"`
-	MaxRequestBodySize      string            `json:"maxRequestBodySize"`
+	Env                    string            `json:"env"` // prod/dev/test
+	AllowIP                []string          `json:"allowIP"`
+	SSLAuto                bool              `json:"sslAuto"`
+	SSLEmail               string            `json:"sslEmail"`
+	SSLHosts               []string          `json:"sslHosts"`
+	SSLCacheDir            string            `json:"sslCacheDir"`
+	SSLKeyFile             string            `json:"sslKeyFile"`
+	SSLCertFile            string            `json:"sslCertFile"`
+	ReusePort              bool              `json:"reusePort"`
+	RealIPTrustedProxies   []string          `json:"realIPTrustedProxies"`
+	RealIPProxyType        string            `json:"realIPProxyType"`
+	RealIPHeaders          []string          `json:"realIPHeaders"`
+	EditableFileExtensions map[string]string `json:"editableFileExtensions"`
+	EditableFileMaxSize    string            `json:"editableFileMaxSize"`
+	editableFileMaxBytes   int
+	PlayableFileExtensions map[string]string `json:"playableFileExtensions"`
+	ErrorPages             map[int]string    `json:"errorPages"`
+	CmdTimeout             string            `json:"cmdTimeout"`
+	CmdTimeoutDuration     time.Duration     `json:"-"`
+	ShowExpirationTime     int64             `json:"showExpirationTime"` //显示过期时间：0为始终显示；大于0为距离剩余到期时间多少秒的时候显示；小于0为不显示
+	SessionName            string            `json:"sessionName"`
+	SessionEngine          string            `json:"sessionEngine"`
+	SessionConfig          echo.H            `json:"sessionConfig"`
+
+	MaxRequestBodySize      string `json:"maxRequestBodySize"`
 	maxRequestBodySizeBytes int
-	DisableAutoUpgradeDB    bool `json:"disableAutoUpgradeDB"` // 是否关闭自动升级数据表结构
-	DisableHTTPLog          bool `json:"disableHTTPLog"`
+
+	UploadFileMaxSize      string `json:"uploadFileMaxSize"`
+	uploadFileMaxSizeBytes int
+
+	DisableAutoUpgradeDB bool `json:"disableAutoUpgradeDB"` // 是否关闭自动升级数据表结构
+	DisableHTTPLog       bool `json:"disableHTTPLog"`
 }
 
 func (sys *System) Init() {
@@ -65,6 +70,12 @@ func (sys *System) Init() {
 		sys.maxRequestBodySizeBytes, err = ParseBytes(sys.MaxRequestBodySize)
 		if err != nil {
 			log.Errorf(`failed to parse config.system.maxRequestBodySizeBytes(%q): %v`, sys.MaxRequestBodySize, err.Error())
+		}
+	}
+	if len(sys.UploadFileMaxSize) > 0 {
+		sys.uploadFileMaxSizeBytes, err = ParseBytes(sys.UploadFileMaxSize)
+		if err != nil {
+			log.Errorf(`failed to parse config.system.uploadFileMaxSizeBytes(%q): %v`, sys.UploadFileMaxSize, err.Error())
 		}
 	}
 	if sys.editableFileMaxBytes < 1 && len(sys.EditableFileMaxSize) > 0 {
@@ -108,6 +119,13 @@ func (sys *System) MaxRequestBodySizeBytes() int {
 		return defaultMaxRequestBodyBytes
 	}
 	return sys.maxRequestBodySizeBytes
+}
+
+func (sys *System) UploadFileMaxSizeBytes() int {
+	if sys.uploadFileMaxSizeBytes <= 0 {
+		return defaultUploadFileMaxBytes
+	}
+	return sys.uploadFileMaxSizeBytes
 }
 
 func (sys *System) Editable(fileName string) (string, bool) {

@@ -16,18 +16,27 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-package captcha
+package clitranslator
 
 import (
-	"github.com/webx-top/echo"
-	"github.com/webx-top/echo/code"
+	"github.com/admpub/once"
+	"github.com/coscms/webcore/library/config"
+	"github.com/webx-top/echo/middleware/language"
 )
 
-var (
-	//ErrCaptcha 验证码错误
-	ErrCaptcha = echo.NewError(echo.T(`Captcha is incorrect`), code.CaptchaError)
-	//ErrCaptchaIdMissing 缺少captchaId
-	ErrCaptchaIdMissing = echo.NewError(echo.T(`Missing captchaId`), code.CaptchaIdMissing).SetZone(`captchaId`)
-	//ErrCaptchaCodeRequired 验证码不能为空
-	ErrCaptchaCodeRequired = echo.NewError(echo.T(`Captcha code is required`), code.CaptchaCodeRequired).SetZone(`code`)
-)
+var translate *language.Translate
+var translock once.Once
+var LangCode = `zh-CN` // 默认语言
+
+func initTranslate() {
+	translate = config.FromFile().BuildTranslator(LangCode)
+}
+
+func GetTranslator() *language.Translate {
+	translock.Do(initTranslate)
+	return translate
+}
+
+func ResetTranslator() {
+	translock.Reset()
+}

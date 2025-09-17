@@ -206,9 +206,12 @@ func FormStoreToMap(d echo.H) echo.H {
 	m := echo.H{}
 	for k, v := range d {
 		// api.ValueObject
-		vo := param.AsStore(v).Get(`ValueObject`)
+		store := param.AsStore(v)
+		vo := store.Get(`ValueObject`)
 		if vo != nil {
 			m[k] = vo
+		} else {
+			m[k] = store.Get(`Value`)
 		}
 	}
 	return m

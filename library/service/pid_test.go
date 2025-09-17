@@ -16,18 +16,25 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-package captcha
+package service
 
 import (
-	"github.com/webx-top/echo"
-	"github.com/webx-top/echo/code"
+	"os"
+	"path/filepath"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
-var (
-	//ErrCaptcha 验证码错误
-	ErrCaptcha = echo.NewError(echo.T(`Captcha is incorrect`), code.CaptchaError)
-	//ErrCaptchaIdMissing 缺少captchaId
-	ErrCaptchaIdMissing = echo.NewError(echo.T(`Missing captchaId`), code.CaptchaIdMissing).SetZone(`captchaId`)
-	//ErrCaptchaCodeRequired 验证码不能为空
-	ErrCaptchaCodeRequired = echo.NewError(echo.T(`Captcha code is required`), code.CaptchaCodeRequired).SetZone(`code`)
-)
+func TestPidFile(t *testing.T) {
+	pidFile := createPidFile()
+	pidDir := filepath.Dir(pidFile)
+	err := os.MkdirAll(pidDir+`/daemon/1`, os.ModePerm)
+	assert.NoError(t, err)
+	err = os.MkdirAll(pidDir+`/daemon/2`, os.ModePerm)
+	assert.NoError(t, err)
+	err = os.MkdirAll(pidDir+`/daemon/3`, os.ModePerm)
+	assert.NoError(t, err)
+	files := getPidFiles()
+	assert.Equal(t, []string{}, files)
+}

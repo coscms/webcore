@@ -95,6 +95,13 @@ func (c *Config) GetMaxRequestBodySize() int {
 	return c.Sys.MaxRequestBodySizeBytes()
 }
 
+func (c *Config) GetUploadFileMaxSize() int {
+	if c.settings.UploadFileMaxSizeBytes() > 0 {
+		return c.settings.UploadFileMaxSizeBytes()
+	}
+	return c.Sys.UploadFileMaxSizeBytes()
+}
+
 // ConnectedDB 数据库是否已连接，如果没有连接则自动连接
 func (c *Config) ConnectedDB(autoConn ...bool) bool {
 	if c.connectedDB {
@@ -104,7 +111,7 @@ func (c *Config) ConnectedDB(autoConn ...bool) bool {
 	if n == 0 || (n > 0 && autoConn[0]) {
 		err := c.connectDB()
 		if err != nil {
-			log.Error(err)
+			log.Errorf(`failed to connect database: %v`, err)
 		}
 	}
 	return c.connectedDB
@@ -144,13 +151,21 @@ func (c *Config) PrintExtend() {
 }
 
 func (c *Config) registerExtend(key string, recv interface{}) {
-	fmt.Printf(color.YellowString(`[Register Extend Config]`)+` `+color.MagentaString(`P%d`, FromCLI().Pid())+` %s: %T`+"\n", key, recv)
+	if c.IsEnvDev() {
+		fmt.Printf(color.YellowString(`[RegisterExtendConfig]`)+` `+color.MagentaString(`P%d`, FromCLI().Pid())+` %s: %T`+"\n", key, recv)
+	} else {
+		log.Debugf(`[RegisterExtendConfig]%s: %T`, key, recv)
+	}
 	c.Extend[key] = recv
 }
 
 func (c *Config) UnregisterExtend(key string) {
 	if recv, ok := c.Extend[key]; ok {
-		fmt.Printf(color.YellowString(`[Unregister Extend Config]`)+` `+color.MagentaString(`P%d`, FromCLI().Pid())+` %s: %T`+"\n", key, recv)
+		if c.IsEnvDev() {
+			fmt.Printf(color.YellowString(`[UnregisterExtendConfig]`)+` `+color.MagentaString(`P%d`, FromCLI().Pid())+` %s: %T`+"\n", key, recv)
+		} else {
+			log.Debugf(`[UnregisterExtendConfig]%s: %T`, key, recv)
+		}
 		delete(c.Extend, key)
 	}
 }
@@ -328,28 +343,4 @@ func (c *Config) SetDefaults() *Config {
 		}
 	}
 	return c.initLanguage()
-}
-
-func (c *Config) initLanguage() *Config {
-	if len(c.Language.Default) > 0 {
-		c.Language.Default = echo.NewLangCode(c.Language.Default).Normalize()
-	}
-	if len(c.Language.Fallback) > 0 {
-		c.Language.Fallback = echo.NewLangCode(c.Language.Fallback).Normalize()
-	}
-	if len(c.Language.AllList) == 0 {
-		if len(c.Language.Default) == 0 {
-			c.Language.Default = `en`
-		}
-		c.Language.AllList = []string{c.Language.Default}
-		return c
-	}
-	for index, lang := range c.Language.AllList {
-		lang = echo.NewLangCode(lang).Normalize()
-		if index == 0 && len(c.Language.Default) == 0 {
-			c.Language.Default = lang
-		}
-		c.Language.AllList[index] = lang
-	}
-	return c
 }

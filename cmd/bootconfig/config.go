@@ -38,6 +38,7 @@ var (
 	FaviconPath      = "public/assets/backend/images/favicon-xs.ico"
 	SoftwareName     = `Nging` // 软件英文名(也作为软件二进制可执行文件的名称)
 	SoftwareTitle    = `Nging` // 软件标题(显示在网页上的软件名称)
+	ContainerImage   = ``      // 容器镜像
 	OfficialHomepage = `https://github.com/admpub/nging`
 	Policy           func() echo.KVList
 	Setup            = func(echo.Context) error { return echo.ErrNotImplemented }

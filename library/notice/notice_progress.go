@@ -71,6 +71,11 @@ func (a *NoticeAndProgress) Add(n int64) NProgressor {
 	return a
 }
 
+func (a *NoticeAndProgress) OnlyAdd(n int64) NProgressor {
+	a.prog.OnlyAdd(n)
+	return a
+}
+
 func (a *NoticeAndProgress) Done(n int64) NProgressor {
 	a.prog.Done(n)
 	if last, ok := a.last.Load().(MessageWithStatus); ok {
@@ -120,7 +125,7 @@ func (a *NoticeAndProgress) Progress() *Progress {
 	return a.prog
 }
 
-func NewNoticer(ctx context.Context, config *HTTPNoticerConfig) Noticer {
+func NewNoticer(ctx context.Context, config *Config) Noticer {
 	var noticeSender Noticer
 	if config.IsExited == nil && config.Timeout != 0 {
 		config.IsExited = NewControlWithContext(ctx, config.Timeout)
@@ -132,11 +137,10 @@ func NewNoticer(ctx context.Context, config *HTTPNoticerConfig) Noticer {
 			config.Mode = ModeNotify
 		}
 	}
-	progress := NewProgress().SetControl(config.IsExited)
 	if len(config.User) > 0 {
 		OpenMessage(config.User, config.Type)
 		//defer CloseMessage(config.User, config.Type)
-		noticeSender = MakeNoticer(progress, config.Type, config.Mode, config.ID, config.ClientID, config.User)
+		noticeSender = MakeNoticer(config.Progress(), config.Type, config.Mode, config.ID, config.ClientID, config.User)
 	} else {
 		noticeSender = DefaultNoticer
 	}

@@ -16,45 +16,47 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-package captcha_go
+package service
 
 import (
-	"context"
+	stdLog "log"
+	"os"
+	"path/filepath"
 
-	"github.com/coscms/captcha"
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 )
 
-func NewStoreSession() captcha.Storer {
-	return &storeSession{}
-}
-
-const (
-	sessionKey = `captchaGoGen`
-)
-
-type storeSession struct {
-}
-
-func (a *storeSession) Put(ctx context.Context, key string, val interface{}, timeout int64) error {
-	eCtx := ctx.(echo.Context)
-	eCtx.Session().Set(sessionKey, com.String(val))
-	return nil
-}
-
-func (a *storeSession) Get(ctx context.Context, key string, value interface{}) error {
-	eCtx := ctx.(echo.Context)
-	sessVal, ok := eCtx.Session().Get(sessionKey).(string)
-	if !ok {
-		return captcha.ErrIllegalKey
+func createPidFile() string {
+	pidFile := filepath.Join(echo.Wd(), `data/pid`)
+	err := com.MkdirAll(pidFile, os.ModePerm)
+	if err != nil {
+		stdLog.Println(err)
 	}
-	*(value.(*[]byte)) = com.Str2bytes(sessVal)
-	return nil
+	pidFile = filepath.Join(pidFile, `nging.pid`)
+	return pidFile
 }
 
-func (a *storeSession) Delete(ctx context.Context, key string) error {
-	eCtx := ctx.(echo.Context)
-	eCtx.Session().Delete(sessionKey)
-	return nil
+func getPidFiles() []string {
+	pidFile := []string{}
+	pidFilePath := filepath.Join(echo.Wd(), `data/pid`)
+	err := filepath.Walk(pidFilePath, func(pidPath string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if info.IsDir() {
+			if info.Name() == `daemon` { // 忽略进程值守创建的进程ID，避免被清理
+				err = filepath.SkipDir
+			}
+			return err
+		}
+		if filepath.Ext(pidPath) == `.pid` {
+			pidFile = append(pidFile, pidPath)
+		}
+		return nil
+	})
+	if err != nil {
+		stdLog.Println(err)
+	}
+	return pidFile
 }

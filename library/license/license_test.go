@@ -30,6 +30,12 @@ func init() {
 	//*/
 }
 
+func TestCpuID(t *testing.T) {
+	cpuID, err := CpuID()
+	assert.NoError(t, err)
+	t.Logf(`cpuID: %s`, cpuID)
+}
+
 func TestEmptyLicense(t *testing.T) {
 	SetEmptyLicenseFeature(`A`, `B`, `C`)
 	assert.True(t, HasFeature(`A`))

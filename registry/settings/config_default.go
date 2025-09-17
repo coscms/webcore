@@ -82,6 +82,16 @@ var configDefaults = map[string]map[string]*dbschema.NgingConfig{
 			Sort:        0,
 			Disabled:    `N`,
 		},
+		`uploadFileMaxSize`: {
+			Key:         `uploadFileMaxSize`,
+			Label:       `上传文件的最大尺寸`,
+			Description: ``,
+			Value:       `1G`,
+			Group:       `base`,
+			Type:        `text`,
+			Sort:        0,
+			Disabled:    `N`,
+		},
 	},
 	`smtp`: {
 		`username`: {

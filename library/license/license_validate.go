@@ -19,7 +19,8 @@ func Check(ctx echo.Context) error {
 	if SkipLicenseCheck {
 		return nil
 	}
-	err := Validate()
+	License()
+	err := Error()
 	if err != nil {
 		return fmt.Errorf(`[L] %w`, err)
 	}
@@ -203,4 +204,11 @@ func HasAnyFeature(feature ...string) bool {
 		return true
 	}
 	return License().Info.HasAnyFeature(feature...)
+}
+
+func FeatureList() []string {
+	if SkipLicenseCheck {
+		return nil
+	}
+	return License().Info.Feature
 }

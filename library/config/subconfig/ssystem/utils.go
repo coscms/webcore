@@ -11,7 +11,8 @@ import (
 
 var (
 	reNumeric                  = regexp.MustCompile(`^[0-9]+$`)
-	defaultMaxRequestBodyBytes = 2 << 20 // 2M
+	defaultMaxRequestBodyBytes = 2 << 20    // 2M
+	defaultUploadFileMaxBytes  = 1024 << 20 // 1024M
 )
 
 func ParseTimeDuration(timeout string) time.Duration {

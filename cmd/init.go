@@ -26,11 +26,10 @@ import (
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/defaults"
-	"github.com/webx-top/echo/middleware/language"
 
 	"github.com/admpub/log"
-	"github.com/admpub/once"
 	"github.com/coscms/webcore/cmd/bootconfig"
+	"github.com/coscms/webcore/library/clitranslator"
 	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webcore/library/config/subconfig/sdb"
 	"github.com/coscms/webcore/request"
@@ -67,36 +66,12 @@ var initCmd = &cobra.Command{
 	RunE:    initRunE,
 }
 
-var translate *language.Translate
-var translock once.Once
-
-func initTranslate() {
-	translate = BuildTranslator(config.FromFile().Language)
-}
-
-func GetTranslator() *language.Translate {
-	translock.Do(initTranslate)
-	return translate
-}
-
-func ResetTranslator() {
-	translock.Reset()
-}
-
-func BuildTranslator(c language.Config) *language.Translate {
-	c.SetFSFunc(bootconfig.LangFSFunc)
-	c.Reload = false
-	lng := language.New(&c)
-	tr := &language.Translate{}
-	tr.Reset(InitInstallConfig.Language, lng)
-	return tr
-}
-
 func NewContext() echo.Context {
 	ctx := defaults.NewMockContext().SetAuto(true)
 
 	// 启用多语言支持
-	ctx.SetTranslator(GetTranslator())
+	clitranslator.LangCode = InitInstallConfig.Language
+	ctx.SetTranslator(clitranslator.GetTranslator())
 
 	ctx.Request().Header().Set(echo.HeaderAccept, echo.MIMETextPlain)
 	return ctx

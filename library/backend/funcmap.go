@@ -1,6 +1,7 @@
 package backend
 
 import (
+	"strings"
 	"sync"
 	"time"
 
@@ -54,6 +55,7 @@ func init() {
 	tplfunc.TplFuncMap[`BuildTime`] = func() string { return config.Version.BuildTime }
 	tplfunc.TplFuncMap[`Config`] = getConfig
 	tplfunc.TplFuncMap[`MaxRequestBodySize`] = getMaxRequestBodySize
+	tplfunc.TplFuncMap[`UploadFileMaxSize`] = getUploadFileMaxSize
 	tplfunc.TplFuncMap[`IndexStrSlice`] = indexStrSlice
 	tplfunc.TplFuncMap[`HasString`] = hasString
 	tplfunc.TplFuncMap[`Date`] = date
@@ -120,6 +122,10 @@ func getMaxRequestBodySize() int {
 	return config.FromFile().GetMaxRequestBodySize()
 }
 
+func getUploadFileMaxSize() int {
+	return config.FromFile().GetUploadFileMaxSize()
+}
+
 func getAvatar(avatar string, defaults ...string) string {
 	if len(avatar) > 0 {
 		return tplfunc.AddSuffix(avatar, `_200_200`)
@@ -184,9 +190,16 @@ func getBackendURL(paths ...string) (r string) {
 	//return subdomains.Default.URL(r, `backend`)
 }
 
+func SetFrontendURL(url string) {
+	echo.Set(`frontend.url`, strings.TrimRight(url, `/`))
+}
+
 func getFrontendURL(paths ...string) (r string) {
 	for _, ppath := range paths {
 		r += ppath
+	}
+	if baseURL := echo.String(`frontend.url`); len(baseURL) > 0 {
+		return baseURL + subdomains.Default.RelativeURL(r, `frontend`)
 	}
 	return subdomains.Default.URL(r, `frontend`)
 }
@@ -203,6 +216,9 @@ func getFrontendURLByName(name string, params ...interface{}) string {
 	info := subdomains.Default.Get(`frontend`)
 	if info == nil {
 		return `/not-found:` + name
+	}
+	if baseURL := echo.String(`frontend.url`); len(baseURL) > 0 {
+		return baseURL + info.RelativeURLByName(name, params...)
 	}
 	return info.URLByName(subdomains.Default, name, params...)
 }

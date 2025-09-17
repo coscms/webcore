@@ -76,6 +76,7 @@ var (
 	packageName string //free
 	machineID   string
 	domain      string
+	licenseOnce once.Once
 )
 
 func Version() string {
@@ -125,7 +126,7 @@ func ProductDetailURL() (url string) {
 	case ModeMachineID:
 		mid, err := MachineID()
 		if err != nil {
-			panic(err)
+			log.Errorf(`failed to get MachineID: %v`, err)
 		}
 		url += `&machineID=` + mid
 	case ModeDomain:
@@ -167,7 +168,18 @@ func Error() error {
 	return licenseError
 }
 
+func initLicense() {
+	err := Validate()
+	SetError(err)
+}
+
+func ReloadLicense() {
+	licenseOnce.Reset()
+	licenseOnce.Do(initLicense)
+}
+
 func License() lib.LicenseData {
+	licenseOnce.Do(initLicense)
 	lock4data.RLock()
 	defer lock4data.RUnlock()
 	if licenseData == nil {
@@ -215,19 +227,30 @@ func MachineID() (string, error) {
 	if len(addrs) < 1 {
 		return ``, lib.ErrMachineID
 	}
+	var cpuID string
+	cpuID, err = CpuID()
+	if err != nil {
+		return ``, err
+	}
+	machID, _ := lib.MachineID(ProductName())
+	machineID = MachineIDEncode(lib.Hash(addrs[0]) + `#` + cpuID + `#` + machID)
+	return machineID, err
+}
+
+func CpuID() (string, error) {
 	cpuInfo, err := cpu.Info()
 	if err != nil {
 		return ``, err
 	}
 	var cpuID string
 	if len(cpuInfo) > 0 {
+		//com.Dump(cpuInfo)
 		cpuID = cpuInfo[0].PhysicalID
-		if len(cpuID) == 0 {
-			cpuID = com.Md5(com.Dump(cpuInfo, false))
+		if len(cpuID) == 0 || cpuID == `0` {
+			cpuID = com.Md5(com.String(len(cpuInfo)) + com.Dump(cpuInfo, false))
 		}
 	}
-	machineID = MachineIDEncode(lib.Hash(addrs[0]) + `#` + cpuID)
-	return machineID, err
+	return cpuID, err
 }
 
 // FullLicenseURL 包含完整参数的授权网址
