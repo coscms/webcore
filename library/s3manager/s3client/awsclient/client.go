@@ -197,6 +197,14 @@ func (s *AWSClient) ListPage(ctx echo.Context, objectPrefix string) (dirs []os.F
 		n += len(dirs)
 	}
 
+	if n < limit {
+		nextOffset = ``
+	} else if n == limit {
+		if _, err := paginator.NextPage(ctx); err != nil {
+			nextOffset = ``
+		}
+	}
+
 	pagination.SetPosition(prevOffset, nextOffset, offset)
 	ctx.Set(`pagination`, pagination)
 	return
