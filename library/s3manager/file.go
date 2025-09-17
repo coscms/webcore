@@ -28,6 +28,7 @@ import (
 	"github.com/coscms/webcore/library/s3manager/fileinfo"
 	minio "github.com/minio/minio-go/v7"
 	"github.com/webx-top/com"
+	"github.com/webx-top/echo/defaults"
 )
 
 func NewFile(mgr *S3Manager, object *minio.Object, name string, memoryUploadMode bool, uploadTmpPath string) *file {
@@ -106,5 +107,5 @@ func (f *file) Readdir(count int) (fileInfoList []os.FileInfo, err error) {
 			objectPrefix += `/`
 		}
 	}
-	return f.mgr.listByMinio(context.Background(), objectPrefix)
+	return f.mgr.listByMinio(defaults.NewMockContext(), objectPrefix)
 }
