@@ -28,6 +28,7 @@ import (
 	"github.com/coscms/webcore/library/s3manager/fileinfo"
 	minio "github.com/minio/minio-go/v7"
 	"github.com/webx-top/com"
+	"github.com/webx-top/db/lib/factory/pagination"
 	"github.com/webx-top/echo/defaults"
 )
 
@@ -107,5 +108,7 @@ func (f *file) Readdir(count int) (fileInfoList []os.FileInfo, err error) {
 			objectPrefix += `/`
 		}
 	}
-	return f.mgr.listByMinio(defaults.NewMockContext(), objectPrefix)
+	ctx := defaults.NewMockContext()
+	pagination.SetPageDefaultSize(ctx, 2000)
+	return f.mgr.listByMinio(ctx, objectPrefix)
 }
