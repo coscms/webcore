@@ -162,6 +162,9 @@ func (s *AWSClient) ListPage(ctx echo.Context, objectPrefix string) (dirs []os.F
 			if object.Prefix == nil {
 				continue
 			}
+			if *object.Prefix == objectPrefix {
+				continue
+			}
 			nextOffset = *object.Prefix
 			if len(objectPrefix) > 0 {
 				key := strings.TrimPrefix(*object.Prefix, objectPrefix)
@@ -175,6 +178,9 @@ func (s *AWSClient) ListPage(ctx echo.Context, objectPrefix string) (dirs []os.F
 		}
 		for _, object := range output.Contents {
 			if object.Key == nil {
+				continue
+			}
+			if *object.Key == objectPrefix {
 				continue
 			}
 			nextOffset = *object.Key
