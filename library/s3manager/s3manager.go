@@ -700,7 +700,7 @@ func (s *S3Manager) ListTransfer(dirs []os.FileInfo) (dirList []echo.H, fileList
 	return
 }
 
-func (s *S3Manager) GetCORSRules() ([]*s3.CORSRule, error) {
+func (s *S3Manager) GetCORSRules(ctx echo.Context) ([]*s3.CORSRule, error) {
 	s3client, err := awsclient.Connect(s.config, s.bucketName)
 	if err != nil {
 		return nil, err
