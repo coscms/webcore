@@ -158,13 +158,11 @@ func (s *AWSClient) ListPage(ctx echo.Context, objectPrefix string) (dirs []os.F
 		if err != nil {
 			return
 		}
-		if output.StartAfter != nil {
-			nextOffset = *output.StartAfter
-		}
 		for _, object := range output.CommonPrefixes {
 			if object.Prefix == nil {
 				continue
 			}
+			nextOffset = *object.Prefix
 			if len(objectPrefix) > 0 {
 				key := strings.TrimPrefix(*object.Prefix, objectPrefix)
 				object.Prefix = &key
@@ -179,6 +177,7 @@ func (s *AWSClient) ListPage(ctx echo.Context, objectPrefix string) (dirs []os.F
 			if object.Key == nil {
 				continue
 			}
+			nextOffset = *object.Key
 			if len(objectPrefix) > 0 {
 				key := strings.TrimPrefix(*object.Key, objectPrefix)
 				object.Key = &key

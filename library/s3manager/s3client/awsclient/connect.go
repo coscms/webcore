@@ -39,9 +39,13 @@ func Connect(c context.Context, m *dbschema.NgingCloudStorage, bucketName string
 }
 
 func NewConfig(c context.Context, m *dbschema.NgingCloudStorage) (aws.Config, error) {
+	scheme := `https://`
+	if m.Secure != `Y` {
+		scheme = `http://`
+	}
 	return config.LoadDefaultConfig(
 		c,
-		config.WithBaseEndpoint(m.Endpoint),
+		config.WithBaseEndpoint(scheme+m.Endpoint),
 		config.WithRegion(m.Region),
 		config.WithCredentialsProvider(credentials.StaticCredentialsProvider{
 			Value: aws.Credentials{
