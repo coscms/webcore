@@ -33,18 +33,20 @@ func Connect(c context.Context, m *dbschema.NgingCloudStorage, bucketName string
 	if err != nil {
 		return nil, err
 	}
-	return &AWSClient{Client: s3.NewFromConfig(cfg), bucketName: bucketName}, nil
+	return &AWSClient{Client: s3.NewFromConfig(cfg, func(o *s3.Options) {
+		o.EndpointOptions.DisableHTTPS = m.Secure != `Y`
+	}), bucketName: bucketName}, nil
 }
 
 func NewConfig(c context.Context, m *dbschema.NgingCloudStorage) (aws.Config, error) {
 	return config.LoadDefaultConfig(
 		c,
-		// config.WithDisableSSL(m.Secure != `Y`),
-		// config.WithEndpoint(m.Endpoint),
+		config.WithBaseEndpoint(m.Endpoint),
 		config.WithRegion(m.Region),
 		config.WithCredentialsProvider(credentials.StaticCredentialsProvider{
 			Value: aws.Credentials{
-				AccessKeyID: m.Key, SecretAccessKey: m.Secret,
+				AccessKeyID:     m.Key,
+				SecretAccessKey: m.Secret,
 				//Source: "provider",
 			},
 		}),
