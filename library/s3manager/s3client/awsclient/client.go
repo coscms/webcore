@@ -146,9 +146,7 @@ func (s *AWSClient) ListPage(ctx echo.Context, objectPrefix string) (dirs []os.F
 		StartAfter: aws.String(offset),
 	}
 
-	paginator := s3.NewListObjectsV2Paginator(s.Client, params, func(o *s3.ListObjectsV2PaginatorOptions) {
-		o.Limit = int32(limit)
-	})
+	paginator := s3.NewListObjectsV2Paginator(s.Client, params)
 
 	var n int
 
