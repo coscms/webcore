@@ -35,6 +35,7 @@ import (
 
 	"github.com/coscms/webcore/dbschema"
 	"github.com/coscms/webcore/library/charset"
+	"github.com/coscms/webcore/library/common"
 	"github.com/coscms/webcore/library/filemanager"
 	"github.com/coscms/webcore/library/notice"
 	"github.com/coscms/webcore/library/s3manager/fileinfo"
@@ -575,16 +576,35 @@ func (s *S3Manager) Download(ctx echo.Context, ppath string) error {
 	return ctx.Attachment(f, fileName, fi.LastModified, inline)
 }
 
-func (s *S3Manager) listByMinio(ctx context.Context, objectPrefix string) (dirs []os.FileInfo, err error) {
+func (s *S3Manager) listByMinio(ctx echo.Context, objectPrefix string) (dirs []os.FileInfo, err error) {
 	c, err := s.Client()
 	if c == nil || err != nil {
 		return nil, err
 	}
-	objectCh := c.ListObjects(ctx, s.bucketName, minio.ListObjectsOptions{Prefix: objectPrefix})
+	_, limit, pagination := common.PagingWithPosition(ctx)
+	if limit < 1 {
+		limit = 20
+	}
+	offset := ctx.Form(`offset`)
+	prevOffset := ctx.Form(`prev`)
+	var nextOffset string
+	q := ctx.Request().URL().Query()
+	q.Del(`offset`)
+	q.Del(`prev`)
+	q.Del(`_pjax`)
+	objectCh := c.ListObjects(ctx, s.bucketName, minio.ListObjectsOptions{
+		Prefix:     objectPrefix,
+		MaxKeys:    limit,
+		StartAfter: offset,
+	})
 	for object := range objectCh {
 		if object.Err != nil {
 			continue
 		}
+		if object.Key == objectPrefix {
+			continue
+		}
+		nextOffset = object.Key
 		if len(objectPrefix) > 0 {
 			object.Key = strings.TrimPrefix(object.Key, objectPrefix)
 		}
@@ -594,6 +614,33 @@ func (s *S3Manager) listByMinio(ctx context.Context, objectPrefix string) (dirs 
 		obj := fileinfo.New(object)
 		dirs = append(dirs, obj)
 	}
+
+	n := len(dirs)
+
+	if n < limit {
+		nextOffset = ``
+	} else if n == limit {
+		objectCh := c.ListObjects(ctx, s.bucketName, minio.ListObjectsOptions{
+			Prefix:     objectPrefix,
+			MaxKeys:    1,
+			StartAfter: nextOffset,
+		})
+		for object := range objectCh {
+			if object.Err != nil {
+				continue
+			}
+			if object.Key == objectPrefix {
+				continue
+			}
+			n++
+		}
+		if n == limit {
+			nextOffset = ``
+		}
+	}
+
+	pagination.SetPosition(prevOffset, nextOffset, offset)
+	ctx.Set(`pagination`, pagination)
 	return
 }
 
