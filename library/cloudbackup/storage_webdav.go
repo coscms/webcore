@@ -53,7 +53,7 @@ func newStorageWebDAV(ctx echo.Context, cfg dbschema.NgingCloudBackup) (Storager
 }
 
 var webDavForms = []Form{
-	{Type: `text`, Label: `网址`, Name: `storageConfig.uri`, Required: true, Placeholder: `http(s)://<IP或域名>:<端口>`, Pattern: `^http[s]?://`},
+	{Type: `url`, Label: `网址`, Name: `storageConfig.uri`, Required: true, Placeholder: `http(s)://<IP或域名>:<端口>`},
 	{Type: `text`, Label: `用户名`, Name: `storageConfig.username`, Required: true},
 	{Type: `password`, Label: `密码`, Name: `storageConfig.password`, Required: true},
 }
