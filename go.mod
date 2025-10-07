@@ -61,7 +61,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.88.2
 	github.com/caddy-plugins/webdav v1.3.4
 	github.com/coscms/captcha v0.2.3
-	github.com/coscms/forms v1.13.10
+	github.com/coscms/forms v1.13.11
 	github.com/coscms/go-imgparse v0.0.1
 	github.com/coscms/oauth2s v0.4.3
 	github.com/coscms/session-boltstore v0.0.0-20250617034717-a58d8848fa61
