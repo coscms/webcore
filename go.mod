@@ -3,7 +3,6 @@ module github.com/coscms/webcore
 go 1.25.1
 
 require (
-	gitee.com/admpub/certmagic v0.8.9
 	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/abh/errorutil v1.0.0
 	github.com/admpub/9t v0.0.1
@@ -60,6 +59,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.19.8
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.88.2
 	github.com/caddy-plugins/webdav v1.3.4
+	github.com/caddyserver/certmagic v0.25.0
 	github.com/coscms/captcha v0.2.3
 	github.com/coscms/forms v1.13.11
 	github.com/coscms/go-imgparse v0.0.1
@@ -104,6 +104,7 @@ require (
 
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
+	gitee.com/admpub/certmagic v0.8.9 // indirect
 	github.com/admpub/boltstore v1.2.0 // indirect
 	github.com/admpub/caddy v1.2.9 // indirect
 	github.com/admpub/dateparse v0.0.0-20250903020633-d86d3f2a4cfd // indirect
@@ -143,6 +144,7 @@ require (
 	github.com/aymerick/douceur v0.2.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/boombuler/barcode v1.1.0 // indirect
+	github.com/caddyserver/zerossl v0.1.3 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
@@ -187,12 +189,14 @@ require (
 	github.com/klauspost/cpuid/v2 v2.3.0 // indirect
 	github.com/kr/fs v0.1.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
+	github.com/libdns/libdns v1.1.1 // indirect
 	github.com/linxGnu/gumble v1.0.6 // indirect
 	github.com/lufia/plan9stats v0.0.0-20250827001030-24949be3fa54 // indirect
 	github.com/maruel/rs v1.1.0 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-sqlite3 v1.14.32 // indirect
+	github.com/mholt/acmez/v3 v3.1.3 // indirect
 	github.com/miekg/dns v1.1.68 // indirect
 	github.com/minio/crc64nvme v1.1.1 // indirect
 	github.com/minio/md5-simd v1.1.2 // indirect
@@ -240,8 +244,12 @@ require (
 	github.com/webx-top/poolx v0.0.0-20210912044716-5cfa2d58e380 // indirect
 	github.com/webx-top/tagfast v0.0.1 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
+	github.com/zeebo/blake3 v0.2.4 // indirect
 	go.etcd.io/bbolt v1.4.3 // indirect
 	go.uber.org/mock v0.6.0 // indirect
+	go.uber.org/multierr v1.11.0 // indirect
+	go.uber.org/zap v1.27.0 // indirect
+	go.uber.org/zap/exp v0.3.0 // indirect
 	go.yaml.in/yaml/v2 v2.4.3 // indirect
 	golang.org/x/exp v0.0.0-20250911091902-df9299821621 // indirect
 	golang.org/x/image v0.31.0 // indirect

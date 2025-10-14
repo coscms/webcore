@@ -26,11 +26,11 @@ import (
 	"strings"
 	"time"
 
-	"gitee.com/admpub/certmagic"
 	figure "github.com/admpub/go-figure"
 	"github.com/admpub/go-ps"
 	"github.com/admpub/log"
 	"github.com/admpub/service"
+	"github.com/caddyserver/certmagic"
 	"github.com/kardianos/osext"
 	"github.com/spf13/cobra"
 	"github.com/webx-top/com"
@@ -220,12 +220,12 @@ func initCertMagic(c *engine.Config) error {
 		return err
 	}
 	if bootconfig.Develop { // use the staging endpoint while we're developing
-		certmagic.Default.CA = certmagic.LetsEncryptStagingCA
+		certmagic.DefaultACME.CA = certmagic.LetsEncryptStagingCA
 	} else {
-		certmagic.Default.CA = certmagic.LetsEncryptProductionCA
+		certmagic.DefaultACME.CA = certmagic.LetsEncryptProductionCA
 	}
-	certmagic.Default.Email = c.TLSEmail
-	certmagic.Default.Agreed = true
+	certmagic.DefaultACME.Email = c.TLSEmail
+	certmagic.DefaultACME.Agreed = true
 	certmagic.Default.Storage = fileStorage
 	ln, err := certmagic.Listen(c.TLSHosts)
 	if err == nil {
