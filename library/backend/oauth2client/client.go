@@ -3,7 +3,6 @@ package oauth2client
 import (
 	"github.com/admpub/goth"
 	"github.com/admpub/log"
-	"github.com/coscms/oauth2s/client/goth/providers"
 	"github.com/coscms/webcore/library/backend"
 	"github.com/coscms/webcore/library/backend/oauth2nging"
 	"github.com/coscms/webcore/library/common"
@@ -79,10 +78,10 @@ func (c *OAuth2Config) ToAccounts() []*oauth2.Account {
 		acc := account.ToAccount()
 		var provider func(account *oauth2.Account) goth.Provider
 		if !isProduction {
-			provider = providers.Get(acc.Name + `_dev`)
+			provider = oauth2.GetConstructor(acc.Name + `_dev`)
 		}
 		if provider == nil {
-			provider = providers.Get(acc.Name)
+			provider = oauth2.GetConstructor(acc.Name)
 		}
 		if provider != nil {
 			log.Infof(`backend oauth2 account: %s`, acc.Name)
@@ -152,7 +151,7 @@ func InitOauth(e *echo.Echo, middlewares ...interface{}) {
 
 // RegisterProvider 注册Provider
 func RegisterProvider(c *oauth2.Config) {
-	providers.Register(`nging`, func(account *oauth2.Account) goth.Provider {
+	oauth2.Register(`nging`, func(account *oauth2.Account) goth.Provider {
 		hostURL := account.Extra.String(`hostURL`)
 		if len(account.CallbackURL) == 0 {
 			account.CallbackURL = oauth2.DefaultPath + "/callback/" + account.Name

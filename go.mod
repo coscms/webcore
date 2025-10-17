@@ -62,7 +62,7 @@ require (
 	github.com/coscms/captcha v0.2.3
 	github.com/coscms/forms v1.13.11
 	github.com/coscms/go-imgparse v0.0.1
-	github.com/coscms/oauth2s v0.4.3
+	github.com/coscms/oauth2s v0.5.0
 	github.com/coscms/session-boltstore v0.0.0-20250617034717-a58d8848fa61
 	github.com/coscms/session-mysqlstore v0.0.0-20250617035706-a20b648443b1
 	github.com/coscms/session-redisstore v0.0.0-20250624032337-117cf04cfaf4
@@ -88,7 +88,7 @@ require (
 	github.com/webx-top/codec v0.3.0
 	github.com/webx-top/com v1.4.0
 	github.com/webx-top/db v1.28.9
-	github.com/webx-top/echo v1.22.5
+	github.com/webx-top/echo v1.22.6
 	github.com/webx-top/image v0.1.2
 	github.com/webx-top/restyclient v0.0.6
 	github.com/webx-top/validation v0.0.3
