@@ -34,6 +34,15 @@ func TestCpuID(t *testing.T) {
 	cpuID, err := CpuID()
 	assert.NoError(t, err)
 	t.Logf(`cpuID: %s`, cpuID)
+
+	mp := SplitChecksums(`d41d8cd98f00b204e9800998ecf8427e  file1.txt
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  file2.txt
+`)
+	//ppnocolor.Println(mp)
+	assert.Equal(t, map[string]string{
+		"file1.txt": "d41d8cd98f00b204e9800998ecf8427e",
+		"file2.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+	}, mp)
 }
 
 func TestEmptyLicense(t *testing.T) {

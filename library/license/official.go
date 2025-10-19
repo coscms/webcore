@@ -28,6 +28,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/admpub/errors"
@@ -219,25 +220,39 @@ func LatestVersion(ctx echo.Context, version string, download bool) (*ProductVer
 		}
 		np.Complete()
 		var signList []string
+		var isSHA256 bool
 		if len(result.Data.Sign) > 0 {
-			signList = strings.Split(result.Data.Sign, `,`)
+			sign := result.Data.Sign
+			sign, isSHA256 = strings.CutPrefix(result.Data.Sign, `sha256:`)
+			signList = strings.Split(sign, `,`)
 		}
 		if len(signList) > 0 {
-			fileMd5 := com.Md5file(saveTo)
-			var matched bool
-			for _, sign := range signList {
-				if sign == fileMd5 {
-					matched = true
-					break
+			var sign string
+			if isSHA256 {
+				sign, err = Sha256file(saveTo)
+				if err != nil {
+					return result.Data, err
 				}
+			} else {
+				sign = com.Md5file(saveTo)
 			}
-			if !matched {
+			if !com.InSlice(sign, signList) {
 				return result.Data, com.ErrMd5Unmatched
 			}
 		} else {
+			fname := path.Base(result.Data.DownloadURLOther)
 			if resp, err := restclient.RestyRetryable().Get(result.Data.DownloadURL + `.sha256`); err == nil && resp.IsSuccess() {
 				expectedSHA := resp.String()
 				expectedSHA = strings.TrimSpace(expectedSHA)
+				err = VerifyChecksum(saveTo, expectedSHA)
+				if err != nil {
+					return result.Data, err
+				}
+			} else if resp, err := restclient.RestyRetryable().Get(strings.TrimSuffix(result.Data.DownloadURLOther, fname) + `checksums.txt`); err == nil && resp.IsSuccess() {
+				expectedSHA := resp.String()
+				expectedSHA = strings.TrimSpace(expectedSHA)
+				shaMap := SplitChecksums(expectedSHA)
+				expectedSHA = shaMap[fname]
 				err = VerifyChecksum(saveTo, expectedSHA)
 				if err != nil {
 					return result.Data, err
@@ -253,10 +268,17 @@ func LatestVersion(ctx echo.Context, version string, download bool) (*ProductVer
 	}
 }
 
-func VerifyChecksum(file string, expected string) error {
+var spacer = regexp.MustCompile(`\s+`)
+
+func SplitBySpace(s string, n int) []string {
+	s = strings.TrimSpace(s)
+	return spacer.Split(s, n)
+}
+
+func Sha256file(file string) (string, error) {
 	f, err := os.OpenFile(file, os.O_RDONLY, 0666)
 	if err != nil {
-		return err
+		return ``, err
 	}
 	defer f.Close()
 	copyBuf := make([]byte, 1024*1024)
@@ -264,14 +286,38 @@ func VerifyChecksum(file string, expected string) error {
 	h := sha256.New()
 	_, err = io.CopyBuffer(h, f, copyBuf)
 	if err != nil {
-		return err
+		return ``, err
 	}
 
 	sha256Result := hex.EncodeToString(h.Sum(nil))
-	expected = strings.SplitN(expected, ` `, 2)[0]
+	return sha256Result, nil
+}
+
+func VerifyChecksum(file string, expected string) error {
+	sha256Result, err := Sha256file(file)
+	if err != nil {
+		return err
+	}
+	expected = SplitBySpace(expected, 2)[0]
 	if sha256Result != expected {
 		//log.Warnf(`Checksum unmatched: %s != %s`, sha256Result, expected)
 		err = ErrChecksumUnmatched
 	}
 	return err
+}
+
+func SplitChecksums(data string) map[string]string {
+	data = strings.TrimSpace(data)
+	result := make(map[string]string)
+	for _, line := range strings.Split(data, "\n") {
+		line = strings.TrimSpace(line)
+		if len(line) == 0 {
+			continue
+		}
+		parts := SplitBySpace(line, 2)
+		if len(parts) == 2 {
+			result[parts[1]] = parts[0]
+		}
+	}
+	return result
 }
