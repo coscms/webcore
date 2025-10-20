@@ -1,6 +1,10 @@
 package httpserverutils
 
-import "github.com/webx-top/echo"
+import (
+	"github.com/webx-top/com"
+	"github.com/webx-top/echo"
+	"github.com/webx-top/echo/middleware/session"
+)
 
 const (
 	KindBackend   = `backend`
@@ -30,4 +34,27 @@ func IsFrontendContext(ctx echo.Context) bool {
 
 func IsBackendContext(ctx echo.Context) bool {
 	return GetServerKindByContext(ctx) == KindBackend
+}
+
+// CookieMaxAge 允许设置的Cookie最大有效时长(单位:秒)
+var CookieMaxAge = 86400 * 365
+
+func RememberSession(c echo.Context) int {
+	remember := c.Form(`remember`)
+	var maxAge int
+	if len(remember) > 0 {
+		if remember == `forever` {
+			maxAge = CookieMaxAge
+		} else {
+			duration, err := com.ParseTimeDuration(remember)
+			if err == nil {
+				maxAge = int(duration.Seconds())
+			}
+		}
+		if maxAge > CookieMaxAge {
+			maxAge = CookieMaxAge
+		}
+		session.RememberMaxAge(c, maxAge)
+	}
+	return maxAge
 }
