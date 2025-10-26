@@ -27,10 +27,12 @@ var (
 	placeholderRegexp  = regexp.MustCompile(`\[storage:[\d]+\]`)
 )
 
+// CleanDomain 清除文件网址中的域名部分
 func CleanDomain(fileURL string) string {
 	return fileURLDomainRegex.ReplaceAllString(fileURL, ``)
 }
 
+// ParseDomain 解析文件网址中的协议(http: or https:)和域名部分
 func ParseDomain(fileURL string) (scheme string, domain string) {
 	matched := fileURLDomainRegex.FindStringSubmatch(fileURL)
 	if len(matched) > 2 {

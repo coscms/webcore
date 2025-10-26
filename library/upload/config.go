@@ -66,10 +66,10 @@ func (c *FileType) MaxSizeBytes() int {
 }
 
 type Config struct {
-	FileTypes         map[string]*FileType `json:"fileTypes"`
-	MaxSize           string               `json:"maxSize"`
-	Icon              string               `json:"icon"`
-	AllowedExtensions []string             `json:"allowedExtensions"`
+	FileTypes         map[string]*FileType `json:"fileTypes"`         // 文件类型配置
+	MaxSize           string               `json:"maxSize"`           // 全局最大上传大小 如：2M、200K...支持的单位有： B、K、M、G、T、P(分别代表字节(Byte)、千字节(KB)、兆字节(MB)、吉字节(GB)、太字节(TB)、拍字节(PB))
+	Icon              string               `json:"icon"`              // 默认文件图标
+	AllowedExtensions []string             `json:"allowedExtensions"` // 被允许上传的文件的扩展名
 	maxSizeBytes      int
 	fileTypes         map[string]string
 }
