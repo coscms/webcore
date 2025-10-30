@@ -276,8 +276,8 @@ github.com/fsnotify/fsnotify v1.9.0 h1:2Ml+OJNzbYCTzsxtv8vKSFD9PbJjmhYF14k/jKC7S
 github.com/fsnotify/fsnotify v1.9.0/go.mod h1:8jBTzvmWwFyi3Pb8djgCCO5IBqzKJ/Jwo8TRcHyHii0=
 github.com/fynelabs/selfupdate v0.2.1 h1:jaU85o1tnzsyICg29YfQurQPlMV4oSHLmomFIGatsgk=
 github.com/fynelabs/selfupdate v0.2.1/go.mod h1:V2z7H295LzTph5mYBnm3EDRN+oKf7G2VU5B0pc77jdw=
-github.com/gabriel-vasile/mimetype v1.4.10 h1:zyueNbySn/z8mJZHLt6IPw0KoZsiQNszIpU+bX4+ZK0=
-github.com/gabriel-vasile/mimetype v1.4.10/go.mod h1:d+9Oxyo1wTzWdyVUPMmXFvp4F9tea18J8ufA774AB3s=
+github.com/gabriel-vasile/mimetype v1.4.11 h1:AQvxbp830wPhHTqc1u7nzoLT+ZFxGY7emj5DR5DYFik=
+github.com/gabriel-vasile/mimetype v1.4.11/go.mod h1:d+9Oxyo1wTzWdyVUPMmXFvp4F9tea18J8ufA774AB3s=
 github.com/gavv/httpexpect v2.0.0+incompatible h1:1X9kcRshkSKEjNJJxX9Y9mQ5BRfbxU5kORdjhlA1yX8=
 github.com/gavv/httpexpect v2.0.0+incompatible/go.mod h1:x+9tiU1YnrOvnB725RkpoLv1M62hOWzwo5OXotisrKc=
 github.com/geoffgarside/ber v1.1.0/go.mod h1:jVPKeCbj6MvQZhwLYsGwaGI52oUorHoHKNecGT85ZCc=
@@ -662,8 +662,8 @@ github.com/webx-top/codec v0.3.0/go.mod h1:FL2TNTorudSTop040uNCTONOlIJfl6kElJLxy
 github.com/webx-top/com v0.2.10/go.mod h1:DDfATzu1w5+vD5XmG3YRTfLjaIqZWi/yeJ7HQEGsM2Q=
 github.com/webx-top/com v1.4.1 h1:ecMsocWikBES03cpsd47IjFBS9LR9tut+MMtCM9fWd0=
 github.com/webx-top/com v1.4.1/go.mod h1:qNrw27rDEesdJrQ43XroGxrYHs/+8F9UHP1RZH0fZUg=
-github.com/webx-top/db v1.28.9 h1:OP27+lk50HZAc/c7mZ86HcpGhM4Wcul/c7P+JyYTTOM=
-github.com/webx-top/db v1.28.9/go.mod h1:Z5OTbsVaEwghJfMZWAxji02A29kHFIB6YQnLrvnjEhY=
+github.com/webx-top/db v1.28.10 h1:T7cnyPisIe0jtlAcfNB2Ml9ws3HjgTXqZPMuEQ+Ph5Y=
+github.com/webx-top/db v1.28.10/go.mod h1:LXivNAN3a6iL9DC5kcxPMnzgqSkMI8duC4P5TFkpJW0=
 github.com/webx-top/echo v1.22.6 h1:Suxqxn9J2MhEp4R+koVIc+cmKkCf8WvJJa4/TVRfIvY=
 github.com/webx-top/echo v1.22.6/go.mod h1:49/6KuIXQ0drMyE1ElVHJ/qO/pocREClTyE+Qb621aI=
 github.com/webx-top/image v0.1.2 h1:Jh2C1QzX+725KhzMB0VbBxsiL39Y0WscZNcC5xej/IU=

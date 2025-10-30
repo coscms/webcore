@@ -69,7 +69,7 @@ require (
 	github.com/coscms/session-sqlitestore v0.0.4
 	github.com/coscms/session-sqlstore v0.0.1
 	github.com/fynelabs/selfupdate v0.2.1
-	github.com/gabriel-vasile/mimetype v1.4.10
+	github.com/gabriel-vasile/mimetype v1.4.11
 	github.com/go-playground/validator/v10 v10.28.0
 	github.com/hirochachacha/go-smb2 v1.1.0
 	github.com/jlaffaye/ftp v0.2.0
@@ -88,7 +88,7 @@ require (
 	github.com/webx-top/client v0.9.6
 	github.com/webx-top/codec v0.3.0
 	github.com/webx-top/com v1.4.1
-	github.com/webx-top/db v1.28.9
+	github.com/webx-top/db v1.28.10
 	github.com/webx-top/echo v1.22.6
 	github.com/webx-top/image v0.1.2
 	github.com/webx-top/restyclient v0.0.6
