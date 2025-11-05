@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net"
+	"net/http"
 	"strings"
 
 	"github.com/admpub/ip2region/v3/binding/golang/ip2region"
@@ -168,6 +169,32 @@ func searchByLocalDict(cfg *IP2RegionConfig, ip string) (info ip2region.IpInfo, 
 	}
 	info, err = region6.MemorySearch(ip)
 	return
+}
+
+func IP2RegionHandler(c echo.Context) error {
+	ip := c.Param(`ip`)
+	if len(ip) == 0 {
+		return echo.ErrBadRequest
+	}
+	cfg, _ := GetIP2RegionConfig()
+	if cfg != nil {
+		if len(cfg.APIKey) > 0 {
+			val := c.Header(echo.HeaderAuthorization)
+			if strings.TrimPrefix(val, `Bearer `) != cfg.APIKey {
+				return echo.ErrUnauthorized
+			}
+		} else if cfg.APIBasicAuth != nil && cfg.APIBasicAuth.Username != `` && cfg.APIBasicAuth.Password != `` {
+			if username, password, ok := c.Request().BasicAuth(); !ok || username != cfg.APIBasicAuth.Username || password != cfg.APIBasicAuth.Password {
+				c.Response().Header().Set(echo.HeaderWWWAuthenticate, "Basic realm=Restricted")
+				return echo.ErrUnauthorized
+			}
+		}
+	}
+	info, err := searchByLocalDict(cfg, ip)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(info)
 }
 
 type APIBasicAuth struct {
