@@ -2,53 +2,92 @@ package ip2region
 
 import (
 	"fmt"
+	"net"
 	"strings"
 
-	"github.com/admpub/ip2region/v2/binding/golang/ip2region"
+	"github.com/admpub/ip2region/v3/binding/golang/ip2region"
 	"github.com/admpub/log"
 	syncOnce "github.com/admpub/once"
+	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 )
 
 var (
-	region   *ip2region.Ip2Region
-	dictFile string
-	once     syncOnce.Once
+	region4    *ip2region.Ip2Region
+	region6    *ip2region.Ip2Region
+	dict4File  string
+	dict6File  string
+	once4      syncOnce.Once
+	once6      syncOnce.Once
+	memoryMode bool
 )
 
 func init() {
-	dictFile = echo.Wd() + echo.FilePathSeparator + `data` + echo.FilePathSeparator + `ip2region` + echo.FilePathSeparator + `ip2region.xdb`
+	dict4File = echo.Wd() + echo.FilePathSeparator + `data` + echo.FilePathSeparator + `ip2region` + echo.FilePathSeparator + `ip2region_v4.xdb`
+	dict6File = echo.Wd() + echo.FilePathSeparator + `data` + echo.FilePathSeparator + `ip2region` + echo.FilePathSeparator + `ip2region_v6.xdb`
+	memoryMode = com.GetenvBool(`IP2REGION_MEMORY_MODE`, false)
 }
 
-func SetDictFile(f string) {
-	dictFile = f
-	once.Reset()
+func SetDict4File(f4 string) {
+	dict4File = f4
+	once4.Reset()
 }
 
-func SetInstance(newInstance *ip2region.Ip2Region) {
-	if region == nil {
-		region = newInstance
+func SetDict6File(f6 string) {
+	dict6File = f6
+	once6.Reset()
+}
+
+func SetInstance4(new4Instance *ip2region.Ip2Region) {
+	if region4 == nil {
+		region4 = new4Instance
 	} else {
-		oldRegion := *region
-		*region = *newInstance
-		oldRegion.Close()
+		oldRegion4 := *region4
+		*region4 = *new4Instance
+		oldRegion4.Close()
 	}
 }
 
-func initialize() (err error) {
-	if region != nil {
-		region.Close()
+func SetInstance6(new6Instance *ip2region.Ip2Region) {
+	if region6 == nil {
+		region4 = new6Instance
+	} else {
+		oldRegion6 := *region6
+		*region6 = *new6Instance
+		oldRegion6.Close()
 	}
-	region, err = ip2region.New(dictFile)
+}
+
+func initialize4() (err error) {
+	if region4 != nil {
+		region4.Close()
+	}
+	region4, err = ip2region.New(dict4File, memoryMode)
 	if err != nil {
-		err = fmt.Errorf(`ip2region.New(%s) error: %w`, dictFile, err)
+		err = fmt.Errorf(`ip2region.New(%s) error: %w`, dict4File, err)
 		log.Error(err)
 	}
 	return
 }
 
-func IsInitialized() bool {
-	return region != nil
+func initialize6() (err error) {
+	if region6 != nil {
+		region6.Close()
+	}
+	region6, err = ip2region.New(dict6File, memoryMode)
+	if err != nil {
+		err = fmt.Errorf(`ip2region.New(%s) error: %w`, dict6File, err)
+		log.Error(err)
+	}
+	return
+}
+
+func IsInitialized4() bool {
+	return region4 != nil
+}
+
+func IsInitialized6() bool {
+	return region6 != nil
 }
 
 // ErrIsInvalidIP 解析 IPv6 时会报这个错误
@@ -64,12 +103,6 @@ func IPInfo(ip string) (info ip2region.IpInfo, err error) {
 	if len(ip) == 0 {
 		return
 	}
-	once.Do(func() {
-		err = initialize()
-	})
-	if err != nil {
-		return
-	}
 	defer func() {
 		if e := recover(); e != nil {
 			panicErr := echo.NewPanicError(e, nil).Parse(15)
@@ -77,7 +110,23 @@ func IPInfo(ip string) (info ip2region.IpInfo, err error) {
 			err = fmt.Errorf(`%v`, e)
 		}
 	}()
-	info, err = region.MemorySearch(ip)
+	if net.ParseIP(ip).To4() != nil {
+		once4.Do(func() {
+			err = initialize4()
+		})
+		if err != nil {
+			return
+		}
+		info, err = region4.MemorySearch(ip)
+	} else {
+		once6.Do(func() {
+			err = initialize6()
+		})
+		if err != nil {
+			return
+		}
+		info, err = region6.MemorySearch(ip)
+	}
 	return
 }
 
@@ -85,14 +134,14 @@ func ClearZero(info *ip2region.IpInfo) {
 	if info.Country == `0` {
 		info.Country = ``
 	}
-	if info.Region == `0` {
-		info.Region = ``
-	}
 	if info.Province == `0` {
 		info.Province = ``
 	}
 	if info.City == `0` {
 		info.City = ``
+	}
+	if info.District == `0` {
+		info.District = ``
 	}
 	if info.ISP == `0` {
 		info.ISP = ``
@@ -112,10 +161,6 @@ func Stringify(info ip2region.IpInfo, jsonify ...bool) string {
 		formats = append(formats, `"国家":%q`)
 		args = append(args, info.Country)
 	}
-	if !IsZero(info.Region) {
-		formats = append(formats, `"地区":%q`)
-		args = append(args, info.Region)
-	}
 	if !IsZero(info.Province) {
 		formats = append(formats, `"省份":%q`)
 		args = append(args, info.Province)
@@ -123,6 +168,10 @@ func Stringify(info ip2region.IpInfo, jsonify ...bool) string {
 	if !IsZero(info.City) {
 		formats = append(formats, `"城市":%q`)
 		args = append(args, info.City)
+	}
+	if !IsZero(info.District) {
+		formats = append(formats, `"区县":%q`)
+		args = append(args, info.District)
 	}
 	if !IsZero(info.ISP) {
 		formats = append(formats, `"线路":%q`)

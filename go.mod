@@ -1,6 +1,6 @@
 module github.com/coscms/webcore
 
-go 1.25.1
+go 1.25.3
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.2
@@ -31,7 +31,7 @@ require (
 	github.com/admpub/goth v0.0.4
 	github.com/admpub/httpscerts v0.0.0-20180907121630-a2990e2af45c
 	github.com/admpub/imageproxy v0.10.1
-	github.com/admpub/ip2region/v2 v2.0.1
+	github.com/admpub/ip2region/v3 v3.0.3
 	github.com/admpub/license_gen v0.1.2
 	github.com/admpub/log v1.4.0
 	github.com/admpub/mahonia v0.0.0-20151019004008-c528b747d92d

@@ -32,7 +32,7 @@ import (
 	"github.com/coscms/webcore/library/ip2region"
 	"github.com/coscms/webcore/library/sessionguard"
 
-	ip2regionparser "github.com/admpub/ip2region/v2/binding/golang/ip2region"
+	ip2regionparser "github.com/admpub/ip2region/v3/binding/golang/ip2region"
 )
 
 func NewLoginLog(ctx echo.Context) *LoginLog {

@@ -92,8 +92,8 @@ github.com/admpub/imageproxy v0.10.1 h1:wesf2QLhhr5lXzgzqipU7Zdgj8XxfIj3usC9zFI5
 github.com/admpub/imageproxy v0.10.1/go.mod h1:Q2IWHqO+nhz/JeyHbtFNtRxAsTz0H56ZQIWYeE+xsFM=
 github.com/admpub/imaging v1.6.3 h1:MCc/eATbjynupG7N39HpGsbIQbOUYEjfKhzKA0WNL4g=
 github.com/admpub/imaging v1.6.3/go.mod h1:krwZ51a7U69i7Jsi3lENxZsUu8k9vk+k+oekV99E2W4=
-github.com/admpub/ip2region/v2 v2.0.1 h1:GdqxShon3Dp/vY5ArpE2/Acx8lcmgzXQk9CJBrARjFk=
-github.com/admpub/ip2region/v2 v2.0.1/go.mod h1:gcBWNm2NyIHgzfZZQZDMt8tUPEg8fbo3bi53JnjnVpQ=
+github.com/admpub/ip2region/v3 v3.0.3 h1:dN9nBTdWYkuvVKudUQ1gwX1pDx6UZXwK4DCVfO05EWI=
+github.com/admpub/ip2region/v3 v3.0.3/go.mod h1:n3kW+J79jQAQPZjD689zlSCsnuuAu0JuofOiYbxcsIc=
 github.com/admpub/json5 v0.0.1 h1:ZgD9YKNEpOqjcg553hqi1Zv8f8tNWLjxZrFcoksCRCw=
 github.com/admpub/json5 v0.0.1/go.mod h1:spt0tC/we4imVn3yB/FUuENv2qDJRSi7cxnt+buqWVE=
 github.com/admpub/license_gen v0.1.2 h1:v9SVFwPG/ZGGH2CuZFfu6ruUQF0AjT9ixEFoeu5Sd9s=

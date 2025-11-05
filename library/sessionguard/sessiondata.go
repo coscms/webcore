@@ -5,7 +5,7 @@ import (
 
 	"github.com/webx-top/echo"
 
-	ip2regionparser "github.com/admpub/ip2region/v2/binding/golang/ip2region"
+	ip2regionparser "github.com/admpub/ip2region/v3/binding/golang/ip2region"
 	"github.com/coscms/webcore/library/ip2region"
 )
 

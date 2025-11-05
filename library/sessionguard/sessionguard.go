@@ -10,7 +10,7 @@ import (
 
 	"github.com/coscms/webcore/dbschema"
 
-	ip2regionparser "github.com/admpub/ip2region/v2/binding/golang/ip2region"
+	ip2regionparser "github.com/admpub/ip2region/v3/binding/golang/ip2region"
 	"github.com/coscms/webcore/library/common"
 	"github.com/coscms/webcore/library/ip2region"
 )
@@ -73,7 +73,6 @@ func Validate(ctx echo.Context, lastIP string, ownerType string, ownerId uint64)
 		}
 		oldLocation := &ip2regionparser.IpInfo{
 			Country:  ipLoc[`国家`],
-			Region:   ipLoc[`地区`],
 			Province: ipLoc[`省份`],
 			City:     ipLoc[`城市`],
 		}
@@ -112,7 +111,6 @@ func (c *SessionGuardConfig) validateEnv(ctx echo.Context, ownerType string, own
 		return false
 	}
 	matched := ipInfo.Country == oldLocation.Country &&
-		ipInfo.Region == oldLocation.Region &&
 		ipInfo.Province == oldLocation.Province &&
 		ipInfo.City == oldLocation.City
 	if !matched {
