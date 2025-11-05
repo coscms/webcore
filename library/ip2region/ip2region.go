@@ -29,7 +29,7 @@ var (
 )
 
 func init() {
-	dict4File = echo.Wd() + echo.FilePathSeparator + `data` + echo.FilePathSeparator + `ip2region` + echo.FilePathSeparator + `ip2region_v4.xdb`
+	dict4File = echo.Wd() + echo.FilePathSeparator + `data` + echo.FilePathSeparator + `ip2region` + echo.FilePathSeparator + `ip2region.xdb`
 	dict6File = echo.Wd() + echo.FilePathSeparator + `data` + echo.FilePathSeparator + `ip2region` + echo.FilePathSeparator + `ip2region_v6.xdb`
 	memoryMode = com.GetenvBool(`IP2REGION_MEMORY_MODE`, false)
 	extend.Register(`ip2region`, func() interface{} {
