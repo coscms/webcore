@@ -1,6 +1,8 @@
 package ip2region
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"net"
 	"strings"
@@ -8,8 +10,11 @@ import (
 	"github.com/admpub/ip2region/v3/binding/golang/ip2region"
 	"github.com/admpub/log"
 	syncOnce "github.com/admpub/once"
+	"github.com/coscms/webcore/library/config"
+	"github.com/coscms/webcore/library/config/extend"
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
+	"github.com/webx-top/restyclient"
 )
 
 var (
@@ -26,6 +31,9 @@ func init() {
 	dict4File = echo.Wd() + echo.FilePathSeparator + `data` + echo.FilePathSeparator + `ip2region` + echo.FilePathSeparator + `ip2region_v4.xdb`
 	dict6File = echo.Wd() + echo.FilePathSeparator + `data` + echo.FilePathSeparator + `ip2region` + echo.FilePathSeparator + `ip2region_v6.xdb`
 	memoryMode = com.GetenvBool(`IP2REGION_MEMORY_MODE`, false)
+	extend.Register(`ip2region`, func() interface{} {
+		return &IP2RegionConfig{}
+	})
 }
 
 func SetDict4File(f4 string) {
@@ -99,10 +107,36 @@ func ErrIsInvalidIP(err error) bool {
 	return strings.HasPrefix(err.Error(), `invalid ip address`)
 }
 
-func IPInfo(ip string) (info ip2region.IpInfo, err error) {
-	if len(ip) == 0 {
-		return
+func requestAPI(cfg *IP2RegionConfig, ip string) (ip2region.IpInfo, error) {
+	api := strings.Replace(cfg.APIURL, `{ip}`, ip, -1)
+	cli := restyclient.Classic()
+	if len(cfg.APIKey) > 0 {
+		cli.SetAuthToken(cfg.APIKey)
 	}
+	if cfg.APIBasicAuth != nil && cfg.APIBasicAuth.Username != `` && cfg.APIBasicAuth.Password != `` {
+		cli.SetBasicAuth(cfg.APIBasicAuth.Username, cfg.APIBasicAuth.Password)
+	}
+	if len(cfg.APIHeaders) > 0 {
+		cli.SetHeaders(cfg.APIHeaders)
+	}
+	resp, err := cli.Get(api)
+	if err != nil {
+		return ip2region.IpInfo{}, err
+	}
+	if !resp.IsSuccess() {
+		return ip2region.IpInfo{}, fmt.Errorf(`IP geolocation API error: %s`, com.StripTags(resp.String()))
+	}
+	var info ip2region.IpInfo
+	body := resp.Body()
+	if bytes.HasPrefix(body, []byte(`{`)) && bytes.HasSuffix(body, []byte(`}`)) {
+		err = json.Unmarshal(body, &info)
+	} else {
+		info.Parse(string(body))
+	}
+	return info, nil
+}
+
+func searchByLocalDict(cfg *IP2RegionConfig, ip string) (info ip2region.IpInfo, err error) {
 	defer func() {
 		if e := recover(); e != nil {
 			panicErr := echo.NewPanicError(e, nil).Parse(15)
@@ -112,22 +146,59 @@ func IPInfo(ip string) (info ip2region.IpInfo, err error) {
 	}()
 	if net.ParseIP(ip).To4() != nil {
 		once4.Do(func() {
+			if cfg != nil && len(cfg.IPv4Dict) > 0 {
+				SetDict4File(cfg.IPv4Dict)
+			}
 			err = initialize4()
 		})
 		if err != nil {
 			return
 		}
 		info, err = region4.MemorySearch(ip)
-	} else {
-		once6.Do(func() {
-			err = initialize6()
-		})
-		if err != nil {
-			return
-		}
-		info, err = region6.MemorySearch(ip)
+		return
 	}
+	once6.Do(func() {
+		if cfg != nil && len(cfg.IPv6Dict) > 0 {
+			SetDict6File(cfg.IPv6Dict)
+		}
+		err = initialize6()
+	})
+	if err != nil {
+		return
+	}
+	info, err = region6.MemorySearch(ip)
 	return
+}
+
+type APIBasicAuth struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+type IP2RegionConfig struct {
+	Mode         string            `json:"mode"`
+	APIURL       string            `json:"apiUrl"`
+	APIKey       string            `json:"apiKey,omitempty"`
+	APIBasicAuth *APIBasicAuth     `json:"apiBasicAuth,omitempty"`
+	APIHeaders   map[string]string `json:"apiHeaders,omitempty"`
+	IPv4Dict     string            `json:"ipv4Dict,omitempty"`
+	IPv6Dict     string            `json:"ipv6Dict,omitempty"`
+}
+
+func GetIP2RegionConfig() (cfg *IP2RegionConfig, ok bool) {
+	cfg, ok = config.FromFile().Extend.Get(`ip2region`).(*IP2RegionConfig)
+	return
+}
+
+func IPInfo(ip string) (info ip2region.IpInfo, err error) {
+	if len(ip) == 0 {
+		return
+	}
+	cfg, ok := GetIP2RegionConfig()
+	if ok && cfg.Mode == `api` {
+		return requestAPI(cfg, ip)
+	}
+	return searchByLocalDict(cfg, ip)
 }
 
 func ClearZero(info *ip2region.IpInfo) {
