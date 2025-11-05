@@ -203,7 +203,7 @@ type APIBasicAuth struct {
 }
 
 type IP2RegionConfig struct {
-	Mode         string            `json:"mode"`
+	Mode         string            `json:"mode"` // api / local
 	APIURL       string            `json:"apiUrl"`
 	APIKey       string            `json:"apiKey,omitempty"`
 	APIBasicAuth *APIBasicAuth     `json:"apiBasicAuth,omitempty"`
