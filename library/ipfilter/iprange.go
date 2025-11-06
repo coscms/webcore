@@ -8,6 +8,9 @@ import (
 	"strings"
 )
 
+// ParsePrefix converts an IP string into a netip.Prefix.
+// If the input doesn't contain a CIDR notation, it automatically appends /32 for IPv4 or /128 for IPv6.
+// Returns the parsed prefix or an error if the IP is invalid or parsing fails.
 func ParsePrefix(ip string) (pfx netip.Prefix, err error) {
 	if !strings.Contains(ip, `/`) {
 		ipr := net.ParseIP(ip)
@@ -28,6 +31,8 @@ func ParsePrefix(ip string) (pfx netip.Prefix, err error) {
 	return
 }
 
+// ParseIPRange parses the given start and end IP addresses and returns a list of IP prefixes
+// covering the range. Returns an error if either IP fails to parse.
 func ParseIPRange(startIP, endIP string) ([]netip.Prefix, error) {
 	start, err := netip.ParseAddr(startIP)
 	if err != nil {
@@ -40,6 +45,9 @@ func ParseIPRange(startIP, endIP string) ([]netip.Prefix, error) {
 	return ToPrefixes(start, end)
 }
 
+// ToPrefixes converts an IP address range (start to end) into a list of CIDR prefixes.
+// It handles both IPv4 and IPv6 addresses, ensuring the resulting prefixes cover the entire range.
+// Returns an error if the IP types are inconsistent or if any calculation fails.
 func ToPrefixes(start netip.Addr, end netip.Addr) ([]netip.Prefix, error) {
 	if start.BitLen() != end.BitLen() {
 		return nil, fmt.Errorf(`inconsistency between start and end ip types: %v - %v`, start.String(), end.String())
@@ -73,6 +81,8 @@ func ToPrefixes(start netip.Addr, end netip.Addr) ([]netip.Prefix, error) {
 	}
 }
 
+// prefixLength calculates the prefix length of an IP address by finding the first non-zero byte
+// and counting the leading zeros in that byte. Returns 0 for the special case of overflow.
 func prefixLength(ip net.IP) int {
 	for index, c := range ip {
 		if c != 0 {
@@ -83,6 +93,9 @@ func prefixLength(ip net.IP) int {
 	return 0
 }
 
+// trailingZeros counts the number of trailing zero bits in the IP address.
+// It returns the total number of trailing zeros in the IP bytes,
+// with each byte contributing up to 8 trailing zeros.
 func trailingZeros(ip net.IP) int {
 	ipLen := len(ip)
 	for i := ipLen - 1; i >= 0; i-- {
@@ -93,6 +106,8 @@ func trailingZeros(ip net.IP) int {
 	return ipLen * 8
 }
 
+// lastIP calculates the last IP address in a subnet given an IP and its netmask.
+// Returns the broadcast address of the subnet or an error if IP and mask lengths mismatch.
 func lastIP(ip net.IP, mask net.IPMask) (net.IP, error) {
 	ipLen := len(ip)
 	if ipLen != len(mask) {
@@ -105,6 +120,9 @@ func lastIP(ip net.IP, mask net.IPMask) (net.IP, error) {
 	return res, nil
 }
 
+// addOne increments the given IP address by one.
+// It handles overflow by carrying over to the next byte when a byte reaches 0xFF.
+// Returns a new IP address with the incremented value.
 func addOne(ip net.IP) net.IP {
 	ipLen := len(ip)
 	res := make(net.IP, ipLen)
@@ -118,6 +136,8 @@ func addOne(ip net.IP) net.IP {
 	return res
 }
 
+// xor performs a bitwise XOR operation between two IP addresses.
+// Returns the resulting IP and an error if the input IPs have different lengths.
 func xor(a, b net.IP) (net.IP, error) {
 	ipLen := len(a)
 	if ipLen != len(b) {

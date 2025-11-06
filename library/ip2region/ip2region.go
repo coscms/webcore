@@ -19,12 +19,25 @@ import (
 )
 
 var (
-	region4    *ip2region.Ip2Region
-	region6    *ip2region.Ip2Region
-	dict4File  string
-	dict6File  string
-	once4      syncOnce.Once
-	once6      syncOnce.Once
+	// region4 holds the IPv4 database instance for IP address lookups
+	region4 *ip2region.Ip2Region
+
+	// region6 holds the IPv6 database instance for IP address lookups
+	region6 *ip2region.Ip2Region
+
+	// dict4File specifies the file path for IPv4 database
+	dict4File string
+
+	// dict6File specifies the file path for IPv6 database
+	dict6File string
+
+	// once4 ensures thread-safe initialization of IPv4 database
+	once4 syncOnce.Once
+
+	// once6 ensures thread-safe initialization of IPv6 database
+	once6 syncOnce.Once
+
+	// memoryMode indicates whether to load the database into memory for faster lookups
 	memoryMode bool
 )
 
@@ -37,16 +50,20 @@ func init() {
 	})
 }
 
+// SetDict4File sets the dictionary file path for the IPv4 dictionary and resets the initialization state.
 func SetDict4File(f4 string) {
 	dict4File = f4
 	once4.Reset()
 }
 
+// SetDict6File sets the dictionary file path for the IPv6 dictionary and resets the initialization state.
 func SetDict6File(f6 string) {
 	dict6File = f6
 	once6.Reset()
 }
 
+// SetInstance4 sets the IPv4 IP2Region instance, replacing any existing instance.
+// It safely closes the previous instance if one exists.
 func SetInstance4(new4Instance *ip2region.Ip2Region) {
 	if region4 == nil {
 		region4 = new4Instance
@@ -57,6 +74,8 @@ func SetInstance4(new4Instance *ip2region.Ip2Region) {
 	}
 }
 
+// SetInstance6 sets the IPv6 region instance and properly closes the old instance if it exists.
+// The function ensures proper cleanup of the previous instance before replacing it with the new one.
 func SetInstance6(new6Instance *ip2region.Ip2Region) {
 	if region6 == nil {
 		region4 = new6Instance
@@ -67,6 +86,9 @@ func SetInstance6(new6Instance *ip2region.Ip2Region) {
 	}
 }
 
+// initialize4 initializes the IPv4 IP2Region database.
+// It closes any existing database connection first, then loads the new database from dict4File.
+// Returns error if the database fails to load.
 func initialize4() (err error) {
 	if region4 != nil {
 		region4.Close()
@@ -79,6 +101,9 @@ func initialize4() (err error) {
 	return
 }
 
+// initialize6 initializes the IPv6 region database by loading the specified dictionary file.
+// It closes any existing database connection before attempting to create a new one.
+// Returns an error if the database initialization fails.
 func initialize6() (err error) {
 	if region6 != nil {
 		region6.Close()
@@ -91,10 +116,12 @@ func initialize6() (err error) {
 	return
 }
 
+// IsInitialized4 returns true if the IPv4 region data has been initialized.
 func IsInitialized4() bool {
 	return region4 != nil
 }
 
+// IsInitialized6 reports whether the IPv6 region data has been initialized.
 func IsInitialized6() bool {
 	return region6 != nil
 }
@@ -108,6 +135,9 @@ func ErrIsInvalidIP(err error) bool {
 	return strings.HasPrefix(err.Error(), `invalid ip address`)
 }
 
+// requestAPI makes a request to the IP geolocation API with the given IP address.
+// It handles API authentication (token or basic auth), custom headers, and response parsing.
+// Returns IpInfo on success or error if the request fails or API returns non-success status.
 func requestAPI(cfg *IP2RegionConfig, ip string) (ip2region.IpInfo, error) {
 	api := strings.Replace(cfg.APIURL, `{ip}`, ip, -1)
 	cli := restyclient.Classic()
@@ -137,6 +167,10 @@ func requestAPI(cfg *IP2RegionConfig, ip string) (ip2region.IpInfo, error) {
 	return info, nil
 }
 
+// searchByLocalDict searches for IP location information using local dictionary files.
+// It handles both IPv4 and IPv6 addresses, initializing the appropriate dictionary if needed.
+// Returns IpInfo containing location details or an error if the search fails.
+// Panics are recovered and logged, converting them to error returns.
 func searchByLocalDict(cfg *IP2RegionConfig, ip string) (info ip2region.IpInfo, err error) {
 	defer func() {
 		if e := recover(); e != nil {
@@ -171,6 +205,13 @@ func searchByLocalDict(cfg *IP2RegionConfig, ip string) (info ip2region.IpInfo, 
 	return
 }
 
+// IP2RegionHandler handles IP address lookup requests using the IP2Region database.
+// It validates the request IP parameter and checks API authentication if configured.
+// Returns the region information in JSON format or an appropriate HTTP error:
+// - 400 Bad Request if IP parameter is missing
+// - 401 Unauthorized if authentication fails
+// - 500 Internal Server Error if lookup fails
+// - 200 OK with region data on success
 func IP2RegionHandler(c echo.Context) error {
 	ip := c.Param(`ip`)
 	if len(ip) == 0 {
@@ -197,11 +238,23 @@ func IP2RegionHandler(c echo.Context) error {
 	return c.JSON(info)
 }
 
+// APIBasicAuth represents basic authentication credentials for API access.
+// It contains Username and Password fields for authentication purposes.
 type APIBasicAuth struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
 
+// IP2RegionConfig defines the configuration structure for IP2Region service.
+// It supports both API and local modes for IP address lookup.
+// Fields:
+//   - Mode: Operation mode ("api" or "local")
+//   - APIURL: Endpoint URL for API mode
+//   - APIKey: Authentication key for API mode (optional)
+//   - APIBasicAuth: Basic authentication credentials for API mode (optional)
+//   - APIHeaders: Custom headers for API requests (optional)
+//   - IPv4Dict: Path to IPv4 database file for local mode (optional)
+//   - IPv6Dict: Path to IPv6 database file for local mode (optional)
 type IP2RegionConfig struct {
 	Mode         string            `json:"mode"` // api / local
 	APIURL       string            `json:"apiUrl"`
@@ -212,11 +265,16 @@ type IP2RegionConfig struct {
 	IPv6Dict     string            `json:"ipv6Dict,omitempty"`
 }
 
+// GetIP2RegionConfig retrieves the IP2Region configuration from the extended config file.
+// Returns the configuration and a boolean indicating if the config was found and is of the correct type.
 func GetIP2RegionConfig() (cfg *IP2RegionConfig, ok bool) {
 	cfg, ok = config.FromFile().Extend.Get(`ip2region`).(*IP2RegionConfig)
 	return
 }
 
+// IPInfo retrieves IP address information using either API mode or local dictionary search.
+// It returns IpInfo struct containing location details and an error if any occurred.
+// If the IP string is empty, returns zero values.
 func IPInfo(ip string) (info ip2region.IpInfo, err error) {
 	if len(ip) == 0 {
 		return
@@ -228,6 +286,8 @@ func IPInfo(ip string) (info ip2region.IpInfo, err error) {
 	return searchByLocalDict(cfg, ip)
 }
 
+// ClearZero removes "0" values from IpInfo fields by replacing them with empty strings.
+// It checks and clears zero values for Country, Province, City, District, and ISP fields.
 func ClearZero(info *ip2region.IpInfo) {
 	if info.Country == `0` {
 		info.Country = ``
@@ -246,10 +306,15 @@ func ClearZero(info *ip2region.IpInfo) {
 	}
 }
 
+// IsZero checks if the string is empty or equals "0".
 func IsZero(str string) bool {
 	return len(str) == 0 || str == `0`
 }
 
+// Stringify converts IpInfo struct into a formatted string representation.
+// If jsonify is true or not provided, returns a JSON-like string with fields like "国家", "省份", "城市".
+// Otherwise returns a simple concatenated string of all non-zero fields.
+// Only includes non-zero fields in the output.
 func Stringify(info ip2region.IpInfo, jsonify ...bool) string {
 	var (
 		formats []string

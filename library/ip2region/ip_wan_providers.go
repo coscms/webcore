@@ -6,6 +6,18 @@ import (
 	"github.com/coscms/webcore/library/config/extend"
 )
 
+// WANIPProvider defines a structure for WAN IP address providers.
+// It contains configuration for retrieving public IP addresses (both IPv4 and IPv6)
+// from external services, including request details and response parsing rules.
+// Name: Provider's display name
+// Description: Brief description of the provider
+// URL: Endpoint URL for IP lookup
+// Method: HTTP method to use (GET/POST/etc)
+// IP4Rule: Regex pattern for extracting IPv4 from response (empty if not applicable)
+// IP6Rule: Regex pattern for extracting IPv6 from response ("=" means entire response body)
+// ip4regexp: Compiled regex for IPv4 parsing
+// ip6regexp: Compiled regex for IPv6 parsing
+// Disabled: Whether this provider is temporarily disabled
 type WANIPProvider struct {
 	Name        string
 	Description string
@@ -18,16 +30,20 @@ type WANIPProvider struct {
 	Disabled    bool
 }
 
+// HasIPv6Rule reports whether the WANIPProvider has any IPv6 rules configured.
 func (w *WANIPProvider) HasIPv6Rule() bool {
 	return len(w.IP6Rule) > 0
 }
 
+// HasIPv4Rule returns true if there are IPv4 rules defined or if there are no IPv6 rules.
 func (w *WANIPProvider) HasIPv4Rule() bool {
 	return len(w.IP4Rule) > 0 || !w.HasIPv6Rule()
 }
 
 type WANIPProviders map[string]*WANIPProvider
 
+// Reload reloads all registered WAN IP providers, registering valid ones and unregistering invalid ones.
+// Returns nil if the receiver is nil or after completing the reload operation.
 func (w *WANIPProviders) Reload() error {
 	if w == nil {
 		return nil
@@ -113,6 +129,9 @@ func init() {
 	}
 }
 
+// Register adds a WANIPProvider to the available providers map after validating and compiling its IP rules.
+// It validates and compiles the IPv4 and IPv6 regex patterns if provided, and sets a default HTTP method if none specified.
+// Returns an error if any regex compilation fails.
 func Register(p *WANIPProvider) (err error) {
 	if len(p.IP4Rule) > 0 && p.IP4Rule != `=` {
 		p.ip4regexp, err = regexp.Compile(p.IP4Rule)
@@ -133,11 +152,15 @@ func Register(p *WANIPProvider) (err error) {
 	return
 }
 
+// Get returns the WANIPProvider instance registered with the given name.
+// Returns nil if no provider is found for the specified name.
 func Get(name string) *WANIPProvider {
 	p, _ := wanIPProviders[name]
 	return p
 }
 
+// Unregister removes the specified WAN IP providers from the registry.
+// It takes one or more provider names as arguments and deletes them from the active providers list.
 func Unregister(names ...string) {
 	for _, name := range names {
 		delete(wanIPProviders, name)

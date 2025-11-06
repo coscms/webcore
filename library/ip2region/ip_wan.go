@@ -20,6 +20,8 @@ const (
 var ipv6Regexp = regexp.MustCompile(IPv6Rule)
 var ipv4Regexp = regexp.MustCompile(IPv4Rule)
 
+// FindIPv4 extracts the first IPv4 address found in the given content string.
+// Returns an empty string if no IPv4 address is found.
 func FindIPv4(content string) string {
 	matches := ipv4Regexp.FindAllStringSubmatch(content, 1)
 	if len(matches) > 0 && len(matches[0]) > 1 {
@@ -28,6 +30,8 @@ func FindIPv4(content string) string {
 	return ``
 }
 
+// FindIPv6 extracts the first IPv6 address found in the given content string.
+// Returns an empty string if no IPv6 address is found.
 func FindIPv6(content string) string {
 	matches := ipv6Regexp.FindAllStringSubmatch(content, 1)
 	if len(matches) > 0 && len(matches[0]) > 1 {
@@ -36,11 +40,25 @@ func FindIPv6(content string) string {
 	return ``
 }
 
+// WANIP represents a public IP address with its query timestamp.
+// IP is the public IP address string.
+// QueryTime records when the IP was queried or updated.
 type WANIP struct {
 	IP        string
 	QueryTime time.Time
 }
 
+// GetWANIP retrieves the current WAN (Wide Area Network) IP address from various providers.
+// It supports both IPv4 and IPv6 (defaults to IPv4) and can use cached results if available.
+// Parameters:
+//   - cachedSeconds: duration in seconds to use cached IP if available (0 to disable caching)
+//   - ipVers: optional IP version (4 or 6, defaults to 4)
+//
+// Returns:
+//   - wanIP: contains the retrieved IP and query timestamp
+//   - err: aggregated errors from failed provider attempts if any occurred
+//
+// The function will try multiple providers until it finds a valid IP or exhausts all options.
 func GetWANIP(cachedSeconds float64, ipVers ...int) (wanIP WANIP, err error) {
 	var (
 		ipv4  string
