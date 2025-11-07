@@ -240,6 +240,6 @@ func (f *FormBuilder) Generate() *FormBuilder {
 
 // Snippet 表单片段
 func (f *FormBuilder) Snippet() *FormBuilder {
-	f.Config().Template = common.TmplDir(f.Config().Theme) + `/allfields.html`
+	f.Config().Template = `allfields`
 	return f
 }

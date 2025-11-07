@@ -231,7 +231,7 @@ func (t *ThemeInfo) Render(templateName string) template.HTML {
 	f.Theme = formCommon.BOOTSTRAP
 	f.Init(copied)
 	f.ParseFromConfig(true)
-	f.Config().Template = formCommon.TmplDir(f.Config().Theme) + `/allfields.html`
+	f.Config().Template = `allfields`
 	return f.Render()
 }
 
