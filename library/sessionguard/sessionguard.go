@@ -28,7 +28,10 @@ func GetLastLoginInfo(ctx echo.Context, ownerType string, ownerId uint64, sessio
 	return m, err
 }
 
-const InvalidIPAddress = `invalid ip address`
+const (
+	InvalidIPAddress = `invalid ip address`
+	NotFoundXDB      = `not found xdb`
+)
 
 // Validate 验证 session 环境是否安全，避免 cookie 和 session id 被窃取
 // 在非匿名模式下 UserAgent 和 IP 归属地与登录时的一致
@@ -99,7 +102,7 @@ func (c *SessionGuardConfig) validateEnv(ctx echo.Context, ownerType string, own
 	log.Debugf(`[%s:%d]ip mismatched: %q != %q`, ownerType, ownerId, lastIP, currentIP)
 	ipInfo, err := ip2region.IPInfo(currentIP)
 	if err != nil {
-		if ip2region.ErrIsInvalidIP(err) { // 忽略不支持 IPv6 的情况
+		if ip2region.ErrIsInvalidIP(err) || ip2region.ErrIsNotFoundXDB(err) { // 忽略不支持 IPv6 的情况
 			return true
 		}
 		log.Errorf(`[%s:%d]failed to get IPInfo: %v`, ownerType, ownerId, err)

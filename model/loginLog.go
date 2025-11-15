@@ -53,10 +53,13 @@ func (s *LoginLog) check() error {
 		if len(s.IpLocation) == 0 {
 			_, err := s.InitLocation()
 			if err != nil { // invalid ip address `::1`
-				if !ip2region.ErrIsInvalidIP(err) {
+				if ip2region.ErrIsInvalidIP(err) {
+					s.IpLocation = `error:` + sessionguard.InvalidIPAddress
+				} else if ip2region.ErrIsNotFoundXDB(err) {
+					s.IpLocation = `error:` + sessionguard.NotFoundXDB
+				} else {
 					return err
 				}
-				s.IpLocation = `error:` + sessionguard.InvalidIPAddress
 			}
 		}
 	}
@@ -100,7 +103,11 @@ func (s *LoginLog) AddAndSaveSession() (pk interface{}, err error) {
 	var ipLocation ip2regionparser.IpInfo
 	ipLocation, err = s.InitLocation()
 	if err != nil { // invalid ip address `::1`
-		if !ip2region.ErrIsInvalidIP(err) {
+		if ip2region.ErrIsInvalidIP(err) {
+			s.IpLocation = `error:` + sessionguard.InvalidIPAddress
+		} else if ip2region.ErrIsNotFoundXDB(err) {
+			s.IpLocation = `error:` + sessionguard.NotFoundXDB
+		} else {
 			s.Success = `N`
 			s.Failmsg = err.Error()
 			s.IpLocation = `error`
@@ -108,7 +115,6 @@ func (s *LoginLog) AddAndSaveSession() (pk interface{}, err error) {
 			pk, _ = s.Add()
 			return
 		}
-		s.IpLocation = `error:` + sessionguard.InvalidIPAddress
 	}
 	pk, err = s.Add()
 	sEnv := &sessionguard.Environment{

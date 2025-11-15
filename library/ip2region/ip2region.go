@@ -6,9 +6,11 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/admpub/ip2region/v3/binding/golang/ip2region"
+	"github.com/admpub/ip2region/v3/binding/golang/xdb"
 	"github.com/admpub/log"
 	syncOnce "github.com/admpub/once"
 	"github.com/coscms/webcore/library/config"
@@ -132,7 +134,14 @@ func ErrIsInvalidIP(err error) bool {
 		return false
 	}
 
-	return strings.HasPrefix(err.Error(), `invalid ip address`)
+	return xdb.IsInvalidIPAddress(err) || strings.HasPrefix(err.Error(), `invalid ip address`)
+}
+
+func ErrIsNotFoundXDB(err error) bool {
+	if err == nil {
+		return false
+	}
+	return os.IsNotExist(err)
 }
 
 // requestAPI makes a request to the IP geolocation API with the given IP address.

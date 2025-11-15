@@ -31,7 +31,7 @@ require (
 	github.com/admpub/goth v0.0.4
 	github.com/admpub/httpscerts v0.0.0-20180907121630-a2990e2af45c
 	github.com/admpub/imageproxy v0.10.1
-	github.com/admpub/ip2region/v3 v3.0.3
+	github.com/admpub/ip2region/v3 v3.0.4
 	github.com/admpub/license_gen v0.1.2
 	github.com/admpub/log v1.4.0
 	github.com/admpub/mahonia v0.0.0-20151019004008-c528b747d92d
