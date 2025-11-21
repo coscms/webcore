@@ -29,6 +29,7 @@ func New(ctx echo.Context, model interface{}, options ...Option) *FormBuilder {
 		Forms: forms.NewForms(forms.New()),
 		on:    MethodHooks{},
 		ctx:   ctx,
+		dbi:   factory.DefaultDBI,
 	}
 	defaultHooks := []MethodHook{
 		BindModel(f),
@@ -171,7 +172,7 @@ func (f *FormBuilder) ParseConfigFile(jsonformat ...bool) error {
 	}
 
 	defaultValues := f.DefaultValues()
-	if defaultValues != nil && len(defaultValues) > 0 {
+	if len(defaultValues) > 0 {
 		cfg.SetDefaultValue(func(fieldName string) string {
 			fieldName = com.Title(fieldName)
 			val, _ := defaultValues[fieldName]
