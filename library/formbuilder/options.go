@@ -3,6 +3,7 @@ package formbuilder
 import (
 	"github.com/coscms/forms/config"
 	"github.com/webx-top/db/lib/factory"
+	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/formfilter"
 )
 
@@ -62,5 +63,13 @@ func RenderBefore(fn func()) Option {
 func DBI(dbi *factory.DBI) Option {
 	return func(f *FormBuilder) {
 		f.dbi = dbi
+	}
+}
+
+// Languages 多语言配置
+func Languages(langs *echo.KVData, langDefault string) Option {
+	return func(f *FormBuilder) {
+		f.languages = langs
+		f.langDefault = langDefault
 	}
 }

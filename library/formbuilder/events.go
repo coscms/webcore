@@ -2,7 +2,10 @@ package formbuilder
 
 import (
 	"errors"
+	"strings"
 
+	"github.com/webx-top/com"
+	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/formfilter"
 	"github.com/webx-top/validation"
 )
@@ -19,9 +22,7 @@ func (hooks MethodHooks) On(method string, funcs ...MethodHook) {
 
 func (hooks MethodHooks) Off(methods ...string) {
 	for _, method := range methods {
-		if _, ok := hooks[method]; ok {
-			delete(hooks, method)
-		}
+		delete(hooks, method)
 	}
 }
 
@@ -47,7 +48,30 @@ func (hooks MethodHooks) Fire(method string) error {
 
 func BindModel(form *FormBuilder) MethodHook {
 	return func() error {
-		opts := []formfilter.Options{formfilter.Include(form.Config().GetNames()...)}
+		names := form.Config().GetNames()
+		if form.langDefault != "" && form.languages != nil {
+			if form.ctx.Lang().Normalize() == form.langDefault {
+				//langKey := com.UpperCaseFirst(form.langDefault)
+				for _, name := range names {
+					//pp.Println(name)
+					if after, found := strings.CutPrefix(name, `Language[`+form.langDefault+`]`); found {
+						nameRaw := strings.Trim(after, `[]`)
+						names = append(names, nameRaw)
+						nameLower := com.LowerCaseFirst(nameRaw)
+						formName := `Language[` + form.langDefault + `][` + nameLower + `]`
+						values := form.ctx.FormValues(formName)
+						if len(values) == 0 {
+							formName = `Language[` + form.langDefault + `][` + nameRaw + `]`
+							values = form.ctx.FormValues(formName)
+						}
+						//pp.Println(formName)
+						echo.SetFormValues(form.ctx.Request().Form(), nameLower, values)
+					}
+				}
+			}
+			//pp.Println(form.ctx.Lang().Normalize(), form.langDefault, form.ctx.Forms())
+		}
+		opts := []formfilter.Options{formfilter.Include(names...)}
 		opts = append(opts, form.filters...)
 		return form.ctx.MustBind(form.Model, formfilter.Build(opts...))
 	}

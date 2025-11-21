@@ -4,11 +4,12 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"slices"
 	"strings"
 
 	"github.com/coscms/forms"
 	"github.com/coscms/forms/common"
-	"github.com/coscms/forms/config"
+	formsconfig "github.com/coscms/forms/config"
 	"github.com/coscms/forms/fields"
 	"gopkg.in/yaml.v3"
 
@@ -66,15 +67,17 @@ func New(ctx echo.Context, model interface{}, options ...Option) *FormBuilder {
 // FormBuilder HTML表单构建器
 type FormBuilder struct {
 	*forms.Forms
-	on         MethodHooks
-	exit       bool
-	err        error
-	ctx        echo.Context
-	configFile string
-	config     *config.Config
-	dbi        *factory.DBI
-	defaults   map[string]string
-	filters    []formfilter.Options
+	on          MethodHooks
+	exit        bool
+	err         error
+	ctx         echo.Context
+	configFile  string
+	config      *formsconfig.Config
+	dbi         *factory.DBI
+	defaults    map[string]string
+	filters     []formfilter.Options
+	languages   *echo.KVData
+	langDefault string
 }
 
 // Exited 是否需要退出后续处理。此时一般有err值，用于记录错误原因
@@ -109,7 +112,7 @@ func (f *FormBuilder) Error() error {
 }
 
 // ParseConfigFile 解析配置文件 xxx.form.json
-func (f *FormBuilder) ParseConfigFile(jsonformat ...bool) (*config.Config, error) {
+func (f *FormBuilder) ParseConfigFile(jsonformat ...bool) (*formsconfig.Config, error) {
 	configFile := f.configFile + `.form`
 	renderer, ok := f.ctx.Renderer().(driver.Driver)
 	if !ok {
@@ -128,7 +131,7 @@ func (f *FormBuilder) ParseConfigFile(jsonformat ...bool) (*config.Config, error
 	if len(configFile) == 0 {
 		return nil, ErrJSONConfigFileNameInvalid
 	}
-	var cfg *config.Config
+	var cfg *formsconfig.Config
 	b, err := renderer.RawContent(configFile)
 	if err != nil {
 		if !os.IsNotExist(err) || renderer.Manager() == nil {
@@ -158,8 +161,8 @@ func (f *FormBuilder) ParseConfigFile(jsonformat ...bool) (*config.Config, error
 				return nil, fmt.Errorf(`[forms.Unmarshal] %s: %w`, configFile, err)
 			}
 		} else {
-			cfg, err = common.GetOrSetCachedConfig(configFile, func() (*config.Config, error) {
-				cfg := &config.Config{}
+			cfg, err = common.GetOrSetCachedConfig(configFile, func() (*formsconfig.Config, error) {
+				cfg := &formsconfig.Config{}
 				err := yaml.Unmarshal(b, cfg)
 				return cfg, err
 			})
@@ -174,13 +177,13 @@ func (f *FormBuilder) ParseConfigFile(jsonformat ...bool) (*config.Config, error
 	return cfg, err
 }
 
-func (f *FormBuilder) SetConfig(cfg *config.Config) *FormBuilder {
+func (f *FormBuilder) SetConfig(cfg *formsconfig.Config) *FormBuilder {
 	f.config = cfg
 	return f
 }
 
 func (f *FormBuilder) InitConfig() error {
-	var cfg *config.Config
+	var cfg *formsconfig.Config
 	var err error
 	if f.config == nil {
 		cfg, err = f.ParseConfigFile()
@@ -199,8 +202,61 @@ func (f *FormBuilder) InitConfig() error {
 			return val
 		})
 	}
+	if f.languages != nil {
+		f.toLangset(cfg)
+	}
 	f.Init(cfg)
-	return nil
+	return err
+}
+
+func (f *FormBuilder) toLangset(cfg *formsconfig.Config) {
+	if f.languages == nil {
+		return
+	}
+	langCodes := f.languages.Keys()
+	if len(langCodes) <= 1 {
+		return
+	}
+	m, ok := f.Model.(factory.Short)
+	if !ok {
+		return
+	}
+	var fields []string
+	for _, info := range f.dbi.Fields[m.Short_()] {
+		if info.Multilingual {
+			fields = append(fields, info.GoName)
+		}
+	}
+	if len(fields) == 0 {
+		return
+	}
+	var setElems func(elems []*formsconfig.Element)
+	setElems = func(elems []*formsconfig.Element) {
+		for _, elem := range elems {
+			if elem.Type == `fieldset` {
+				setElems(elems)
+				continue
+			}
+			if elem.Type == `langset` {
+				// 已经是langset类型，无需处理
+				continue
+			}
+			if elem.Name == `` {
+				continue
+			}
+			fieldName := com.Title(elem.Name)
+			if !slices.Contains(fields, fieldName) {
+				continue
+			}
+			cloned := elem.Clone()
+			elem.Type = `langset`
+			elem.Elements = []*formsconfig.Element{cloned}
+			for _, lang := range langCodes {
+				elem.AddLanguage(formsconfig.NewLanguage(lang, f.languages.Get(lang), `Language[`+lang+`][%s]`))
+			}
+		}
+	}
+	setElems(cfg.Elements)
 }
 
 // DefaultValues 获取model结构体各个字段在数据库中的默认值

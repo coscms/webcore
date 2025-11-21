@@ -26,7 +26,6 @@ elements:
       choices: []
       elements: []
       format: ""
-      languages: []
       data: {}
     - id: ""
       type: text
