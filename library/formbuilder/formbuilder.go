@@ -71,6 +71,7 @@ type FormBuilder struct {
 	err        error
 	ctx        echo.Context
 	configFile string
+	config     *config.Config
 	dbi        *factory.DBI
 	defaults   map[string]string
 	filters    []formfilter.Options
@@ -108,12 +109,11 @@ func (f *FormBuilder) Error() error {
 }
 
 // ParseConfigFile 解析配置文件 xxx.form.json
-func (f *FormBuilder) ParseConfigFile(jsonformat ...bool) error {
+func (f *FormBuilder) ParseConfigFile(jsonformat ...bool) (*config.Config, error) {
 	configFile := f.configFile + `.form`
-	var cfg *config.Config
 	renderer, ok := f.ctx.Renderer().(driver.Driver)
 	if !ok {
-		return fmt.Errorf(`FormBuilder: Expected renderer is "driver.Driver", but got "%T"`, f.ctx.Renderer())
+		return nil, fmt.Errorf(`FormBuilder: Expected renderer is "driver.Driver", but got "%T"`, f.ctx.Renderer())
 	}
 	var isJSON bool
 	if len(jsonformat) > 0 {
@@ -126,35 +126,36 @@ func (f *FormBuilder) ParseConfigFile(jsonformat ...bool) error {
 	}
 	configFile = renderer.TmplPath(f.ctx, configFile)
 	if len(configFile) == 0 {
-		return ErrJSONConfigFileNameInvalid
+		return nil, ErrJSONConfigFileNameInvalid
 	}
+	var cfg *config.Config
 	b, err := renderer.RawContent(configFile)
 	if err != nil {
 		if !os.IsNotExist(err) || renderer.Manager() == nil {
-			return fmt.Errorf(`read file %s: %w`, configFile, err)
+			return nil, fmt.Errorf(`read file %s: %w`, configFile, err)
 		}
 		cfg = f.ToConfig()
 		if isJSON {
 			b, err = f.ToJSONBlob(cfg)
 			if err != nil {
-				return fmt.Errorf(`[form.ToJSONBlob] %s: %w`, configFile, err)
+				return nil, fmt.Errorf(`[form.ToJSONBlob] %s: %w`, configFile, err)
 			}
 		} else {
 			b, err = yaml.Marshal(cfg)
 			if err != nil {
-				return fmt.Errorf(`[form:yaml.Marshal] %s: %w`, configFile, err)
+				return nil, fmt.Errorf(`[form:yaml.Marshal] %s: %w`, configFile, err)
 			}
 		}
 		err = renderer.Manager().SetTemplate(configFile, b)
 		if err != nil {
-			return fmt.Errorf(`%s: %w`, configFile, err)
+			return nil, fmt.Errorf(`%s: %w`, configFile, err)
 		}
 		f.ctx.Logger().Infof(f.ctx.T(`生成表单配置文件“%v”成功。`), configFile)
 	} else {
 		if isJSON {
 			cfg, err = forms.Unmarshal(b, configFile)
 			if err != nil {
-				return fmt.Errorf(`[forms.Unmarshal] %s: %w`, configFile, err)
+				return nil, fmt.Errorf(`[forms.Unmarshal] %s: %w`, configFile, err)
 			}
 		} else {
 			cfg, err = common.GetOrSetCachedConfig(configFile, func() (*config.Config, error) {
@@ -163,12 +164,31 @@ func (f *FormBuilder) ParseConfigFile(jsonformat ...bool) error {
 				return cfg, err
 			})
 			if err != nil {
-				return fmt.Errorf(`[form:yaml.Unmarshal] %s: %w`, configFile, err)
+				return nil, fmt.Errorf(`[form:yaml.Unmarshal] %s: %w`, configFile, err)
 			}
 		}
 	}
 	if cfg == nil {
 		cfg = f.NewConfig()
+	}
+	return cfg, err
+}
+
+func (f *FormBuilder) SetConfig(cfg *config.Config) *FormBuilder {
+	f.config = cfg
+	return f
+}
+
+func (f *FormBuilder) InitConfig() error {
+	var cfg *config.Config
+	var err error
+	if f.config == nil {
+		cfg, err = f.ParseConfigFile()
+		if err != nil {
+			return err
+		}
+	} else {
+		cfg = f.config
 	}
 
 	defaultValues := f.DefaultValues()
@@ -180,7 +200,7 @@ func (f *FormBuilder) ParseConfigFile(jsonformat ...bool) error {
 		})
 	}
 	f.Init(cfg)
-	return err
+	return nil
 }
 
 // DefaultValues 获取model结构体各个字段在数据库中的默认值
@@ -235,7 +255,11 @@ func (f *FormBuilder) RecvSubmission() error {
 
 // Generate 生成表单参数
 func (f *FormBuilder) Generate() *FormBuilder {
-	f.ParseFromConfig()
+	err := f.InitConfig()
+	if err != nil {
+		f.err = err
+		f.exit = true
+	}
 	return f
 }
 

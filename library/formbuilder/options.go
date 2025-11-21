@@ -1,6 +1,7 @@
 package formbuilder
 
 import (
+	"github.com/coscms/forms/config"
 	"github.com/webx-top/db/lib/factory"
 	"github.com/webx-top/echo/formfilter"
 )
@@ -35,9 +36,18 @@ func ConfigFile(jsonFile string, silent ...bool) Option {
 		if len(silent) > 0 && silent[0] {
 			return
 		}
-		if err := f.ParseConfigFile(); err != nil {
+		cfg, err := f.ParseConfigFile()
+		if err != nil {
 			panic(err)
 		}
+		f.SetConfig(cfg)
+	}
+}
+
+// Config 指定表单配置
+func Config(cfg *config.Config) Option {
+	return func(f *FormBuilder) {
+		f.SetConfig(cfg)
 	}
 }
 
