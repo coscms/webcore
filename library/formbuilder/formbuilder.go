@@ -53,6 +53,11 @@ func New(ctx echo.Context, model interface{}, options ...Option) *FormBuilder {
 		}
 		option(f)
 	}
+	err := f.InitConfig()
+	if err != nil {
+		f.err = err
+		f.exit = true
+	}
 	f.SetLabelFunc(func(txt string) string {
 		return ctx.T(txt)
 	})
@@ -354,13 +359,7 @@ func (f *FormBuilder) RecvSubmission() error {
 
 // Generate 生成表单参数
 func (f *FormBuilder) Generate() *FormBuilder {
-	err := f.InitConfig()
-	if err != nil {
-		f.err = err
-		f.exit = true
-	} else {
-		f.ParseFromConfig()
-	}
+	f.ParseFromConfig()
 	return f
 }
 

@@ -71,6 +71,9 @@ func TestFormbuilder(t *testing.T) {
 			}
 		}, `en`),
 		formbuilder.ConfigFile(`test`))
+
+	assert.NoError(t, form.Error())
+
 	form.OnPost(func() error {
 		var err error
 		fmt.Printf("%#v\n", bean)
