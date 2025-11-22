@@ -79,7 +79,6 @@ func TestFormbuilder(t *testing.T) {
 		fmt.Printf("%#v\n", bean)
 		return err
 	})
-	form.Generate()
 	//fmt.Printf("%#v\n", ctx.Get(`forms`))
 	assert.Equal(t, form.Forms, ctx.Get(`forms`))
 	htmlResult := string(form.Render())

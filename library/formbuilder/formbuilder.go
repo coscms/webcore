@@ -218,6 +218,9 @@ func (f *FormBuilder) InitConfig() error {
 		f.toLangset(cfg)
 	}
 
+	f.Init(cfg)
+	f.ParseFromConfig()
+
 	defaultValues := f.DefaultValues()
 	if len(defaultValues) > 0 {
 		cfg.SetDefaultValue(func(fieldName string) string {
@@ -228,7 +231,6 @@ func (f *FormBuilder) InitConfig() error {
 			return val
 		})
 	}
-	f.Init(cfg)
 	return err
 }
 
@@ -368,12 +370,6 @@ func (f *FormBuilder) RecvSubmission() error {
 		f.exit = true
 	}
 	return f.err
-}
-
-// Generate 生成表单参数
-func (f *FormBuilder) Generate() *FormBuilder {
-	f.ParseFromConfig()
-	return f
 }
 
 // Snippet 表单片段
