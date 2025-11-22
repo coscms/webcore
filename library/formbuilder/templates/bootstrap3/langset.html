@@ -5,8 +5,8 @@
       		{{- range $k,$v := .langs }}
 				<li{{if eq $k 0}} class="active"{{end}}>
 					<a href="#langset_{{$langset.name}}_{{$v.ID}}" data-toggle="tab" aria-expanded="{{if eq $k 0}}true{{else}}false{{end}}">
-            			<i class="green ace-icon fa fa-home bigger-120"></i>
-            			{{$v.Label}}
+            			{{- if $v.Data.iconClass}}<i class="green ace-icon fa {{$v.Data.iconClass}} bigger-120"></i>{{end}}
+            			{{- $v.Label -}}
           			</a>
 				</li>
       		{{- end }}
