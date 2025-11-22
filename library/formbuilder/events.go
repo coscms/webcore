@@ -54,7 +54,8 @@ func BindModel(form *FormBuilder) MethodHook {
 			if form.ctx.Lang().Normalize() == form.langDefault {
 				//langKey := com.UpperCaseFirst(form.langDefault)
 				formData := form.FormData()
-				for _, name := range names {
+				deletedIndexes := []int{}
+				for index, name := range names {
 					//pp.Println(name)
 					if after, found := strings.CutPrefix(name, form.langInputNamePrefix(form.langDefault)); found {
 						nameRaw := strings.Trim(after, `[]`)
@@ -68,7 +69,18 @@ func BindModel(form *FormBuilder) MethodHook {
 						}
 						//pp.Println(formName)
 						echo.SetFormValues(formData, nameLower, values)
+						deletedIndexes = append(deletedIndexes, index)
 					}
+				}
+				// 删除已处理的语言前缀字段
+				if len(deletedIndexes) > 0 {
+					newNames := []string{}
+					for index := range names {
+						if !slices.Contains(deletedIndexes, index) {
+							newNames = append(newNames, names[index])
+						}
+					}
+					names = newNames
 				}
 			}
 			//pp.Println(form.ctx.Lang().Normalize(), form.langDefault, form.ctx.Forms())
