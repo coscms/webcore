@@ -18,6 +18,7 @@ import (
 	"github.com/webx-top/com"
 	"github.com/webx-top/db/lib/factory"
 	"github.com/webx-top/echo"
+	"github.com/webx-top/echo/engine"
 	"github.com/webx-top/echo/formfilter"
 	echoMw "github.com/webx-top/echo/middleware"
 	"github.com/webx-top/echo/middleware/language"
@@ -406,6 +407,9 @@ func (f *FormBuilder) setDefaultLanguage(langDefault ...string) *FormBuilder {
 	return f
 }
 
+// Languages returns the language configuration for the form builder.
+// If a custom language getter is set, it will be called to retrieve the configuration.
+// Returns nil if no language configuration is available.
 func (f *FormBuilder) Languages() *language.Config {
 	if f.langConfig != nil {
 		return f.langConfig
@@ -416,4 +420,10 @@ func (f *FormBuilder) Languages() *language.Config {
 		return f.langConfig
 	}
 	return nil
+}
+
+// FormData retrieves form data from the request based on the content type.
+// Returns engine.URLValuer containing either POST form data or URL query parameters.
+func (f *FormBuilder) FormData() engine.URLValuer {
+	return FormData(f.ctx)
 }

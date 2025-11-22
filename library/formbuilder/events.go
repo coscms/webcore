@@ -53,6 +53,7 @@ func BindModel(form *FormBuilder) MethodHook {
 		if form.langDefault != "" && form.Languages() != nil {
 			if form.ctx.Lang().Normalize() == form.langDefault {
 				//langKey := com.UpperCaseFirst(form.langDefault)
+				formData := form.FormData()
 				for _, name := range names {
 					//pp.Println(name)
 					if after, found := strings.CutPrefix(name, form.langInputNamePrefix(form.langDefault)); found {
@@ -66,7 +67,7 @@ func BindModel(form *FormBuilder) MethodHook {
 							values = form.ctx.FormValues(formName)
 						}
 						//pp.Println(formName)
-						echo.SetFormValues(form.ctx.Request().Form(), nameLower, values)
+						echo.SetFormValues(formData, nameLower, values)
 					}
 				}
 			}
