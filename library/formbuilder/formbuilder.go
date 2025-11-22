@@ -79,18 +79,19 @@ func New(ctx echo.Context, model interface{}, options ...Option) *FormBuilder {
 // FormBuilder HTML表单构建器
 type FormBuilder struct {
 	*forms.Forms
-	on          MethodHooks
-	exit        bool
-	err         error
-	ctx         echo.Context
-	configFile  string
-	config      *formsconfig.Config
-	dbi         *factory.DBI
-	defaults    map[string]string
-	filters     []formfilter.Options
-	langsGetter func(echo.Context) language.Config
-	langDefault string
-	langConfig  *language.Config
+	on           MethodHooks
+	exit         bool
+	err          error
+	ctx          echo.Context
+	configFile   string
+	config       *formsconfig.Config
+	dbi          *factory.DBI
+	defaults     map[string]string
+	filters      []formfilter.Options
+	langsGetter  func(echo.Context) language.Config
+	langDefault  string
+	langConfig   *language.Config
+	allowedNames []string
 }
 
 // Exited 是否需要退出后续处理。此时一般有err值，用于记录错误原因

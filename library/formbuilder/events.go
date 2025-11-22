@@ -2,6 +2,7 @@ package formbuilder
 
 import (
 	"errors"
+	"slices"
 	"strings"
 
 	"github.com/webx-top/com"
@@ -71,6 +72,13 @@ func BindModel(form *FormBuilder) MethodHook {
 			}
 			//pp.Println(form.ctx.Lang().Normalize(), form.langDefault, form.ctx.Forms())
 		}
+		if len(form.allowedNames) > 0 {
+			for _, name := range form.allowedNames {
+				if !slices.Contains(names, name) {
+					names = append(names, name)
+				}
+			}
+		}
 		opts := []formfilter.Options{formfilter.Include(names...)}
 		opts = append(opts, form.filters...)
 		return form.ctx.MustBind(form.Model, formfilter.Build(opts...))
@@ -83,8 +91,7 @@ func ValidModel(form *FormBuilder) MethodHook {
 		err := form.Validate().Error()
 		if !errors.Is(err, validation.NoError) {
 			form.ctx.Data().SetInfo(err.Message, 0).SetZone(err.Field)
-			return err
 		}
-		return nil
+		return err
 	}
 }

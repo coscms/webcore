@@ -74,3 +74,9 @@ func LanguagesGetter(langsGetter func(echo.Context) language.Config, langDefault
 		f.setDefaultLanguage(langDefault...)
 	}
 }
+
+func AllowedNames(names ...string) Option {
+	return func(f *FormBuilder) {
+		f.allowedNames = names
+	}
+}
