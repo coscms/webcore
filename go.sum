@@ -74,8 +74,8 @@ github.com/admpub/go-reuseport v0.5.0 h1:WbIumvnr46Nlq/J1TDHz8QfCk8K//b+AImHf6VB
 github.com/admpub/go-reuseport v0.5.0/go.mod h1:LfaS8MPNO8NNjvGJuEnbOkp7Tec4E0dkxPhBpfgTSx0=
 github.com/admpub/go-utility v0.0.1 h1:/nja86vknCoMYJtMCm8nV+vuBiOf5PU45I5w7XAJUEU=
 github.com/admpub/go-utility v0.0.1/go.mod h1:QZ/OrlUkHyD7Hg8Jj/iPkT6RZuMfYUOp0S4NsaQzRnA=
-github.com/admpub/godotenv v1.4.3 h1:yxoRSi0rVWLNLC1c3v1MBw3At6fBTvTwGrVY/44huaA=
-github.com/admpub/godotenv v1.4.3/go.mod h1:W8zOql4lSgnK6zfI6Le+GXlAaz5ZCj4kZI2wgcjar18=
+github.com/admpub/godotenv v1.4.4 h1:xi/+0B0k/F3ZfuoYICccvn3KGLOWRomJHZLB5PZ7iQY=
+github.com/admpub/godotenv v1.4.4/go.mod h1:W8zOql4lSgnK6zfI6Le+GXlAaz5ZCj4kZI2wgcjar18=
 github.com/admpub/goseaweedfs v0.1.2 h1:NZscMMvBF5IvXH7fTEcipvR7fy449fGkYVqV3ulwDjI=
 github.com/admpub/goseaweedfs v0.1.2/go.mod h1:c0o71otHOOh1fB2foHHmtxcMX5k7zl4WmOYofFVe090=
 github.com/admpub/goth v0.0.4 h1:eOSvkOwrj6Z/Q25OdUHWwn9mF5/6Y0oWQkdApnwD8uM=
