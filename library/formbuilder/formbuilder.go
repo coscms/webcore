@@ -190,9 +190,10 @@ func (f *FormBuilder) ParseConfigFile(jsonformat ...bool) (*formsconfig.Config, 
 			}
 		}
 	}
-	if cfg == nil {
-		cfg = f.NewConfig()
+	if cfg != nil {
+		return cfg.Clone(), err
 	}
+	cfg = f.NewConfig()
 	return cfg, err
 }
 
@@ -210,7 +211,7 @@ func (f *FormBuilder) InitConfig() error {
 			return err
 		}
 	} else {
-		cfg = f.config
+		cfg = f.config.Clone()
 	}
 
 	if f.Languages() != nil {
