@@ -236,11 +236,15 @@ func (f *FormBuilder) toLangset(cfg *formsconfig.Config) {
 	if len(fields) == 0 {
 		return
 	}
-	var setElems func(elems []*formsconfig.Element)
-	setElems = func(elems []*formsconfig.Element) {
-		for _, elem := range elems {
+	var setElems func(elems []*formsconfig.Element) []*formsconfig.Element
+	setElems = func(elems []*formsconfig.Element) []*formsconfig.Element {
+		var lastLangset *formsconfig.Element
+		var lastLangsetIndex int
+		var deleteIndexes []int
+		for index, elem := range elems {
 			if elem.Type == `fieldset` {
-				setElems(elems)
+				elem.Elements = setElems(elem.Elements)
+				elems[index] = elem
 				continue
 			}
 			if elem.Type == `langset` {
@@ -255,14 +259,36 @@ func (f *FormBuilder) toLangset(cfg *formsconfig.Config) {
 				continue
 			}
 			cloned := elem.Clone()
+			if lastLangset != nil && lastLangsetIndex == index-1 {
+				// 紧跟在上一个langset后面，合并到上一个langset中
+				lastLangset.Elements = append(lastLangset.Elements, cloned)
+				deleteIndexes = append(deleteIndexes, index)
+				lastLangsetIndex = index
+				continue
+			}
+			// 创建新的langset
 			elem.Type = `langset`
 			elem.Elements = []*formsconfig.Element{cloned}
 			for _, lang := range langCodes {
 				elem.AddLanguage(formsconfig.NewLanguage(lang, lgs.Get(lang), `Language[`+lang+`][%s]`))
 			}
+			lastLangset = elem
+			lastLangsetIndex = index
 		}
+		// 删除已合并的元素
+		if len(deleteIndexes) > 0 {
+			newElems := []*formsconfig.Element{}
+			for index, elem := range elems {
+				if slices.Contains(deleteIndexes, index) {
+					continue
+				}
+				newElems = append(newElems, elem)
+			}
+			elems = newElems
+		}
+		return elems
 	}
-	setElems(cfg.Elements)
+	cfg.Elements = setElems(cfg.Elements)
 }
 
 // DefaultValues 获取model结构体各个字段在数据库中的默认值
