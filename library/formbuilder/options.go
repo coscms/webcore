@@ -5,6 +5,7 @@ import (
 	"github.com/webx-top/db/lib/factory"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/formfilter"
+	"github.com/webx-top/echo/middleware/language"
 )
 
 type Option func(*FormBuilder)
@@ -67,9 +68,9 @@ func DBI(dbi *factory.DBI) Option {
 }
 
 // LanguagesGetter 多语言配置
-func LanguagesGetter(langsGetter func(echo.Context) *echo.KVData, langDefault ...string) Option {
+func LanguagesGetter(langsGetter func(echo.Context) language.Config, langDefault ...string) Option {
 	return func(f *FormBuilder) {
-		f.languagesGetter = langsGetter
+		f.langsGetter = langsGetter
 		f.setDefaultLanguage(langDefault...)
 	}
 }

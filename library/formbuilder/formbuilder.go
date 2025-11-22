@@ -7,6 +7,7 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/admpub/log"
 	"github.com/coscms/forms"
 	"github.com/coscms/forms/common"
 	formsconfig "github.com/coscms/forms/config"
@@ -18,6 +19,7 @@ import (
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/formfilter"
 	echoMw "github.com/webx-top/echo/middleware"
+	"github.com/webx-top/echo/middleware/language"
 	"github.com/webx-top/echo/middleware/render/driver"
 )
 
@@ -25,16 +27,16 @@ var (
 	ErrJSONConfigFileNameInvalid = errors.New("*.form.json name invalid")
 )
 
-var LanguagesDefaultGetter func(echo.Context) *echo.KVData
+var LanguagesDefaultGetter func(echo.Context) language.Config
 
 // New 创建表单构建器实例
 func New(ctx echo.Context, model interface{}, options ...Option) *FormBuilder {
 	f := &FormBuilder{
-		Forms:           forms.NewForms(forms.New()),
-		on:              MethodHooks{},
-		ctx:             ctx,
-		dbi:             factory.DefaultDBI,
-		languagesGetter: LanguagesDefaultGetter,
+		Forms:       forms.NewForms(forms.New()),
+		on:          MethodHooks{},
+		ctx:         ctx,
+		dbi:         factory.DefaultDBI,
+		langsGetter: LanguagesDefaultGetter,
 	}
 	f.setDefaultLanguage()
 	defaultHooks := []MethodHook{
@@ -72,17 +74,18 @@ func New(ctx echo.Context, model interface{}, options ...Option) *FormBuilder {
 // FormBuilder HTML表单构建器
 type FormBuilder struct {
 	*forms.Forms
-	on              MethodHooks
-	exit            bool
-	err             error
-	ctx             echo.Context
-	configFile      string
-	config          *formsconfig.Config
-	dbi             *factory.DBI
-	defaults        map[string]string
-	filters         []formfilter.Options
-	languagesGetter func(echo.Context) *echo.KVData
-	langDefault     string
+	on          MethodHooks
+	exit        bool
+	err         error
+	ctx         echo.Context
+	configFile  string
+	config      *formsconfig.Config
+	dbi         *factory.DBI
+	defaults    map[string]string
+	filters     []formfilter.Options
+	langsGetter func(echo.Context) language.Config
+	langDefault string
+	langConfig  *language.Config
 }
 
 // Exited 是否需要退出后续处理。此时一般有err值，用于记录错误原因
@@ -222,12 +225,13 @@ func (f *FormBuilder) toLangset(cfg *formsconfig.Config) {
 	if lgs == nil {
 		return
 	}
-	langCodes := lgs.Keys()
+	langCodes := lgs.AllList
 	if len(langCodes) <= 1 {
 		return
 	}
 	m, ok := f.Model.(factory.Short)
 	if !ok {
+		log.Warnf(`[formbuilder.toLangset] model %T does not implement factory.Short`, f.Model)
 		return
 	}
 	var fields []string
@@ -273,7 +277,11 @@ func (f *FormBuilder) toLangset(cfg *formsconfig.Config) {
 			elem.Type = `langset`
 			elem.Elements = []*formsconfig.Element{cloned}
 			for _, lang := range langCodes {
-				elem.AddLanguage(formsconfig.NewLanguage(lang, lgs.Get(lang), `Language[`+lang+`][%s]`))
+				label := lgs.ExtraBy(lang).String(`label`)
+				if len(label) == 0 {
+					label = lang
+				}
+				elem.AddLanguage(formsconfig.NewLanguage(lang, label, `Language[`+lang+`][%s]`))
 			}
 			lastLangset = elem
 			lastLangsetIndex = index
@@ -350,6 +358,8 @@ func (f *FormBuilder) Generate() *FormBuilder {
 	if err != nil {
 		f.err = err
 		f.exit = true
+	} else {
+		f.ParseFromConfig()
 	}
 	return f
 }
@@ -366,20 +376,20 @@ func (f *FormBuilder) setDefaultLanguage(langDefault ...string) *FormBuilder {
 		_langDefault = langDefault[0]
 	}
 	if len(_langDefault) == 0 && f.Languages() != nil {
-		for _, item := range f.Languages().Slice() {
-			if item != nil && item.H != nil && item.H.Bool(`isDefault`) {
-				_langDefault = item.K
-				break
-			}
-		}
+		_langDefault = f.Languages().Default
 	}
 	f.langDefault = _langDefault
 	return f
 }
 
-func (f *FormBuilder) Languages() *echo.KVData {
-	if f.languagesGetter != nil {
-		return f.languagesGetter(f.ctx)
+func (f *FormBuilder) Languages() *language.Config {
+	if f.langConfig != nil {
+		return f.langConfig
+	}
+	if f.langsGetter != nil {
+		c := f.langsGetter(f.ctx)
+		f.langConfig = &c
+		return f.langConfig
 	}
 	return nil
 }

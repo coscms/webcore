@@ -14,6 +14,7 @@ import (
 	"github.com/webx-top/db/lib/factory"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/defaults"
+	"github.com/webx-top/echo/middleware/language"
 	"github.com/webx-top/echo/middleware/render"
 	"github.com/webx-top/echo/param"
 )
@@ -55,15 +56,19 @@ func TestFormbuilder(t *testing.T) {
 			Multilingual: true,
 		},
 	}
-	langs := echo.NewKVData()
-	langs.Add(`en`, `English`)
-	langs.Add(`zh-CN`, `简体中文`)
 	bean := &TestRequest{}
 	ctx := defaults.NewMockContext()
 	ctx.SetRenderer(d)
 	form := formbuilder.New(ctx, bean,
-		formbuilder.LanguagesGetter(func(ctx echo.Context) *echo.KVData {
-			return langs
+		formbuilder.LanguagesGetter(func(ctx echo.Context) language.Config {
+			return language.Config{
+				Default: `en`,
+				AllList: []string{`en`, `zh-CN`},
+				Extra: map[string]param.Store{
+					`en`:    param.Store{`label`: `English`},
+					`zh-CN`: param.Store{`label`: `简体中文`},
+				},
+			}
 		}, `en`),
 		formbuilder.ConfigFile(`test`))
 	form.OnPost(func() error {
@@ -76,6 +81,10 @@ func TestFormbuilder(t *testing.T) {
 	assert.Equal(t, form.Forms, ctx.Get(`forms`))
 	htmlResult := string(form.Render())
 	fmt.Println(htmlResult)
+	os.WriteFile(`testdata/test.html`, []byte(`<html><head>
+	<link rel="stylesheet" href="https://www.coscms.com/public/assets/backend/js/bootstrap/dist/css/bootstrap.min.css?t=0" />
+	</head><body><div class="container">`+htmlResult+`</div><script src="https://www.coscms.com/public/assets/backend/js/jquery3.6.min.js?t=0"></script>
+	<script type="text/javascript" src="https://www.coscms.com/public/assets/backend/js/bootstrap/dist/js/bootstrap.min.js?t=0"></script></body></html>`), os.ModePerm)
 	var spaceClearRegex = regexp.MustCompile(`(>)[\s]+(&|<)`)
 	htmlResult = spaceClearRegex.ReplaceAllString(htmlResult, `$1$2`)
 	expected := `<form generator="forms" class="form-horizontal" id="Forms" role="form" method="POST" action="" required-redstar="true">
