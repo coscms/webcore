@@ -55,14 +55,14 @@ func BindModel(form *FormBuilder) MethodHook {
 				//langKey := com.UpperCaseFirst(form.langDefault)
 				for _, name := range names {
 					//pp.Println(name)
-					if after, found := strings.CutPrefix(name, `Language[`+form.langDefault+`]`); found {
+					if after, found := strings.CutPrefix(name, form.langInputNamePrefix(form.langDefault)); found {
 						nameRaw := strings.Trim(after, `[]`)
 						names = append(names, nameRaw)
 						nameLower := com.LowerCaseFirst(nameRaw)
-						formName := `Language[` + form.langDefault + `][` + nameLower + `]`
+						formName := form.langInputNamePrefix(form.langDefault) + `[` + nameLower + `]`
 						values := form.ctx.FormValues(formName)
 						if len(values) == 0 {
-							formName = `Language[` + form.langDefault + `][` + nameRaw + `]`
+							formName = form.langInputNamePrefix(form.langDefault) + `[` + nameRaw + `]`
 							values = form.ctx.FormValues(formName)
 						}
 						//pp.Println(formName)
@@ -91,7 +91,8 @@ func ValidModel(form *FormBuilder) MethodHook {
 		err := form.Validate().Error()
 		if !errors.Is(err, validation.NoError) {
 			form.ctx.Data().SetInfo(err.Message, 0).SetZone(err.Field)
+			return err
 		}
-		return err
+		return nil
 	}
 }

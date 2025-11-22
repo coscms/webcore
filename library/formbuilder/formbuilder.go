@@ -230,7 +230,7 @@ func (f *FormBuilder) InitConfig() error {
 			}
 			val = f.ctx.Form(fieldName)
 			if len(val) == 0 && len(f.langDefault) > 0 {
-				if after, found := strings.CutPrefix(fieldName, `Language[`+f.langDefault+`]`); found && len(after) > 0 {
+				if after, found := strings.CutPrefix(fieldName, f.langInputNamePrefix(f.langDefault)); found && len(after) > 0 {
 					fieldName = strings.Trim(after, `[]`)
 					val, _ = defaultValues[com.Title(fieldName)]
 				}
@@ -239,6 +239,15 @@ func (f *FormBuilder) InitConfig() error {
 		})
 	}
 	return err
+}
+
+func (f *FormBuilder) langInputNamePrefix(lang string) string {
+	return `Language[` + lang + `]`
+}
+
+func (f *FormBuilder) SetLangInput(lang string, field string, value string) *FormBuilder {
+	f.ctx.Request().Form().Set(f.langInputNamePrefix(lang)+`[`+field+`]`, value)
+	return f
 }
 
 func (f *FormBuilder) toLangset(cfg *formsconfig.Config) {
@@ -302,7 +311,7 @@ func (f *FormBuilder) toLangset(cfg *formsconfig.Config) {
 				if len(label) == 0 {
 					label = lang
 				}
-				elem.AddLanguage(formsconfig.NewLanguage(lang, label, `Language[`+lang+`][%s]`))
+				elem.AddLanguage(formsconfig.NewLanguage(lang, label, f.langInputNamePrefix(lang)+`[%s]`))
 			}
 			lastLangset = elem
 			lastLangsetIndex = index

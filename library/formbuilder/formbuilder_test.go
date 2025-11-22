@@ -126,11 +126,14 @@ func TestFormbuilder(t *testing.T) {
 		Age:  123,
 	}
 	ctx.Request().SetMethod(`POST`)
-	ctx.Request().Form().Set(`Language[en][name]`, expectedReq.Name)
+	form.SetLangInput(`en`, `name`, expectedReq.Name)
 	ctx.Request().Form().Set(`age`, param.AsString(expectedReq.Age))
 	err := form.RecvSubmission()
 	if form.Exited() {
 		err = form.Error()
+	}
+	if err != nil {
+		fmt.Printf("Error:%[1]T: %[1]v\n", err)
 	}
 	assert.NoError(t, err)
 	assert.Equal(t, expectedReq, bean)
