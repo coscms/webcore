@@ -75,6 +75,8 @@ func LanguagesGetter(langsGetter func(echo.Context) language.Config, langDefault
 	}
 }
 
+// AllowedNames sets the allowed field names for the form builder.
+// It accepts a variadic list of string names to be permitted in the form.
 func AllowedNames(names ...string) Option {
 	return func(f *FormBuilder) {
 		f.allowedNames = names
