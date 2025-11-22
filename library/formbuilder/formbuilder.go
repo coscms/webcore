@@ -227,6 +227,12 @@ func (f *FormBuilder) InitConfig() error {
 			val, ok := defaultValues[com.Title(fieldName)]
 			if !ok {
 				val = f.ctx.Form(fieldName)
+				if len(val) == 0 && len(f.langDefault) > 0 {
+					if after, found := strings.CutPrefix(fieldName, `Language[`+f.langDefault+`]`); found && len(after) > 0 {
+						fieldName = strings.Trim(after, `[]`)
+						val, _ = defaultValues[com.Title(fieldName)]
+					}
+				}
 			}
 			return val
 		})
