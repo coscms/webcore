@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"reflect"
 	"slices"
 	"strings"
 
@@ -21,6 +22,7 @@ import (
 	echoMw "github.com/webx-top/echo/middleware"
 	"github.com/webx-top/echo/middleware/language"
 	"github.com/webx-top/echo/middleware/render/driver"
+	"github.com/webx-top/echo/param"
 )
 
 var (
@@ -330,16 +332,14 @@ func (f *FormBuilder) DefaultValues() map[string]string {
 	f.defaults = map[string]string{}
 	for _, info := range fields {
 		v := m.GetField(info.GoName)
-		if v != nil {
-			valStr := com.String(v)
-			if len(valStr) > 0 {
-				f.defaults[info.GoName] = valStr
-				continue
-			}
+		var valStr string
+		if v != nil && !reflect.ValueOf(v).IsZero() {
+			valStr = param.AsString(v)
 		}
-		if len(info.DefaultValue) > 0 {
-			f.defaults[info.GoName] = info.DefaultValue
+		if len(valStr) == 0 {
+			valStr = info.DefaultValue
 		}
+		f.defaults[info.GoName] = valStr
 	}
 	return f.defaults
 }
