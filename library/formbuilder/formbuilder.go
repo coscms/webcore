@@ -138,9 +138,12 @@ func (f *FormBuilder) ParseConfigFile(jsonformat ...bool) (*formsconfig.Config, 
 	}
 	var cfg *formsconfig.Config
 	b, err := renderer.RawContent(configFile)
-	if err != nil {
-		if !os.IsNotExist(err) || renderer.Manager() == nil {
+	if err != nil || len(b) == 0 {
+		if err != nil && !os.IsNotExist(err) {
 			return nil, fmt.Errorf(`read file %s: %w`, configFile, err)
+		}
+		if renderer.Manager() == nil {
+			return nil, fmt.Errorf(`renderer.Manager() is nil: %s`, configFile)
 		}
 		cfg = f.ToConfig()
 		if isJSON {
