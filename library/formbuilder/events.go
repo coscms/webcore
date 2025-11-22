@@ -49,7 +49,7 @@ func (hooks MethodHooks) Fire(method string) error {
 func BindModel(form *FormBuilder) MethodHook {
 	return func() error {
 		names := form.Config().GetNames()
-		if form.langDefault != "" && form.languages != nil {
+		if form.langDefault != "" && form.Languages() != nil {
 			if form.ctx.Lang().Normalize() == form.langDefault {
 				//langKey := com.UpperCaseFirst(form.langDefault)
 				for _, name := range names {

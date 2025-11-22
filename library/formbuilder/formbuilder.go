@@ -25,13 +25,18 @@ var (
 	ErrJSONConfigFileNameInvalid = errors.New("*.form.json name invalid")
 )
 
+var LanguagesDefaultGetter func(echo.Context) *echo.KVData
+
+// New 创建表单构建器实例
 func New(ctx echo.Context, model interface{}, options ...Option) *FormBuilder {
 	f := &FormBuilder{
-		Forms: forms.NewForms(forms.New()),
-		on:    MethodHooks{},
-		ctx:   ctx,
-		dbi:   factory.DefaultDBI,
+		Forms:           forms.NewForms(forms.New()),
+		on:              MethodHooks{},
+		ctx:             ctx,
+		dbi:             factory.DefaultDBI,
+		languagesGetter: LanguagesDefaultGetter,
 	}
+	f.setDefaultLanguage()
 	defaultHooks := []MethodHook{
 		BindModel(f),
 		ValidModel(f),
@@ -67,17 +72,17 @@ func New(ctx echo.Context, model interface{}, options ...Option) *FormBuilder {
 // FormBuilder HTML表单构建器
 type FormBuilder struct {
 	*forms.Forms
-	on          MethodHooks
-	exit        bool
-	err         error
-	ctx         echo.Context
-	configFile  string
-	config      *formsconfig.Config
-	dbi         *factory.DBI
-	defaults    map[string]string
-	filters     []formfilter.Options
-	languages   *echo.KVData
-	langDefault string
+	on              MethodHooks
+	exit            bool
+	err             error
+	ctx             echo.Context
+	configFile      string
+	config          *formsconfig.Config
+	dbi             *factory.DBI
+	defaults        map[string]string
+	filters         []formfilter.Options
+	languagesGetter func(echo.Context) *echo.KVData
+	langDefault     string
 }
 
 // Exited 是否需要退出后续处理。此时一般有err值，用于记录错误原因
@@ -202,7 +207,7 @@ func (f *FormBuilder) InitConfig() error {
 			return val
 		})
 	}
-	if f.languages != nil {
+	if f.Languages() != nil {
 		f.toLangset(cfg)
 	}
 	f.Init(cfg)
@@ -210,10 +215,11 @@ func (f *FormBuilder) InitConfig() error {
 }
 
 func (f *FormBuilder) toLangset(cfg *formsconfig.Config) {
-	if f.languages == nil {
+	lgs := f.Languages()
+	if lgs == nil {
 		return
 	}
-	langCodes := f.languages.Keys()
+	langCodes := lgs.Keys()
 	if len(langCodes) <= 1 {
 		return
 	}
@@ -252,7 +258,7 @@ func (f *FormBuilder) toLangset(cfg *formsconfig.Config) {
 			elem.Type = `langset`
 			elem.Elements = []*formsconfig.Element{cloned}
 			for _, lang := range langCodes {
-				elem.AddLanguage(formsconfig.NewLanguage(lang, f.languages.Get(lang), `Language[`+lang+`][%s]`))
+				elem.AddLanguage(formsconfig.NewLanguage(lang, lgs.Get(lang), `Language[`+lang+`][%s]`))
 			}
 		}
 	}
@@ -323,4 +329,28 @@ func (f *FormBuilder) Generate() *FormBuilder {
 func (f *FormBuilder) Snippet() *FormBuilder {
 	f.Config().Template = `allfields`
 	return f
+}
+
+func (f *FormBuilder) setDefaultLanguage(langDefault ...string) *FormBuilder {
+	var _langDefault string
+	if len(langDefault) > 0 {
+		_langDefault = langDefault[0]
+	}
+	if len(_langDefault) == 0 && f.Languages() != nil {
+		for _, item := range f.Languages().Slice() {
+			if item != nil && item.H != nil && item.H.Bool(`isDefault`) {
+				_langDefault = item.K
+				break
+			}
+		}
+	}
+	f.langDefault = _langDefault
+	return f
+}
+
+func (f *FormBuilder) Languages() *echo.KVData {
+	if f.languagesGetter != nil {
+		return f.languagesGetter(f.ctx)
+	}
+	return nil
 }

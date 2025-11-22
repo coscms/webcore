@@ -62,7 +62,9 @@ func TestFormbuilder(t *testing.T) {
 	ctx := defaults.NewMockContext()
 	ctx.SetRenderer(d)
 	form := formbuilder.New(ctx, bean,
-		formbuilder.Languages(langs, `en`),
+		formbuilder.LanguagesGetter(func(ctx echo.Context) *echo.KVData {
+			return langs
+		}, `en`),
 		formbuilder.ConfigFile(`test`))
 	form.OnPost(func() error {
 		var err error

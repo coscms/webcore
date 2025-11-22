@@ -66,10 +66,10 @@ func DBI(dbi *factory.DBI) Option {
 	}
 }
 
-// Languages 多语言配置
-func Languages(langs *echo.KVData, langDefault string) Option {
+// LanguagesGetter 多语言配置
+func LanguagesGetter(langsGetter func(echo.Context) *echo.KVData, langDefault ...string) Option {
 	return func(f *FormBuilder) {
-		f.languages = langs
-		f.langDefault = langDefault
+		f.languagesGetter = langsGetter
+		f.setDefaultLanguage(langDefault...)
 	}
 }
