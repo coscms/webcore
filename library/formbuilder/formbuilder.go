@@ -211,16 +211,19 @@ func (f *FormBuilder) InitConfig() error {
 		cfg = f.config
 	}
 
+	if f.Languages() != nil {
+		f.toLangset(cfg)
+	}
+
 	defaultValues := f.DefaultValues()
 	if len(defaultValues) > 0 {
 		cfg.SetDefaultValue(func(fieldName string) string {
-			fieldName = com.Title(fieldName)
-			val, _ := defaultValues[fieldName]
+			val, ok := defaultValues[com.Title(fieldName)]
+			if !ok {
+				val = f.ctx.Form(fieldName)
+			}
 			return val
 		})
-	}
-	if f.Languages() != nil {
-		f.toLangset(cfg)
 	}
 	f.Init(cfg)
 	return err
@@ -316,7 +319,7 @@ func (f *FormBuilder) DefaultValues() map[string]string {
 	if f.dbi == nil || f.dbi.Fields == nil {
 		return nil
 	}
-	m, ok := f.Model.(factory.Short)
+	m, ok := f.Model.(factory.Model)
 	if !ok {
 		return nil
 	}
@@ -326,6 +329,14 @@ func (f *FormBuilder) DefaultValues() map[string]string {
 	}
 	f.defaults = map[string]string{}
 	for _, info := range fields {
+		v := m.GetField(info.GoName)
+		if v != nil {
+			valStr := com.String(v)
+			if len(valStr) > 0 {
+				f.defaults[info.GoName] = valStr
+				continue
+			}
+		}
 		if len(info.DefaultValue) > 0 {
 			f.defaults[info.GoName] = info.DefaultValue
 		}
