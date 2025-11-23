@@ -198,11 +198,15 @@ func (f *FormBuilder) ParseConfigFile(jsonformat ...bool) (*formsconfig.Config, 
 	return cfg, err
 }
 
+// SetConfig sets the form builder configuration and returns the FormBuilder instance for method chaining.
 func (f *FormBuilder) SetConfig(cfg *formsconfig.Config) *FormBuilder {
 	f.config = cfg
 	return f
 }
 
+// InitConfig initializes the FormBuilder configuration by either parsing the config file
+// or cloning the existing config. It also handles language set conversion if languages are specified.
+// Returns an error if config parsing fails.
 func (f *FormBuilder) InitConfig() error {
 	var cfg *formsconfig.Config
 	var err error
@@ -220,25 +224,6 @@ func (f *FormBuilder) InitConfig() error {
 	}
 
 	f.Init(cfg)
-	f.ParseFromConfig()
-
-	defaultValues := f.DefaultValues()
-	if len(defaultValues) > 0 {
-		cfg.SetDefaultValue(func(fieldName string) string {
-			val, ok := defaultValues[com.Title(fieldName)]
-			if ok {
-				return val
-			}
-			val = f.ctx.Form(fieldName)
-			if len(val) == 0 && len(f.langDefault) > 0 {
-				if after, found := strings.CutPrefix(fieldName, f.langInputNamePrefix(f.langDefault)); found && len(after) > 0 {
-					fieldName = strings.Trim(after, `[]`)
-					val, _ = defaultValues[com.Title(fieldName)]
-				}
-			}
-			return val
-		})
-	}
 	return err
 }
 
@@ -246,11 +231,22 @@ func (f *FormBuilder) langInputNamePrefix(lang string) string {
 	return `Language[` + lang + `]`
 }
 
-func (f *FormBuilder) SetLangInput(lang string, field string, value string) *FormBuilder {
-	f.ctx.Request().Form().Set(f.langInputNamePrefix(lang)+`[`+field+`]`, value)
+// SetLangInput sets the form input value for a specific language and field.
+// Returns the FormBuilder instance for method chaining.
+func (f *FormBuilder) SetLangInput(lang string, field string, value string, postFormOnly ...bool) *FormBuilder {
+	if len(postFormOnly) > 0 && postFormOnly[0] {
+		f.ctx.Request().PostForm().Set(f.langInputNamePrefix(lang)+`[`+field+`]`, value)
+	} else {
+		f.ctx.Request().Form().Set(f.langInputNamePrefix(lang)+`[`+field+`]`, value)
+	}
 	return f
 }
 
+// toLangset converts multilingual form fields into langset elements in the form configuration.
+// It processes the form elements recursively, grouping multilingual fields under langset containers.
+// For each multilingual field, it creates language-specific inputs based on the available languages.
+// Fields that implement factory.Short interface are checked for multilingual support.
+// The function modifies the provided config in-place and does not return any value.
 func (f *FormBuilder) toLangset(cfg *formsconfig.Config) {
 	lgs := f.Languages()
 	if lgs == nil {
@@ -389,9 +385,43 @@ func (f *FormBuilder) RecvSubmission() error {
 	return f.err
 }
 
+// Generate processes the form configuration, sets default values, and returns the FormBuilder instance for method chaining.
+func (f *FormBuilder) Generate() *FormBuilder {
+	f.ParseFromConfig()
+	f.setDefaultValue()
+	return f
+}
+
+// setDefaultValue sets default values for form fields based on DefaultValues map.
+// It handles both direct field names and language-specific field names (with prefix).
+// If no default values are provided, the function does nothing.
+// The function also checks for form input values as fallback defaults.
+func (f *FormBuilder) setDefaultValue() {
+	defaultValues := f.DefaultValues()
+	if len(defaultValues) == 0 {
+		return
+	}
+	// 需要先调用 ParseFromConfig() 来生成多语言输入表单域
+	f.Config().SetDefaultValue(func(fieldName string) string {
+		val, ok := defaultValues[com.Title(fieldName)]
+		if ok {
+			return val
+		}
+		val = f.ctx.Form(fieldName)
+		if len(val) == 0 && len(f.langDefault) > 0 {
+			if after, found := strings.CutPrefix(fieldName, f.langInputNamePrefix(f.langDefault)); found && len(after) > 0 {
+				fieldName = strings.Trim(after, `[]`)
+				val, _ = defaultValues[com.Title(fieldName)]
+			}
+		}
+		return val
+	})
+}
+
 // Snippet 表单片段
 func (f *FormBuilder) Snippet() *FormBuilder {
 	f.Config().Template = `allfields`
+	f.Config().WithButtons = false
 	return f
 }
 

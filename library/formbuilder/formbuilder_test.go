@@ -81,6 +81,30 @@ func TestFormbuilder(t *testing.T) {
 	})
 	//fmt.Printf("%#v\n", ctx.Get(`forms`))
 	assert.Equal(t, form.Forms, ctx.Get(`forms`))
+
+	// ----- POST Submit -----
+
+	expectedReq := &TestRequest{
+		Name: `test`,
+		Age:  123,
+	}
+	ctx.Request().SetMethod(`POST`)
+	form.SetLangInput(`en`, `name`, expectedReq.Name)
+	ctx.Request().Form().Set(`age`, param.AsString(expectedReq.Age))
+	err := form.RecvSubmission()
+	if form.Exited() {
+		err = form.Error()
+	}
+	if err != nil {
+		fmt.Printf("Error:%[1]T: %[1]v\n", err)
+	}
+	assert.NoError(t, err)
+	assert.Equal(t, expectedReq, bean)
+
+	// ----- Generate HTML -----
+
+	form.Generate()
+
 	htmlResult := string(form.Render())
 	fmt.Println(htmlResult)
 	os.WriteFile(`testdata/test.html`, []byte(`<html><head>
@@ -120,21 +144,4 @@ func TestFormbuilder(t *testing.T) {
 	expected = spaceClearRegex.ReplaceAllString(expected, `$1$2`)
 	//assert.Equal(t, expected, htmlResult)
 
-	// -----
-	expectedReq := &TestRequest{
-		Name: `test`,
-		Age:  123,
-	}
-	ctx.Request().SetMethod(`POST`)
-	form.SetLangInput(`en`, `name`, expectedReq.Name)
-	ctx.Request().Form().Set(`age`, param.AsString(expectedReq.Age))
-	err := form.RecvSubmission()
-	if form.Exited() {
-		err = form.Error()
-	}
-	if err != nil {
-		fmt.Printf("Error:%[1]T: %[1]v\n", err)
-	}
-	assert.NoError(t, err)
-	assert.Equal(t, expectedReq, bean)
 }
