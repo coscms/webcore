@@ -2,28 +2,19 @@ package formbuilder
 
 import (
 	"errors"
-	"fmt"
-	"os"
-	"reflect"
-	"slices"
 	"strings"
 
-	"github.com/admpub/log"
 	"github.com/coscms/forms"
 	"github.com/coscms/forms/common"
 	formsconfig "github.com/coscms/forms/config"
 	"github.com/coscms/forms/fields"
-	"gopkg.in/yaml.v3"
 
-	"github.com/webx-top/com"
 	"github.com/webx-top/db/lib/factory"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/engine"
 	"github.com/webx-top/echo/formfilter"
 	echoMw "github.com/webx-top/echo/middleware"
 	"github.com/webx-top/echo/middleware/language"
-	"github.com/webx-top/echo/middleware/render/driver"
-	"github.com/webx-top/echo/param"
 )
 
 var (
@@ -128,249 +119,6 @@ func (f *FormBuilder) Error() error {
 	return f.err
 }
 
-// ParseConfigFile 解析配置文件 xxx.form.json
-func (f *FormBuilder) ParseConfigFile(jsonformat ...bool) (*formsconfig.Config, error) {
-	configFile := f.configFile + `.form`
-	renderer, ok := f.ctx.Renderer().(driver.Driver)
-	if !ok {
-		return nil, fmt.Errorf(`FormBuilder: Expected renderer is "driver.Driver", but got "%T"`, f.ctx.Renderer())
-	}
-	var isJSON bool
-	if len(jsonformat) > 0 {
-		isJSON = jsonformat[0]
-	}
-	if isJSON {
-		configFile += `.json`
-	} else {
-		configFile += `.yaml`
-	}
-	configFile = renderer.TmplPath(f.ctx, configFile)
-	if len(configFile) == 0 {
-		return nil, ErrJSONConfigFileNameInvalid
-	}
-	var cfg *formsconfig.Config
-	b, err := renderer.RawContent(configFile)
-	if err != nil || len(b) == 0 {
-		if err != nil && !os.IsNotExist(err) {
-			return nil, fmt.Errorf(`read file %s: %w`, configFile, err)
-		}
-		if renderer.Manager() == nil {
-			return nil, fmt.Errorf(`renderer.Manager() is nil: %s`, configFile)
-		}
-		cfg = f.ToConfig()
-		if isJSON {
-			b, err = f.ToJSONBlob(cfg)
-			if err != nil {
-				return nil, fmt.Errorf(`[form.ToJSONBlob] %s: %w`, configFile, err)
-			}
-		} else {
-			b, err = yaml.Marshal(cfg)
-			if err != nil {
-				return nil, fmt.Errorf(`[form:yaml.Marshal] %s: %w`, configFile, err)
-			}
-		}
-		err = renderer.Manager().SetTemplate(configFile, b)
-		if err != nil {
-			return nil, fmt.Errorf(`%s: %w`, configFile, err)
-		}
-		f.ctx.Logger().Infof(f.ctx.T(`生成表单配置文件“%v”成功。`), configFile)
-	} else {
-		if isJSON {
-			cfg, err = forms.Unmarshal(b, configFile)
-			if err != nil {
-				return nil, fmt.Errorf(`[forms.Unmarshal] %s: %w`, configFile, err)
-			}
-		} else {
-			cfg, err = common.GetOrSetCachedConfig(configFile, func() (*formsconfig.Config, error) {
-				cfg := &formsconfig.Config{}
-				err := yaml.Unmarshal(b, cfg)
-				return cfg, err
-			})
-			if err != nil {
-				return nil, fmt.Errorf(`[form:yaml.Unmarshal] %s: %w`, configFile, err)
-			}
-		}
-	}
-	if cfg != nil {
-		return cfg.Clone(), err
-	}
-	cfg = f.NewConfig()
-	return cfg, err
-}
-
-// SetConfig sets the form builder configuration and returns the FormBuilder instance for method chaining.
-func (f *FormBuilder) SetConfig(cfg *formsconfig.Config) *FormBuilder {
-	f.config = cfg
-	return f
-}
-
-// InitConfig initializes the FormBuilder configuration by either parsing the config file
-// or cloning the existing config. It also handles language set conversion if languages are specified.
-// Returns an error if config parsing fails.
-func (f *FormBuilder) InitConfig() error {
-	var cfg *formsconfig.Config
-	var err error
-	if f.config == nil {
-		cfg, err = f.ParseConfigFile()
-		if err != nil {
-			return err
-		}
-	} else {
-		cfg = f.config.Clone()
-	}
-
-	if f.Languages() != nil {
-		f.toLangset(cfg)
-	}
-
-	f.Init(cfg)
-	return err
-}
-
-func (f *FormBuilder) langInputNamePrefix(lang string) string {
-	return `Language[` + lang + `]`
-}
-
-// SetLangInput sets the form input value for a specific language and field.
-// Returns the FormBuilder instance for method chaining.
-func (f *FormBuilder) SetLangInput(lang string, field string, value string, postFormOnly ...bool) *FormBuilder {
-	if len(postFormOnly) > 0 && postFormOnly[0] {
-		f.ctx.Request().PostForm().Set(f.langInputNamePrefix(lang)+`[`+field+`]`, value)
-	} else {
-		f.ctx.Request().Form().Set(f.langInputNamePrefix(lang)+`[`+field+`]`, value)
-	}
-	return f
-}
-
-// toLangset converts multilingual form fields into langset elements in the form configuration.
-// It processes the form elements recursively, grouping multilingual fields under langset containers.
-// For each multilingual field, it creates language-specific inputs based on the available languages.
-// Fields that implement factory.Short interface are checked for multilingual support.
-// The function modifies the provided config in-place and does not return any value.
-func (f *FormBuilder) toLangset(cfg *formsconfig.Config) {
-	lgs := f.Languages()
-	if lgs == nil {
-		return
-	}
-	langCodes := lgs.AllList
-	if len(langCodes) <= 1 {
-		return
-	}
-	m, ok := f.Model.(factory.Short)
-	if !ok {
-		log.Warnf(`[formbuilder.toLangset] model %T does not implement factory.Short`, f.Model)
-		return
-	}
-	var fields []string
-	for _, info := range f.dbi.Fields[m.Short_()] {
-		if info.Multilingual {
-			fields = append(fields, info.GoName)
-		}
-	}
-	if len(fields) == 0 {
-		return
-	}
-	var setElems func(elems []*formsconfig.Element) []*formsconfig.Element
-	setElems = func(elems []*formsconfig.Element) []*formsconfig.Element {
-		var lastLangset *formsconfig.Element
-		var lastLangsetIndex int
-		var deleteIndexes []int
-		for index, elem := range elems {
-			if elem.Type == `fieldset` {
-				elem.Elements = setElems(elem.Elements)
-				elems[index] = elem
-				continue
-			}
-			if elem.Type == `langset` {
-				// 已经是langset类型，无需处理
-				continue
-			}
-			if elem.Name == `` {
-				continue
-			}
-			fieldName := com.Title(elem.Name)
-			if !slices.Contains(fields, fieldName) {
-				continue
-			}
-			cloned := elem.Clone()
-			if lastLangset != nil && lastLangsetIndex == index-1 {
-				// 紧跟在上一个langset后面，合并到上一个langset中
-				lastLangset.Elements = append(lastLangset.Elements, cloned)
-				deleteIndexes = append(deleteIndexes, index)
-				lastLangsetIndex = index
-				continue
-			}
-			// 创建新的langset
-			elem.Type = `langset`
-			elem.Elements = []*formsconfig.Element{cloned}
-			for _, lang := range langCodes {
-				label := lgs.ExtraBy(lang).String(`label`)
-				if len(label) == 0 {
-					label = lang
-				}
-				elem.AddLanguage(formsconfig.NewLanguage(lang, label, f.langInputNamePrefix(lang)+`[%s]`))
-			}
-			lastLangset = elem
-			lastLangsetIndex = index
-		}
-		// 删除已合并的元素
-		if len(deleteIndexes) > 0 {
-			newElems := []*formsconfig.Element{}
-			for index, elem := range elems {
-				if slices.Contains(deleteIndexes, index) {
-					continue
-				}
-				newElems = append(newElems, elem)
-			}
-			elems = newElems
-		}
-		return elems
-	}
-	cfg.Elements = setElems(cfg.Elements)
-}
-
-// DefaultValues 获取model结构体各个字段在数据库中的默认值
-func (f *FormBuilder) DefaultValues() map[string]string {
-	if f.defaults != nil {
-		return f.defaults
-	}
-	if f.dbi == nil || f.dbi.Fields == nil {
-		return nil
-	}
-	m, ok := f.Model.(factory.Model)
-	if !ok {
-		return nil
-	}
-	fields, ok := f.dbi.Fields[m.Short_()]
-	if !ok || fields == nil {
-		return nil
-	}
-	f.defaults = map[string]string{}
-	for _, info := range fields {
-		v := m.GetField(info.GoName)
-		var valStr string
-		if v != nil && !reflect.ValueOf(v).IsZero() {
-			valStr = param.AsString(v)
-		}
-		if len(valStr) == 0 {
-			valStr = info.DefaultValue
-		}
-		f.defaults[info.GoName] = valStr
-	}
-	return f.defaults
-}
-
-// DefaultValue 查询某个结构体字段在数据库中对应的默认值
-func (f *FormBuilder) DefaultValue(fieldName string) string {
-	defaultValues := f.DefaultValues()
-	if defaultValues == nil {
-		return ``
-	}
-	fieldName = com.Title(fieldName)
-	val, _ := defaultValues[fieldName]
-	return val
-}
-
 // RecvSubmission 接收客户端的提交
 func (f *FormBuilder) RecvSubmission() error {
 	ctx := f.ctx
@@ -392,64 +140,11 @@ func (f *FormBuilder) Generate() *FormBuilder {
 	return f
 }
 
-// setDefaultValue sets default values for form fields based on DefaultValues map.
-// It handles both direct field names and language-specific field names (with prefix).
-// If no default values are provided, the function does nothing.
-// The function also checks for form input values as fallback defaults.
-func (f *FormBuilder) setDefaultValue() {
-	defaultValues := f.DefaultValues()
-	if len(defaultValues) == 0 {
-		return
-	}
-	// 需要先调用 ParseFromConfig() 来生成多语言输入表单域
-	f.Config().SetDefaultValue(func(fieldName string) string {
-		val, ok := defaultValues[com.Title(fieldName)]
-		if ok {
-			return val
-		}
-		val = f.ctx.Form(fieldName)
-		if len(val) == 0 && len(f.langDefault) > 0 {
-			if after, found := strings.CutPrefix(fieldName, f.langInputNamePrefix(f.langDefault)); found && len(after) > 0 {
-				fieldName = strings.Trim(after, `[]`)
-				val, _ = defaultValues[com.Title(fieldName)]
-			}
-		}
-		return val
-	})
-}
-
 // Snippet 表单片段
 func (f *FormBuilder) Snippet() *FormBuilder {
 	f.Config().Template = `allfields`
 	f.Config().WithButtons = false
 	return f
-}
-
-func (f *FormBuilder) setDefaultLanguage(langDefault ...string) *FormBuilder {
-	var _langDefault string
-	if len(langDefault) > 0 {
-		_langDefault = langDefault[0]
-	}
-	if len(_langDefault) == 0 && f.Languages() != nil {
-		_langDefault = f.Languages().Default
-	}
-	f.langDefault = _langDefault
-	return f
-}
-
-// Languages returns the language configuration for the form builder.
-// If a custom language getter is set, it will be called to retrieve the configuration.
-// Returns nil if no language configuration is available.
-func (f *FormBuilder) Languages() *language.Config {
-	if f.langConfig != nil {
-		return f.langConfig
-	}
-	if f.langsGetter != nil {
-		c := f.langsGetter(f.ctx)
-		f.langConfig = &c
-		return f.langConfig
-	}
-	return nil
 }
 
 // FormData retrieves form data from the request based on the content type.
