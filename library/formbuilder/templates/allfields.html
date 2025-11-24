@@ -1,9 +1,9 @@
-{{- range $k, $g := .groups }}
-{{- if gt (len $g.Elements) 0}}
+{{- range $k, $g := .groups -}}
+{{- if gt (len $g.Elements) 0 -}}
 <div class="form-group{{if $g.HasError}} has-error{{end}}">
-{{- range $g.Elements }}
-{{ .Render }}
-{{- end }}
+{{- range $g.Elements -}}
+{{- .Render -}}
+{{- end -}}
 </div>
-{{- end }}
-{{- end }}
+{{- end -}}
+{{- end -}}
