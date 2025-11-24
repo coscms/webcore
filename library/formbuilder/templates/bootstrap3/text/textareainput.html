@@ -4,7 +4,7 @@
     {{- end }}
     <div class="col-sm-{{if gt .fieldCols 0}}{{.fieldCols}}{{else if eq .container `fieldset`}}10{{else}}8{{end}}">
         <div{{if .id}} id="{{.id}}-container"{{end}}>
-            <textarea name="{{.name}}" class="form-control{{ if .classes }} {{.classes}}{{end}}"{{if .id}} id="{{.id}}"{{end}}{{if .params}}{{range $k, $v := .params}} {{$k}}="{{$v}}"{{end}}{{end}}{{if .css}} style="{{range $k, $v := .css}}{{$k}}: {{$v}}; {{end}}"{{end}}{{range .tags}} {{.}}{{end}}>{{.text}}</textarea>
+            <textarea name="{{.name}}" class="form-control{{ if .classes }} {{.classes}}{{end}}"{{if .id}} id="{{.id}}"{{end}}{{if .params}}{{range $k, $v := .params}} {{$k}}="{{$v}}"{{end}}{{end}}{{if .css}} style="{{range $k, $v := .css}}{{$k}}: {{- $v}}; {{- end}}"{{end}}{{range .tags}} {{.}}{{end}}>{{.text}}</textarea>
         </div>
         {{- if or .helptext .errors }}
         <div class="help-block">
