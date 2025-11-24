@@ -117,6 +117,13 @@ func (f *FormBuilder) InitConfig() error {
 		cfg = f.config.Clone()
 	}
 
+	if f.configPrepare != nil {
+		err = f.configPrepare(cfg)
+		if err != nil {
+			return err
+		}
+	}
+
 	if f.Languages() != nil {
 		f.toLangset(cfg)
 	}

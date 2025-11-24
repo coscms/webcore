@@ -20,7 +20,7 @@ elements:
       fieldcols: 0
       value: ""
       helptext: ""
-      template: ""
+      template: "select2"
       valid: ""
       attributes: []
       choices: []

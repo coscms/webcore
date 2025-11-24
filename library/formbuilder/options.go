@@ -2,6 +2,7 @@ package formbuilder
 
 import (
 	"github.com/coscms/forms/config"
+	formsconfig "github.com/coscms/forms/config"
 	"github.com/webx-top/db/lib/factory"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/formfilter"
@@ -50,6 +51,12 @@ func ConfigFile(jsonFile string, silent ...bool) Option {
 func Config(cfg *config.Config) Option {
 	return func(f *FormBuilder) {
 		f.SetConfig(cfg)
+	}
+}
+
+func ConfigPrepare(configPrepare func(*formsconfig.Config) error) Option {
+	return func(f *FormBuilder) {
+		f.configPrepare = configPrepare
 	}
 }
 

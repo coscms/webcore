@@ -70,6 +70,9 @@ func (f *FormBuilder) setMultilingualElems(multilingualFields []string, elems []
 		// 创建新的langset
 		elem.Type = `langset`
 		elem.Elements = []*formsconfig.Element{cloned}
+		if len(elem.Template) > 0 {
+			elem.Template = ``
+		}
 		for _, lang := range lgs.AllList {
 			label := lgs.ExtraBy(lang).String(`label`)
 			if len(label) == 0 {
