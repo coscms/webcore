@@ -5,10 +5,9 @@
 	{{- end -}}
 	<div class="col-sm-{{if gt .fieldCols 0}}{{.fieldCols}}{{else if eq .container `fieldset`}}10{{else}}8{{end}}">
 		{{- range .choices -}}
-		<label class="control-label{{ if $p.labelClasses }} {{$p.labelClasses}}{{end}}">
-			<input type="radio" name="{{$p.name}}" class="webx{{if $p.classes}} {{$p.classes}}{{end}}" value="{{.ID}}"{{if $p.params}}{{range $k2, $v2 := $p.params}} {{$k2}}="{{$v2}}"{{end}}{{end}}{{if $p.css}} style="{{range $k2, $v2 := .css}}{{$k2}}: {{- $v2}}; {{- end}}"{{end}}{{if .Checked}} checked="checked"{{end}}{{range $p.tags}} {{.}}{{end}} data-parsley-errors-container="#parsley-error-{{$p.name}}">
-			<span class="lbl">{{.Val}}</span>
-		</label> &nbsp; &nbsp;
+        <div class="radio radio-primary radio-inline{{if $p.classes}} {{$p.classes}}{{end}}"{{if $p.css}} style="{{range $k2, $v2 := .css}}{{$k2}}: {{- $v2}}; {{- end}}"{{end}}>
+          <input type="radio" value="{{.ID}}" name="{{$p.name}}" id="{{if p.lang}}{{p.lang}}-{{end}}{{$p.name}}-{{.ID}}"{{if $p.params}}{{range $k2, $v2 := $p.params}} {{$k2}}="{{$v2}}"{{end}}{{end}}{{if .Checked}} checked="checked"{{end}}{{range $p.tags}} {{.}}{{end}} data-parsley-errors-container="#parsley-error-{{p.lang}}-{{$p.name}}"> <label for="{{if p.lang}}{{p.lang}}-{{end}}{{$p.name}}-{{.ID}}"{{ if $p.labelClasses }} class="{{$p.labelClasses}}"{{end}}>{{.Val}}</label>
+        </div>
 		{{- end -}}
 		{{- if or .helptext .errors -}}
 		<div class="help-block">
@@ -22,6 +21,6 @@
 			{{- end -}}
 		</div>
 		{{- end -}}
-		<div id='parsley-error-{{$p.name}}'></div>
+		<div id='parsley-error-{{p.lang}}-{{$p.name}}'></div>
 	</div>
 {{- end -}}
