@@ -62,7 +62,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.92.0
 	github.com/caddyserver/certmagic v0.25.0
 	github.com/coscms/captcha v0.2.3
-	github.com/coscms/forms v1.14.0
+	github.com/coscms/forms v1.15.2
 	github.com/coscms/go-imgparse v0.0.1
 	github.com/coscms/oauth2s v0.5.0
 	github.com/coscms/session-boltstore v0.0.0-20250617034717-a58d8848fa61
