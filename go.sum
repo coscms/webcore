@@ -84,8 +84,8 @@ github.com/admpub/httpscerts v0.0.0-20180907121630-a2990e2af45c h1:tmqtGUQDycCYR
 github.com/admpub/httpscerts v0.0.0-20180907121630-a2990e2af45c/go.mod h1:ntjmNJTEY4r6P9iKkN08oWLxjJSy85dSsJv6S0mjB3M=
 github.com/admpub/humanize v0.0.0-20190501023926-5f826e92c8ca h1:9mfauR3d9p41BFnAoXmHc2z8yHcgg+3+jT1hbnQrtXo=
 github.com/admpub/humanize v0.0.0-20190501023926-5f826e92c8ca/go.mod h1:eHL6IsGOvDKqPc9Zp0d0NNayoEYoJ+UC+vj6zG0lGCY=
-github.com/admpub/i18n v0.5.2 h1:CrFTmshotyhY6KnvMYoAO1SHQEQVuzkDqA3TdDIrVQM=
-github.com/admpub/i18n v0.5.2/go.mod h1:TY5yv57UR9JBzpFzupd9A7Jggk07gR+BCRi/sPq/Ksw=
+github.com/admpub/i18n v0.5.3 h1:0Jk6QROLdwzh83DtXlHrzyUOUq8iDSiVS/DRkNKg37c=
+github.com/admpub/i18n v0.5.3/go.mod h1:ZHxhTcYyGqHvX9/b6lamxRU4KT+YQRc46tTSHSMtQyI=
 github.com/admpub/identicon v1.0.2 h1:gg3F1Qq4ckH8ANs1iVKEZUnzZynhzmKR28A1ejO7E58=
 github.com/admpub/identicon v1.0.2/go.mod h1:jUrdpNyanISNMRiOTYXex6OVUbDznf1rFPp1iVmTA8Q=
 github.com/admpub/imageproxy v0.10.1 h1:wesf2QLhhr5lXzgzqipU7Zdgj8XxfIj3usC9zFI5rZ8=
