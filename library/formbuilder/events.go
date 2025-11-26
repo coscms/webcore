@@ -51,7 +51,7 @@ func BindModel(form *FormBuilder) MethodHook {
 	return func() error {
 		names := form.Config().GetNames()
 		if form.langDefault != "" && form.Languages() != nil {
-			if form.ctx.Lang().Normalize() == form.langDefault {
+			if len(form.Languages().AllList) > 1 {
 				//langKey := com.UpperCaseFirst(form.langDefault)
 				formData := form.FormData()
 				deletedIndexes := []int{}
