@@ -207,6 +207,7 @@ func (h *HTTPServer) Apply() {
 
 	// 启用session
 	e.Use(session.Middleware(config.SessionOptions, config.AutoSecure))
+
 	// 启用多语言支持
 	if h.language != nil {
 		h.language.Close()
