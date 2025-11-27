@@ -7,6 +7,7 @@ import (
 
 	"github.com/admpub/timeago"
 	"github.com/webx-top/echo"
+	"github.com/webx-top/echo/middleware/language"
 	"github.com/webx-top/echo/middleware/tplfunc"
 	"github.com/webx-top/echo/param"
 	"github.com/webx-top/echo/subdomains"
@@ -40,6 +41,8 @@ func GlobalFuncMap() map[string]interface{} {
 func init() {
 	timeago.Set(`language`, `zh-cn`)
 	tplfunc.TplFuncMap[`Languages`] = languages
+	tplfunc.TplFuncMap[`LanguageConfig`] = languageConfig
+	tplfunc.TplFuncMap[`LanguageExtra`] = languageExtra
 	tplfunc.TplFuncMap[`URLFor`] = subdomains.Default.URL
 	tplfunc.TplFuncMap[`URLByName`] = subdomains.Default.URLByName
 	tplfunc.TplFuncMap[`BackendURLByName`] = getBackendURLByName
@@ -109,6 +112,14 @@ func getFileTypeIcon(typ string) string {
 
 func languages() []string {
 	return config.FromFile().Language.AllList
+}
+
+func languageConfig() language.Config {
+	return config.FromFile().Language
+}
+
+func languageExtra(lang string) param.Store {
+	return config.FromFile().Language.ExtraBy(lang)
 }
 
 func getConfig(args ...string) echo.H {
