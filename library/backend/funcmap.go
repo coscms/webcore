@@ -42,7 +42,6 @@ func init() {
 	timeago.Set(`language`, `zh-cn`)
 	tplfunc.TplFuncMap[`Languages`] = languages
 	tplfunc.TplFuncMap[`LanguageConfig`] = languageConfig
-	tplfunc.TplFuncMap[`LanguageExtra`] = languageExtra
 	tplfunc.TplFuncMap[`URLFor`] = subdomains.Default.URL
 	tplfunc.TplFuncMap[`URLByName`] = subdomains.Default.URLByName
 	tplfunc.TplFuncMap[`BackendURLByName`] = getBackendURLByName
@@ -116,10 +115,6 @@ func languages() []string {
 
 func languageConfig() language.Config {
 	return config.FromFile().Language
-}
-
-func languageExtra(lang string) param.Store {
-	return config.FromFile().Language.ExtraBy(lang)
 }
 
 func getConfig(args ...string) echo.H {
