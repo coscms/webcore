@@ -26,11 +26,12 @@ var LanguagesDefaultGetter func(echo.Context) language.Config
 // New 创建表单构建器实例
 func New(ctx echo.Context, model interface{}, options ...Option) *FormBuilder {
 	f := &FormBuilder{
-		Forms:       forms.NewForms(forms.New()),
-		on:          MethodHooks{},
-		ctx:         ctx,
-		dbi:         factory.DefaultDBI,
-		langsGetter: LanguagesDefaultGetter,
+		Forms:               forms.NewForms(forms.New()),
+		on:                  MethodHooks{},
+		ctx:                 ctx,
+		dbi:                 factory.DefaultDBI,
+		langsGetter:         LanguagesDefaultGetter,
+		formInputNamePrefix: FormInputNamePrefixDefault,
 	}
 	f.setDefaultLanguage()
 	defaultHooks := []MethodHook{
@@ -73,20 +74,21 @@ func New(ctx echo.Context, model interface{}, options ...Option) *FormBuilder {
 // FormBuilder HTML表单构建器
 type FormBuilder struct {
 	*forms.Forms
-	on            MethodHooks
-	exit          bool
-	err           error
-	ctx           echo.Context
-	configFile    string
-	configPrepare func(*formsconfig.Config) error
-	config        *formsconfig.Config
-	dbi           *factory.DBI
-	defaults      map[string]string
-	filters       []formfilter.Options
-	langsGetter   func(echo.Context) language.Config
-	langDefault   string
-	langConfig    *language.Config
-	allowedNames  []string
+	on                  MethodHooks
+	exit                bool
+	err                 error
+	ctx                 echo.Context
+	configFile          string
+	configPrepare       func(*formsconfig.Config) error
+	config              *formsconfig.Config
+	dbi                 *factory.DBI
+	defaults            map[string]string
+	filters             []formfilter.Options
+	langsGetter         func(echo.Context) language.Config
+	langDefault         string
+	langConfig          *language.Config
+	allowedNames        []string
+	formInputNamePrefix string
 }
 
 // Exited 是否需要退出后续处理。此时一般有err值，用于记录错误原因

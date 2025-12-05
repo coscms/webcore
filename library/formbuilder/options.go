@@ -89,3 +89,10 @@ func AllowedNames(names ...string) Option {
 		f.allowedNames = names
 	}
 }
+
+// FormInputNamePrefix sets the prefix for form input names in the FormBuilder.
+func FormInputNamePrefix(prefix string) Option {
+	return func(f *FormBuilder) {
+		f.formInputNamePrefix = prefix
+	}
+}
