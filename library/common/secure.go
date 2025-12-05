@@ -383,7 +383,7 @@ func ContentEncode(content string, contypes ...string) string {
 	case `html`:
 		content = RemoveXSS(content)
 
-	case `url`, `image`, `video`, `audio`, `file`:
+	case `url`, `image`, `video`, `audio`, `file`, `string`:
 		content = MyCleanText(content)
 
 	case `id`, `uint`:
