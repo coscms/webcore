@@ -2,9 +2,11 @@ package formbuilder
 
 import "github.com/webx-top/echo/engine"
 
+var FormInputNamePrefix = `Language`
+
 // langInputNamePrefix returns the input name prefix for the specified language in the format "Language[lang]"
 func (f *FormBuilder) langInputNamePrefix(lang string) string {
-	return `Language[` + lang + `]`
+	return FormInputNamePrefix + `[` + lang + `]`
 }
 
 // SetLangInput sets the form input value for a specific language and field.
