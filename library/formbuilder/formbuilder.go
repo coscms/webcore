@@ -22,7 +22,7 @@ var (
 )
 
 var LanguageConfigGetter func(echo.Context) language.Config
-var Translateable bool
+var TranslateableGetter func(echo.Context) bool
 
 // New 创建表单构建器实例
 func New(ctx echo.Context, model interface{}, options ...Option) *FormBuilder {
@@ -33,7 +33,7 @@ func New(ctx echo.Context, model interface{}, options ...Option) *FormBuilder {
 		dbi:                 factory.DefaultDBI,
 		langsGetter:         LanguageConfigGetter,
 		formInputNamePrefix: FormInputNamePrefixDefault,
-		translateable:       Translateable,
+		translateable:       TranslateableGetter,
 	}
 	f.setDefaultLanguage()
 	defaultHooks := []MethodHook{
@@ -91,7 +91,7 @@ type FormBuilder struct {
 	langConfig          *language.Config
 	allowedNames        []string
 	formInputNamePrefix string
-	translateable       bool
+	translateable       func(echo.Context) bool
 }
 
 // Exited 是否需要退出后续处理。此时一般有err值，用于记录错误原因
@@ -125,11 +125,21 @@ func (f *FormBuilder) Error() error {
 	return f.err
 }
 
-// SetTranslateable sets whether the form fields should be translated.
+// SetTranslateable sets the function that determines if the form should be translated.
 // Returns the FormBuilder instance for method chaining.
-func (f *FormBuilder) SetTranslateable(translateable bool) *FormBuilder {
+func (f *FormBuilder) SetTranslateable(translateable func(echo.Context) bool) *FormBuilder {
 	f.translateable = translateable
 	return f
+}
+
+// Translateable returns whether the form builder supports translation capabilities.
+// It checks if the translateable function is set and calls it with the current context.
+// Returns false if no translateable function is configured.
+func (f *FormBuilder) Translateable() bool {
+	if f.translateable == nil {
+		return false
+	}
+	return f.translateable(f.ctx)
 }
 
 // RecvSubmission 接收客户端的提交

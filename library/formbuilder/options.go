@@ -96,3 +96,11 @@ func FormInputNamePrefix(prefix string) Option {
 		f.formInputNamePrefix = prefix
 	}
 }
+
+// Translateable sets the function that determines if the form should be translated.
+// Returns the FormBuilder instance for method chaining.
+func Translateable(translateable func(echo.Context) bool) Option {
+	return func(f *FormBuilder) {
+		f.translateable = translateable
+	}
+}
