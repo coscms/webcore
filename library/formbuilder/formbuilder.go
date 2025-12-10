@@ -21,17 +21,19 @@ var (
 	ErrJSONConfigFileNameInvalid = errors.New("*.form.json name invalid")
 )
 
-var LanguagesDefaultGetter func(echo.Context) language.Config
+var LanguageConfigGetter func(echo.Context) language.Config
+var Translateable bool
 
 // New 创建表单构建器实例
 func New(ctx echo.Context, model interface{}, options ...Option) *FormBuilder {
 	f := &FormBuilder{
 		Forms:               forms.NewForms(forms.New()),
-		on:                  MethodHooks{},
+		hooks:               MethodHooks{},
 		ctx:                 ctx,
 		dbi:                 factory.DefaultDBI,
-		langsGetter:         LanguagesDefaultGetter,
+		langsGetter:         LanguageConfigGetter,
 		formInputNamePrefix: FormInputNamePrefixDefault,
+		translateable:       Translateable,
 	}
 	f.setDefaultLanguage()
 	defaultHooks := []MethodHook{
@@ -74,7 +76,7 @@ func New(ctx echo.Context, model interface{}, options ...Option) *FormBuilder {
 // FormBuilder HTML表单构建器
 type FormBuilder struct {
 	*forms.Forms
-	on                  MethodHooks
+	hooks               MethodHooks
 	exit                bool
 	err                 error
 	ctx                 echo.Context
@@ -89,6 +91,7 @@ type FormBuilder struct {
 	langConfig          *language.Config
 	allowedNames        []string
 	formInputNamePrefix string
+	translateable       bool
 }
 
 // Exited 是否需要退出后续处理。此时一般有err值，用于记录错误原因
@@ -122,14 +125,21 @@ func (f *FormBuilder) Error() error {
 	return f.err
 }
 
+// SetTranslateable sets whether the form fields should be translated.
+// Returns the FormBuilder instance for method chaining.
+func (f *FormBuilder) SetTranslateable(translateable bool) *FormBuilder {
+	f.translateable = translateable
+	return f
+}
+
 // RecvSubmission 接收客户端的提交
 func (f *FormBuilder) RecvSubmission() error {
 	ctx := f.ctx
 	method := strings.ToUpper(ctx.Method())
-	if f.err = f.on.Fire(method); f.err != nil {
+	if f.err = f.hooks.Fire(method); f.err != nil {
 		return f.err
 	}
-	f.err = f.on.Fire(`*`)
+	f.err = f.hooks.Fire(`*`)
 	if ctx.Response().Committed() {
 		f.exit = true
 	}

@@ -126,4 +126,17 @@ func (f *FormBuilder) toLangset(cfg *formsconfig.Config) {
 		return
 	}
 	cfg.Elements = f.setMultilingualElems(multilingualFields, cfg.Elements)
+	if f.translateable {
+		cfg.Elements = append(cfg.Elements, &formsconfig.Element{
+			ID:    `forceTranslate`,
+			Type:  `checkbox`,
+			Name:  `forceTranslate`,
+			Label: f.ctx.T(`自动翻译`),
+			Choices: []*formsconfig.Choice{
+				{
+					Option: []string{`1`, f.ctx.T(`是`)},
+				},
+			},
+		})
+	}
 }

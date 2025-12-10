@@ -11,7 +11,7 @@ import (
 
 func init() {
 	code.CodeDict.SetHTTPCodeToExists(code.NonPrivileged, http.StatusForbidden)
-	formbuilder.LanguagesDefaultGetter = func(ctx echo.Context) language.Config {
+	formbuilder.LanguageConfigGetter = func(ctx echo.Context) language.Config {
 		return FromFile().Language
 	}
 }
