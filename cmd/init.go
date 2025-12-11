@@ -62,7 +62,7 @@ var InitInstallConfig = &struct {
 var initCmd = &cobra.Command{
 	Use:     "init",
 	Short:   "Silent install",
-	Example: filepath.Base(os.Args[0]) + " init [options]",
+	Example: Executable() + " init [options]",
 	RunE:    initRunE,
 }
 

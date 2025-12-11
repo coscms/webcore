@@ -20,7 +20,6 @@ package cmd
 
 import (
 	"os"
-	"path/filepath"
 
 	"github.com/spf13/cobra"
 	"github.com/webx-top/com"
@@ -46,7 +45,7 @@ var ServiceOptions = &service.Options{
 var serviceCmd = &cobra.Command{
 	Use:     "service",
 	Short:   "Running as a service on major platforms.",
-	Example: filepath.Base(os.Args[0]) + " service [install|uninstall|start|restart|stop]",
+	Example: Executable() + " service [install|uninstall|start|restart|stop]",
 	RunE:    serviceRunE,
 }
 

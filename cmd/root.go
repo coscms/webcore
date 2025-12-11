@@ -55,10 +55,15 @@ import (
 var rootCmd = NewRoot()
 var dumpCli bool
 
+// Executable returns the executable name
+func Executable() string {
+	return filepath.Base(os.Args[0])
+}
+
 func NewRoot() *cobra.Command {
 	// rootCmd represents the base command when called without any subcommands
 	return &cobra.Command{
-		Use:          filepath.Base(os.Args[0]),
+		Use:          Executable(),
 		Short:        ``,
 		Long:         ``,
 		SilenceUsage: true,
