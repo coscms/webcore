@@ -44,7 +44,7 @@ require (
 	github.com/admpub/oauth2/v4 v4.0.3
 	github.com/admpub/once v0.0.1
 	github.com/admpub/pp v0.0.7
-	github.com/admpub/qrcode v0.0.4
+	github.com/admpub/qrcode v0.0.5
 	github.com/admpub/realip v0.2.7
 	github.com/admpub/resty/v2 v2.7.3
 	github.com/admpub/securecookie v1.3.0
@@ -114,6 +114,7 @@ require (
 	github.com/admpub/go-captcha-assets v0.0.0-20250122071745-baa7da4bda0d // indirect
 	github.com/admpub/go-reuseport v0.5.0 // indirect
 	github.com/admpub/go-utility v0.0.1 // indirect
+	github.com/admpub/go-zbar-wasm v0.0.0-20251216112504-432bea056f3a // indirect
 	github.com/admpub/humanize v0.0.0-20190501023926-5f826e92c8ca // indirect
 	github.com/admpub/i18n v0.5.3 // indirect
 	github.com/admpub/identicon v1.0.2 // indirect
@@ -201,7 +202,6 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
-	github.com/mrg0lden/go-zbar-wasm v1.1.1 // indirect
 	github.com/muesli/smartcrop v0.3.0 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/ncruces/go-strftime v1.0.0 // indirect
