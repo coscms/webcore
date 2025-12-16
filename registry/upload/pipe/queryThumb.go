@@ -18,8 +18,13 @@ func init() {
 	Register(`_queryThumb`, queryThumb) // 以下划线开始表示这个独立的功能
 }
 
-// WidthAndHeightRegexp 宽和高
-var WidthAndHeightRegexp = regexp.MustCompile(`^[\d]+x[\d]+$`)
+// widthAndHeightRegexp 宽和高
+var widthAndHeightRegexp = regexp.MustCompile(`^[\d]+x[\d]+$`)
+
+// IsWidthAndHeight checks if the input string matches the width and height pattern.
+func IsWidthAndHeight(s string) bool {
+	return widthAndHeightRegexp.MatchString(s)
+}
 
 // queryThumb 查询缩略图
 func queryThumb(ctx echo.Context, _ driver.Storer, _ uploadClient.Results, data map[string]interface{}) error {
@@ -31,7 +36,7 @@ func queryThumb(ctx echo.Context, _ driver.Storer, _ uploadClient.Results, data 
 	if len(size) == 0 {
 		return ctx.NewError(code.InvalidParameter, `尺寸格式不正确`).SetZone(`size`)
 	}
-	if !WidthAndHeightRegexp.MatchString(size) {
+	if !IsWidthAndHeight(size) {
 		return ctx.NewError(code.InvalidParameter, `尺寸格式不正确`).SetZone(`size`)
 	}
 	sizes := strings.SplitN(size, "x", 2)
