@@ -44,7 +44,7 @@ require (
 	github.com/admpub/oauth2/v4 v4.0.3
 	github.com/admpub/once v0.0.1
 	github.com/admpub/pp v0.0.7
-	github.com/admpub/qrcode v0.0.3
+	github.com/admpub/qrcode v0.0.4
 	github.com/admpub/realip v0.2.7
 	github.com/admpub/resty/v2 v2.7.3
 	github.com/admpub/securecookie v1.3.0
@@ -201,6 +201,7 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
+	github.com/mrg0lden/go-zbar-wasm v1.1.1 // indirect
 	github.com/muesli/smartcrop v0.3.0 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/ncruces/go-strftime v1.0.0 // indirect
@@ -220,6 +221,7 @@ require (
 	github.com/rwcarlsen/goexif v0.0.0-20190401172101-9e8deecbddbd // indirect
 	github.com/segmentio/fasthash v1.0.3 // indirect
 	github.com/smartystreets/assertions v1.2.0 // indirect
+	github.com/tetratelabs/wazero v1.10.1 // indirect
 	github.com/tidwall/btree v1.8.1 // indirect
 	github.com/tidwall/buntdb v1.3.2 // indirect
 	github.com/tidwall/gjson v1.18.0 // indirect
