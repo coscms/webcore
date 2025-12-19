@@ -34,6 +34,7 @@ func New(ctx echo.Context, model interface{}, options ...Option) *FormBuilder {
 		langsGetter:         LanguageConfigGetter,
 		formInputNamePrefix: FormInputNamePrefixDefault,
 		translateable:       TranslateableGetter,
+		ctxStoreKey:         `forms`,
 	}
 	f.setDefaultLanguage()
 	defaultHooks := []MethodHook{
@@ -69,7 +70,9 @@ func New(ctx echo.Context, model interface{}, options ...Option) *FormBuilder {
 			f.Elements(fields.HiddenField(echoMw.DefaultCSRFConfig.ContextKey).SetValue(csrfToken))
 		})
 	}
-	ctx.Set(`forms`, f.Forms)
+	if len(f.ctxStoreKey) > 0 {
+		ctx.Set(f.ctxStoreKey, f.Forms)
+	}
 	return f
 }
 
@@ -92,6 +95,7 @@ type FormBuilder struct {
 	allowedNames        []string
 	formInputNamePrefix string
 	translateable       func(echo.Context) bool
+	ctxStoreKey         string
 }
 
 // Exited 是否需要退出后续处理。此时一般有err值，用于记录错误原因

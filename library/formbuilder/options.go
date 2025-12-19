@@ -104,3 +104,10 @@ func Translateable(translateable func(echo.Context) bool) Option {
 		f.translateable = translateable
 	}
 }
+
+// ContextStoreKey sets the context store key for storing forms in the Echo context.
+func ContextStoreKey(key string) Option {
+	return func(f *FormBuilder) {
+		f.ctxStoreKey = key
+	}
+}
