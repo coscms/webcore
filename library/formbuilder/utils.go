@@ -10,15 +10,18 @@ import (
 	"github.com/webx-top/echo/engine"
 )
 
+// ClearCache 清除表单配置和模板缓存
 func ClearCache() {
 	common.ClearCachedConfig()
 	common.ClearCachedTemplate()
 }
 
+// DelCachedConfig 删除指定的表单配置缓存
 func DelCachedConfig(file string) bool {
 	return common.DelCachedConfig(file)
 }
 
+// AddChoiceByKV adds choices to a form field based on key-value data.
 func AddChoiceByKV(field fields.FieldInterface, kvData *echo.KVData, checkedKeys ...string) fields.FieldInterface {
 	for _, kv := range kvData.Slice() {
 		var checked bool
@@ -33,6 +36,7 @@ func AddChoiceByKV(field fields.FieldInterface, kvData *echo.KVData, checkedKeys
 	return field
 }
 
+// SetChoiceByKV sets the choices of a form field based on key-value data.
 func SetChoiceByKV(field fields.FieldInterface, kvData *echo.KVData, checkedKeys ...string) fields.FieldInterface {
 	choices := []fields.InputChoice{}
 	if len(checkedKeys) == 0 {

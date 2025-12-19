@@ -10,6 +10,7 @@ import (
 	"github.com/webx-top/echo/middleware/language"
 )
 
+// setDefaultLanguage sets the default language for the form builder.
 func (f *FormBuilder) setDefaultLanguage(langDefault ...string) *FormBuilder {
 	var _langDefault string
 	if len(langDefault) > 0 {
@@ -37,6 +38,10 @@ func (f *FormBuilder) Languages() *language.Config {
 	return nil
 }
 
+// setMultilingualElems processes form elements to group multilingual fields into langset elements.
+// It checks each element against the provided list of multilingual fields and restructures
+// the elements accordingly. Elements that are part of a langset are grouped together,
+// and new langset elements are created as needed.
 func (f *FormBuilder) setMultilingualElems(multilingualFields []string, elems []*formsconfig.Element) []*formsconfig.Element {
 	lgs := f.Languages()
 	var lastLangset *formsconfig.Element
