@@ -62,7 +62,7 @@ func (f *FormBuilder) setMultilingualElems(multilingualFields []string, elems []
 			continue
 		}
 		fieldName := elem.Name
-		if strings.HasSuffix(fieldName, `]`) {
+		if strings.HasSuffix(fieldName, `]`) { // 处理数组字段名，如 "tags[name]"
 			start := strings.LastIndex(fieldName, `[`)
 			if start > -1 {
 				fieldName = fieldName[start+1 : len(fieldName)-1]
