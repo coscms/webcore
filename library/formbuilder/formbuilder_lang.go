@@ -2,6 +2,7 @@ package formbuilder
 
 import (
 	"slices"
+	"strings"
 
 	"github.com/admpub/log"
 	formsconfig "github.com/coscms/forms/config"
@@ -60,7 +61,14 @@ func (f *FormBuilder) setMultilingualElems(multilingualFields []string, elems []
 		if elem.Name == `` {
 			continue
 		}
-		fieldName := com.Title(elem.Name)
+		fieldName := elem.Name
+		if strings.HasSuffix(fieldName, `]`) {
+			start := strings.LastIndex(fieldName, `[`)
+			if start > -1 {
+				fieldName = fieldName[start+1 : len(fieldName)-1]
+			}
+		}
+		fieldName = com.Title(fieldName)
 		if !slices.Contains(multilingualFields, fieldName) {
 			continue
 		}
