@@ -9,6 +9,7 @@ import (
 	"github.com/webx-top/com"
 	"github.com/webx-top/db/lib/factory"
 	"github.com/webx-top/echo/middleware/language"
+	"github.com/webx-top/echo/middleware/tplfunc"
 )
 
 // setDefaultLanguage sets the default language for the form builder.
@@ -141,7 +142,7 @@ func (f *FormBuilder) toLangset(cfg *formsconfig.Config) {
 	cfg.Elements = f.setMultilingualElems(multilingualFields, cfg.Elements)
 	if f.Translateable() {
 		cfg.Elements = append(cfg.Elements, &formsconfig.Element{
-			ID:    `forceTranslate`,
+			ID:    f.ctxStoreKey + `ForceTranslate` + tplfunc.RandomString(6),
 			Type:  `checkbox`,
 			Name:  `forceTranslate`,
 			Label: f.ctx.T(`自动翻译`),
