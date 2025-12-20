@@ -111,3 +111,10 @@ func ContextStoreKey(key string) Option {
 		f.ctxStoreKey = key
 	}
 }
+
+// TranslateLabelCols 设置翻译标签的列数
+func TranslateLabelCols(cols int) Option {
+	return func(f *FormBuilder) {
+		f.translateLabelCols = cols
+	}
+}

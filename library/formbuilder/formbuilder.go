@@ -96,6 +96,7 @@ type FormBuilder struct {
 	formInputNamePrefix string
 	translateable       func(echo.Context) bool
 	ctxStoreKey         string
+	translateLabelCols  int
 }
 
 // Exited 是否需要退出后续处理。此时一般有err值，用于记录错误原因
@@ -127,6 +128,12 @@ func (f *FormBuilder) HasError() bool {
 // Error 返回错误值
 func (f *FormBuilder) Error() error {
 	return f.err
+}
+
+// SetTranslateLabelCols 设置翻译标签的列数
+func (f *FormBuilder) SetTranslateLabelCols(cols int) *FormBuilder {
+	f.translateLabelCols = cols
+	return f
 }
 
 // SetTranslateable sets the function that determines if the form should be translated.
