@@ -62,7 +62,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.94.0
 	github.com/caddyserver/certmagic v0.25.0
 	github.com/coscms/captcha v0.2.3
-	github.com/coscms/forms v1.16.2
+	github.com/coscms/forms v1.16.3
 	github.com/coscms/go-imgparse v0.0.1
 	github.com/coscms/oauth2s v0.5.0
 	github.com/coscms/session-boltstore v0.0.0-20250617034717-a58d8848fa61
@@ -223,7 +223,7 @@ require (
 	github.com/rwcarlsen/goexif v0.0.0-20190401172101-9e8deecbddbd // indirect
 	github.com/segmentio/fasthash v1.0.3 // indirect
 	github.com/smartystreets/assertions v1.2.0 // indirect
-	github.com/tetratelabs/wazero v1.10.1 // indirect
+	github.com/tetratelabs/wazero v1.11.0 // indirect
 	github.com/tidwall/btree v1.8.1 // indirect
 	github.com/tidwall/buntdb v1.3.2 // indirect
 	github.com/tidwall/gjson v1.18.0 // indirect
@@ -248,7 +248,7 @@ require (
 	go.uber.org/zap v1.27.1 // indirect
 	go.uber.org/zap/exp v0.3.0 // indirect
 	go.yaml.in/yaml/v2 v2.4.3 // indirect
-	golang.org/x/exp v0.0.0-20251209150349-8475f28825e9 // indirect
+	golang.org/x/exp v0.0.0-20251219203646-944ab1f22d93 // indirect
 	golang.org/x/image v0.34.0 // indirect
 	golang.org/x/mod v0.31.0 // indirect
 	golang.org/x/sys v0.39.0 // indirect
@@ -258,6 +258,6 @@ require (
 	modernc.org/libc v1.67.1 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect
-	modernc.org/sqlite v1.40.1 // indirect
+	modernc.org/sqlite v1.41.0 // indirect
 	rsc.io/qr v0.2.0 // indirect
 )
