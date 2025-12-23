@@ -31,10 +31,7 @@ func TestUpdateEmbedded(t *testing.T) {
 	req, resp := myTesting.NewRequestAndResponse(`GET`, `/`)
 	ctx := e.NewContext(req, resp)
 	ctx.SetTransaction(factory.NewParam())
-	tables := []string{}
-	for table := range dbschema.DBI.Events {
-		tables = append(tables, table)
-	}
+	tables := dbschema.DBI.Events.Tables()
 	echo.Dump(tables)
 	test.Contains(t, tables, `nging_user`)
 	userM := dbschema.NewNgingUser(ctx)
