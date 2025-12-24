@@ -1,19 +1,19 @@
-	<label class="col-sm-{{if gt .labelCols 0}}{{.labelCols}}{{else}}2{{end}} control-label">{{.label}}</label>
-	<div class="col-sm-{{if gt .fieldCols 0}}{{.fieldCols}}{{else}}8{{end}}{{if .classes }} {{.classes}}{{end}}"{{range .tags}} {{.}}{{end}}>
-        {{- if .helptext -}}
-            <div class="help-block">
-                {{- if .helptext }}{{ .helptext | ToHTML }}{{ end -}}
-            </div>
-        {{- end -}}
-		<div class="fieldset bg-fc">
-			{{- range $k, $g := .groups -}}
-			{{- if gt (len $g.Elements) 0 -}}
-			<div class="form-group{{if $g.HasError}} has-error{{end}}">
-			{{- range $g.Elements -}}
-			{{- .Render -}}
-			{{- end -}}
-			</div>
-			{{- end -}}
-			{{- end -}}
+<label class="col-sm-{{if gt .labelCols 0}}{{.labelCols}}{{else}}2{{end}} control-label">{{.label}}</label>
+<div class="col-sm-{{if gt .fieldCols 0}}{{.fieldCols}}{{else}}8{{end}}{{if .classes }} {{.classes}}{{end}}"{{range .tags}} {{.}}{{end}}>
+    {{- if .helptext -}}
+        <div class="help-block">
+            {{- if .helptext }}{{ .helptext | ToHTML }}{{ end -}}
+        </div>
+    {{- end -}}
+	<div class="fieldset bg-fc">
+		{{- range $k, $g := .groups -}}
+		{{- if gt (len $g.Elements) 0 -}}
+		<div class="form-group{{if $g.HasError}} has-error{{end}}">
+		{{- range $g.Elements -}}
+		{{- .Render -}}
+		{{- end -}}
 		</div>
+		{{- end -}}
+		{{- end -}}
 	</div>
+</div>
