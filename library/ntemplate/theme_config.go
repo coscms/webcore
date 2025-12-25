@@ -277,3 +277,11 @@ func GetThemeInfoFromContext(ctx echo.Context) *ThemeInfo {
 	v, _ := ctx.Internal().Get(`theme.config`).(*ThemeInfo)
 	return v
 }
+
+func IsDarkMode(ctx echo.Context) bool {
+	themeInfo := GetThemeInfoFromContext(ctx)
+	if themeInfo == nil {
+		return ctx.Cookie().Get(`ThemeColor`) == Dark
+	}
+	return themeInfo.IsDarkMode()
+}

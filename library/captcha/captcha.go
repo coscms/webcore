@@ -29,6 +29,7 @@ import (
 	"github.com/webx-top/echo/param"
 
 	"github.com/coscms/webcore/library/httpserver/httpserverutils"
+	"github.com/coscms/webcore/library/ntemplate"
 )
 
 type ICaptcha interface {
@@ -66,4 +67,8 @@ func RenderTemplate(ctx echo.Context, captchaType string, templatePath string, o
 	}
 	// return template.HTML(com.Bytes2str(b)) // bug: will be overwritten by a second render
 	return template.HTML(string(b))
+}
+
+func IsDarkMode(ctx echo.Context) bool {
+	return ntemplate.IsDarkMode(ctx)
 }

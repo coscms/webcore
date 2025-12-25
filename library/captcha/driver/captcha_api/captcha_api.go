@@ -100,7 +100,7 @@ func (c *captchaAPI) Render(ctx echo.Context, templatePath string, keysValues ..
 			locationID := `turnstile-` + c.captchaID
 			htmlContent += `<input type="hidden" name="captchaId" value="` + c.captchaID + `" />`
 			var theme string
-			if ctx.Cookie().Get(`ThemeColor`) == `dark` {
+			if captchaLib.IsDarkMode(ctx) {
 				theme = `dark`
 			} else {
 				theme = `light`
@@ -240,7 +240,7 @@ func (c *captchaAPI) MakeData(ctx echo.Context, hostAlias string, name string) e
 	window.setTimeout(function(){turnstile.reset('#` + locationID + `');},1000);
 }`
 		var theme string
-		if ctx.Cookie().Get(`ThemeColor`) == `dark` {
+		if captchaLib.IsDarkMode(ctx) {
 			theme = `dark`
 		} else {
 			theme = `light`
