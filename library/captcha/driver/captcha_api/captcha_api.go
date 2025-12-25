@@ -93,7 +93,7 @@ func (c *captchaAPI) Render(ctx echo.Context, templatePath string, keysValues ..
 	if len(templatePath) == 0 {
 		var htmlContent string
 		switch c.endpoint {
-		case captcha.CloudflareTurnstile:
+		case captcha.CloudflareTurnstile: // Cloudflare Turnstile
 			if len(jsURL) > 0 {
 				htmlContent += `<script src="` + jsURL + `"></script>`
 			}
@@ -105,6 +105,13 @@ func (c *captchaAPI) Render(ctx echo.Context, templatePath string, keysValues ..
 			} else {
 				theme = `light`
 			}
+			// doc: https://developers.cloudflare.com/turnstile/get-started/client-side-rendering/widget-configurations/
+			// data-size="normal"
+			//
+			//	Size		Width				Height	Use case
+			//	normal		300px				65px	Standard implementation
+			//	flexible	100% (min: 300px)	65px	Responsive design
+			//	compact		150px				140px	Space-constrained layouts
 			htmlContent += `<div class="cf-turnstile" id="` + locationID + `" data-sitekey="` + c.siteKey + `" data-theme="` + theme + `"></div>`
 			htmlContent += `<input type="hidden" id="` + locationID + `-extend" disabled />`
 			htmlContent += `<script>
@@ -126,6 +133,8 @@ window.addEventListener('load', function(){
 })
 </script>`
 		default:
+			// Google Recaptcha
+			// doc: https://developers.google.com/recaptcha/docs/v3
 			locationID := `recaptcha-` + c.captchaID
 			htmlContent = `<input type="hidden" name="captchaId" value="` + c.captchaID + `" />`
 			htmlContent += `<input type="hidden" id="` + locationID + `" name="g-recaptcha-response" value="" />`
