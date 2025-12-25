@@ -234,7 +234,7 @@ func (c *captchaAPI) MakeData(ctx echo.Context, hostAlias string, name string) e
 	case `turnstile`:
 		captchaName = `cf-turnstile-response`
 		locationID = `turnstile-` + c.captchaID
-		jsInit = `(function(){ typeof(turnstile)!='undefined' && turnstile.render('#` + locationID + `'); })();`
+		jsInit = `(function(){ typeof(turnstile)!='undefined' && $('#` + locationID + `').children('*').length<1 && turnstile.render('#` + locationID + `'); })();`
 		jsCallback = `function(callback){
 	callback && callback();
 	window.setTimeout(function(){turnstile.reset('#` + locationID + `');},1000);
@@ -245,7 +245,7 @@ func (c *captchaAPI) MakeData(ctx echo.Context, hostAlias string, name string) e
 		} else {
 			theme = `light`
 		}
-		htmlCode = `<input type="hidden" name="captchaId" value="` + c.captchaID + `" /><div class="cf-turnstile text-center" id="turnstile-` + c.captchaID + `" data-sitekey="` + c.siteKey + `" data-theme="` + theme + `"></div>`
+		htmlCode = `<input type="hidden" name="captchaId" value="` + c.captchaID + `" /><div class="cf-turnstile text-center" id="` + locationID + `" data-sitekey="` + c.siteKey + `" data-theme="` + theme + `"></div>`
 	default:
 		captchaName = `g-recaptcha-response`
 		locationID = `recaptcha-` + c.captchaID
@@ -276,7 +276,7 @@ f();
 		callback && callback(token);
 	});
 }`
-		htmlCode = `<input type="hidden" name="captchaId" value="` + c.captchaID + `" /><input type="hidden" id="recaptcha-` + c.captchaID + `" name="g-recaptcha-response" value="" />`
+		htmlCode = `<input type="hidden" name="captchaId" value="` + c.captchaID + `" /><input type="hidden" id="` + locationID + `" name="g-recaptcha-response" value="" />`
 	}
 	data.Set("jsCallback", jsCallback)
 	data.Set("jsInit", jsInit)
