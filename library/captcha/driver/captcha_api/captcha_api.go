@@ -234,7 +234,7 @@ func (c *captchaAPI) MakeData(ctx echo.Context, hostAlias string, name string) e
 	case `turnstile`:
 		captchaName = `cf-turnstile-response`
 		locationID = `turnstile-` + c.captchaID
-		jsInit = `(function(){ typeof(turnstile)!='undefined' && $('#` + locationID + `').children('*').length<1 && turnstile.render('#` + locationID + `'); })();`
+		jsInit = `(function(){ if(typeof(turnstile)!='undefined' && $('#` + locationID + `').children('*').length<1) turnstile.render('#` + locationID + `'); })();`
 		jsCallback = `function(callback){
 	callback && callback();
 	window.setTimeout(function(){turnstile.reset('#` + locationID + `');},1000);
