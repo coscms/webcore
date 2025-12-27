@@ -42,7 +42,7 @@ var CookieMaxAge = 86400 * 365
 func RememberSession(c echo.Context) int {
 	remember := c.Form(`remember`)
 	if len(remember) == 0 {
-		serverKind := c.Echo().Extra().String(ServerKindKey)
+		serverKind := GetServerKindByContext(c)
 		serverKind = com.UpperCaseFirst(serverKind)
 		cookieName := `Remember` + serverKind + `Login` // RememberFrontendLogin or RememberBackendLogin
 		remember = c.GetCookie(cookieName)
