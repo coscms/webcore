@@ -45,7 +45,7 @@ func RememberSession(c echo.Context) int {
 		serverKind := GetServerKindByContext(c)
 		serverKind = com.UpperCaseFirst(serverKind)
 		cookieName := `Remember` + serverKind + `Login` // RememberFrontendLogin or RememberBackendLogin
-		remember = c.GetCookie(cookieName)
+		remember = c.Request().Cookie(cookieName)
 		if len(remember) > 0 {
 			c.SetCookie(cookieName, ``, -3600, `/`)
 		}
