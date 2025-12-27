@@ -7,6 +7,7 @@ import (
 	"github.com/admpub/log"
 	"github.com/coscms/webcore/library/backend"
 	"github.com/coscms/webcore/library/common"
+	"github.com/coscms/webcore/library/httpserver/httpserverutils"
 	"github.com/webx-top/com"
 	"github.com/webx-top/com/formatter"
 	"github.com/webx-top/db"
@@ -69,6 +70,7 @@ func (u *User) FireLoginSuccess(authType string) error {
 	}
 
 	// session
+	httpserverutils.RememberSession(c)
 	u.SetSession()
 	need, err := u.NeedCheckU2F(authType, u.NgingUser.Id, 2)
 	if err != nil {
