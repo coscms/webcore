@@ -1,6 +1,8 @@
 package httpserverutils
 
 import (
+	"net/http"
+
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/middleware/session"
@@ -47,7 +49,14 @@ func RememberSession(c echo.Context) int {
 		cookieName := `Remember` + serverKind + `Login` // RememberFrontendLogin or RememberBackendLogin
 		remember = c.Request().Cookie(cookieName)
 		if len(remember) > 0 {
-			c.SetCookie(cookieName, ``, -3600, `/`)
+			c.Cookie().Add(&http.Cookie{
+				Name:     cookieName,
+				Value:    ``,
+				MaxAge:   -3600,
+				Path:     `/`,
+				Secure:   c.CookieOptions().Secure,
+				SameSite: http.SameSiteLaxMode,
+			})
 		}
 	}
 	var maxAge int
