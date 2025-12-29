@@ -175,8 +175,11 @@ func (f *FormBuilder) RecvSubmission() error {
 }
 
 // Generate processes the form configuration, sets default values, and returns the FormBuilder instance for method chaining.
-func (f *FormBuilder) Generate() *FormBuilder {
+func (f *FormBuilder) Generate(emptyValue ...bool) *FormBuilder {
 	f.ParseFromConfig()
+	if len(emptyValue) > 0 && emptyValue[0] {
+		return f
+	}
 	f.setDefaultValue()
 	return f
 }
