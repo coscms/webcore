@@ -118,3 +118,10 @@ func TranslateLabelCols(cols int) Option {
 		f.translateLabelCols = cols
 	}
 }
+
+// Renames 设置字段重命名
+func Renames(renames map[string]string) Option {
+	return func(f *FormBuilder) {
+		f.renames = renames
+	}
+}

@@ -139,6 +139,13 @@ func (f *FormBuilder) toLangset(cfg *formsconfig.Config) {
 	if len(multilingualFields) == 0 {
 		return
 	}
+	if len(f.renames) > 0 {
+		for index, field := range multilingualFields {
+			if rename, ok := f.renames[field]; ok {
+				multilingualFields[index] = rename
+			}
+		}
+	}
 	cfg.Elements = f.setMultilingualElems(multilingualFields, cfg.Elements)
 	if f.Translateable() {
 		cfg.Elements = append(cfg.Elements, &formsconfig.Element{

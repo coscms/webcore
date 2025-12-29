@@ -97,6 +97,7 @@ type FormBuilder struct {
 	translateable       func(echo.Context) bool
 	ctxStoreKey         string
 	translateLabelCols  int
+	renames             map[string]string
 }
 
 // Exited 是否需要退出后续处理。此时一般有err值，用于记录错误原因
@@ -151,6 +152,12 @@ func (f *FormBuilder) Translateable() bool {
 		return false
 	}
 	return f.translateable(f.ctx)
+}
+
+// SetRenames 设置字段重命名
+func (f *FormBuilder) SetRenames(renames map[string]string) *FormBuilder {
+	f.renames = renames
+	return f
 }
 
 // RecvSubmission 接收客户端的提交
