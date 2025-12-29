@@ -63,13 +63,26 @@ func (f *FormBuilder) setMultilingualElems(multilingualFields []string, elems []
 			continue
 		}
 		fieldName := elem.Name
-		if strings.HasSuffix(fieldName, `]`) { // 处理数组字段名，如 "tags[name]"
-			start := strings.LastIndex(fieldName, `[`)
-			if start > -1 {
-				fieldName = fieldName[start+1 : len(fieldName)-1]
+		var nameInData string
+		if len(elem.Data) > 0 {
+			if v, ok := elem.Data[`structFieldName`]; ok {
+				nameInData, _ = v.(string)
+			} else if v, ok := elem.Data[`originalName`]; ok {
+				nameInData, _ = v.(string)
+				nameInData = com.Title(nameInData)
 			}
 		}
-		fieldName = com.Title(fieldName)
+		if len(nameInData) > 0 {
+			fieldName = nameInData
+		} else {
+			if strings.HasSuffix(fieldName, `]`) { // 处理数组字段名，如 "tags[name]"
+				start := strings.LastIndex(fieldName, `[`)
+				if start > -1 {
+					fieldName = fieldName[start+1 : len(fieldName)-1]
+				}
+			}
+			fieldName = com.Title(fieldName)
+		}
 		if !slices.Contains(multilingualFields, fieldName) {
 			continue
 		}
