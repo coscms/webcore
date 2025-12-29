@@ -2,11 +2,9 @@ package formbuilder
 
 import (
 	"slices"
-	"strings"
 
 	"github.com/admpub/log"
 	formsconfig "github.com/coscms/forms/config"
-	"github.com/webx-top/com"
 	"github.com/webx-top/db/lib/factory"
 	"github.com/webx-top/echo/middleware/language"
 	"github.com/webx-top/echo/middleware/tplfunc"
@@ -62,27 +60,7 @@ func (f *FormBuilder) setMultilingualElems(multilingualFields []string, elems []
 		if elem.Name == `` {
 			continue
 		}
-		fieldName := elem.Name
-		var nameInData string
-		if len(elem.Data) > 0 {
-			if v, ok := elem.Data[`structFieldName`]; ok {
-				nameInData, _ = v.(string)
-			} else if v, ok := elem.Data[`originalName`]; ok {
-				nameInData, _ = v.(string)
-				nameInData = com.Title(nameInData)
-			}
-		}
-		if len(nameInData) > 0 {
-			fieldName = nameInData
-		} else {
-			if strings.HasSuffix(fieldName, `]`) { // 处理数组字段名，如 "tags[name]"
-				start := strings.LastIndex(fieldName, `[`)
-				if start > -1 {
-					fieldName = fieldName[start+1 : len(fieldName)-1]
-				}
-			}
-			fieldName = com.Title(fieldName)
-		}
+		fieldName := elem.GetStructFieldName()
 		if !slices.Contains(multilingualFields, fieldName) {
 			continue
 		}
