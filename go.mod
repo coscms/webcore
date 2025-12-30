@@ -90,7 +90,7 @@ require (
 	github.com/webx-top/client v0.9.6
 	github.com/webx-top/codec v0.3.0
 	github.com/webx-top/com v1.4.1
-	github.com/webx-top/db v1.28.15
+	github.com/webx-top/db v1.28.16
 	github.com/webx-top/echo v1.22.25
 	github.com/webx-top/image v0.1.2
 	github.com/webx-top/restyclient v0.0.6
@@ -255,9 +255,9 @@ require (
 	golang.org/x/tools v0.40.0 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
-	modernc.org/libc v1.67.1 // indirect
+	modernc.org/libc v1.67.2 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect
-	modernc.org/sqlite v1.41.0 // indirect
+	modernc.org/sqlite v1.42.2 // indirect
 	rsc.io/qr v0.2.0 // indirect
 )
