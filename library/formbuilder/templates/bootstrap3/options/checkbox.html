@@ -4,9 +4,10 @@
 	<label class="col-sm-{{if gt .labelCols 0}}{{.labelCols}}{{else}}2{{end}} control-label{{if or (.params.Exists `data-parsley-mincheck`) (.params.Exists `data-parsley-check`)}} required{{end}}{{ if $p.labelClasses }} {{$p.labelClasses}}{{end}}">{{.label}}</label>
 	{{- end -}}
 	<div class="col-sm-{{if gt .fieldCols 0}}{{.fieldCols}}{{else if eq .container `fieldset`}}10{{else}}8{{end}}">
+		{{- $uniqid := .formID | Default (RandomString 5) -}}
 		{{- range .choices -}}
         <div class="checkbox checkbox-primary checkbox-inline{{if $p.classes}} {{$p.classes}}{{end}}"{{if $p.css}} style="{{range $k2, $v2 := .css}}{{$k2}}: {{- $v2}}; {{- end}}"{{end}}>
-          <input type="checkbox" value="{{.ID}}" name="{{$p.name}}" id="{{if $p.lang}}{{$p.lang}}-{{end}}{{if $p.id}}{{$p.id}}{{else}}{{$p.name}}{{end}}-{{.ID}}"{{if $p.params}}{{range $k2, $v2 := $p.params}} {{$k2}}="{{$v2}}"{{end}}{{end}}{{if .Checked}} checked="checked"{{end}}{{range $p.tags}} {{.}}{{end}} data-parsley-errors-container="#parsley-error-{{$p.lang}}-{{if $p.id}}{{$p.id}}{{else}}{{$p.name}}{{end}}"> <label for="{{if $p.lang}}{{$p.lang}}-{{end}}{{if $p.id}}{{$p.id}}{{else}}{{$p.name}}{{end}}-{{.ID}}"{{ if $p.labelClasses }} class="{{$p.labelClasses}}"{{end}}>{{.Val}}</label>
+          <input type="checkbox" value="{{.ID}}" name="{{$p.name}}" id="{{if $p.lang}}{{$p.lang}}-{{end}}{{if $p.id}}{{$p.id}}{{else}}{{$p.name}}{{end}}-{{.ID}}-{{$uniqid}}"{{if $p.params}}{{range $k2, $v2 := $p.params}} {{$k2}}="{{$v2}}"{{end}}{{end}}{{if .Checked}} checked="checked"{{end}}{{range $p.tags}} {{.}}{{end}} data-parsley-errors-container="#parsley-error-{{$p.lang}}-{{if $p.id}}{{$p.id}}{{else}}{{$p.name}}{{end}}-{{$uniqid}}"> <label for="{{if $p.lang}}{{$p.lang}}-{{end}}{{if $p.id}}{{$p.id}}{{else}}{{$p.name}}{{end}}-{{.ID}}-{{$uniqid}}"{{ if $p.labelClasses }} class="{{$p.labelClasses}}"{{end}}>{{.Val}}</label>
         </div>
 		{{- end -}}
 		{{- if or .helptext .errors -}}
@@ -21,6 +22,6 @@
 			{{- end -}}
 		</div>
 		{{- end -}}
-		<div id='parsley-error-{{$p.lang}}-{{if $p.id}}{{$p.id}}{{else}}{{$p.name}}{{end}}'></div>
+		<div id='parsley-error-{{$p.lang}}-{{if $p.id}}{{$p.id}}{{else}}{{$p.name}}{{end}}-{{$uniqid}}'></div>
 	</div>
 {{- end -}}
