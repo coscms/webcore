@@ -1,10 +1,11 @@
 {{- $langset := . -}}
 <div{{if $langset.params}}{{range $k,$v := $langset.params}} {{$k}}="{{$v}}"{{end}}{{end}}{{range $langset.tags}} {{.}}{{end}}>
 	<div class="col-md-12 tabbable langset">
+		{{- $uniqid := .formID | Default (RandomString 5) -}}
 		<ul class="nav nav-tabs">
   		{{- range $k,$v := .langs -}}
 			<li{{if eq $k 0}} class="active"{{end}}>
-				<a href="#langset_{{$langset.name|Slugify}}_{{$v.ID}}" data-toggle="tab" aria-expanded="{{if eq $k 0}}true{{else}}false{{end}}" data-lang="{{$v.ID}}">
+				<a href="#langset_{{$langset.name|Slugify}}_{{$v.ID}}_{{$uniqid}}" data-toggle="tab" aria-expanded="{{if eq $k 0}}true{{else}}false{{end}}" data-lang="{{$v.ID}}">
         			{{- if $v.Data.iconClass}}<i class="green ace-icon fa {{$v.Data.iconClass}} bigger-120"></i>{{end}}
         			{{- $v.Label -}}
       			</a>
@@ -13,7 +14,7 @@
 		</ul>
 		<div class="tab-content">
   		{{- range $k,$v := .langs -}}
-			<div class="tab-pane fade{{if eq $k 0}} active in{{end}}" id="langset_{{$langset.name|Slugify}}_{{$v.ID}}">
+			<div class="tab-pane fade{{if eq $k 0}} active in{{end}}" id="langset_{{$langset.name|Slugify}}_{{$v.ID}}_{{$uniqid}}">
 				{{- range $k, $g := $v.Groups -}}
 				{{- if gt (len $g.Elements) 0 -}}
 				<div class="form-group{{if $g.HasError}} has-error{{end}}">
