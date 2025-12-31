@@ -6,7 +6,10 @@
 	<div class="col-sm-10">
     	<div class="row">
     		<div class="col-sm-2">
-    			<select name="{{.name}}-select2" id="{{if .id}}{{.id}}{{else}}{{.name}}{{end}}-select2" class="form-control-select2{{ if .classes }} {{.classes}}{{end}}"{{if .params}}{{range $k, $v := .params}} {{$k}}="{{$v}}"{{end}}{{end}}{{if .css}} style="{{range $k, $v := .css}}{{$k}}:{{$v}};{{end}}"{{end}}{{range .tags}} {{.}}{{end}}>
+    			<select name="{{.name}}-select2" id="{{if .id}}{{.id}}{{else}}{{.name}}{{end}}-select2" class="form-control-select2{{ if .classes }} {{.classes}}{{end}}"
+				{{- if .params}}{{range $k, $v := .params}} {{$k}}="{{$v}}"{{end}}{{end -}}
+				{{- if .css}} style="{{range $k, $v := .css}}{{$k}}:{{$v}};{{end}}"{{end -}}
+				{{- range .tags}} {{.}}{{end}}>
 					{{- $p := . -}}
 					{{- range $k, $v := .choices -}}
 						{{- if $k -}}
