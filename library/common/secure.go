@@ -26,6 +26,7 @@ import (
 	"strings"
 
 	"github.com/microcosm-cc/bluemonday"
+	"github.com/russross/blackfriday/v2"
 	"github.com/webx-top/com"
 )
 
@@ -449,5 +450,32 @@ func ContentEncode(content string, contypes ...string) string {
 		content = com.StripTags(content)
 	}
 	content = strings.TrimSpace(content)
+	return content
+}
+
+func ContentToHTML(content string, contypes ...string) string {
+	if len(content) == 0 {
+		return content
+	}
+	var contype string
+	if len(contypes) > 0 {
+		contype = contypes[0]
+	}
+	switch contype {
+	case ContentTypeHTML:
+		return content
+
+	case ContentTypeMarkdown:
+		b := com.Str2bytes(content)
+		b = blackfriday.Run(b)
+		content = com.Bytes2str(b)
+
+	case `text`:
+		fallthrough
+
+	default:
+		content = com.HTMLEncode(content)
+		content = com.Nl2br(content)
+	}
 	return content
 }
