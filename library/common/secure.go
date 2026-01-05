@@ -453,6 +453,7 @@ func ContentEncode(content string, contypes ...string) string {
 	return content
 }
 
+// ContentToHTML 将安全的内容转换为HTML格式
 func ContentToHTML(content string, contypes ...string) string {
 	if len(content) == 0 {
 		return content
