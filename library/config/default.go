@@ -29,6 +29,7 @@ import (
 	stdSync "sync"
 	"time"
 
+	"github.com/admpub/log"
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 
@@ -44,15 +45,16 @@ const (
 var _ = FixWd()
 
 var (
-	Installed          sql.NullBool
-	installedSchemaVer float64
-	installedTime      time.Time
-	defaultConfig      *Config
-	defaultConfigMu    stdSync.RWMutex
-	defaultCLIConfig   *CLIConfig
-	onceCLIConfig      stdSync.Once
-	onceUpgrade        stdSync.Once
-	sqlCollection      = NewSQLCollection().RegisterInstall(`nging`, setup.InstallSQL)
+	Installed             sql.NullBool
+	installedSchemaVer    float64
+	installedPkgSchemaVer = map[string]float64{}
+	installedTime         time.Time
+	defaultConfig         *Config
+	defaultConfigMu       stdSync.RWMutex
+	defaultCLIConfig      *CLIConfig
+	onceCLIConfig         stdSync.Once
+	onceUpgrade           stdSync.Once
+	sqlCollection         = NewSQLCollection().RegisterInstall(`nging`, setup.InstallSQL)
 
 	// Errors
 	ErrUnknowDatabaseType = errors.New(`unkown database type`)
@@ -106,9 +108,44 @@ func GetPreupgradeSQLs() map[string]map[string][]string {
 	return sqlCollection.Preupgrade
 }
 
+func genInstalledLockFileContent(now time.Time, verInfo *VersionInfo) (string, error) {
+	content := now.Format(`2006-01-02 15:04:05`) + "\n" + fmt.Sprint(verInfo.DBSchema)
+	jsonV, err := com.JSONEncodeToString(verInfo.PkgDBSchemas)
+	if err != nil {
+		return content, err
+	}
+	content += "\n" + jsonV
+	return content, nil
+}
+
+func parseInstalledLockFileContent(content string) (time.Time, float64, map[string]float64, error) {
+	content = strings.TrimSpace(content)
+	var installedTime, installedSchemaVer, installedPkgSchemaVer string
+	lines := strings.Split(content, "\n")
+	com.SliceExtract(lines, &installedTime, &installedSchemaVer, &installedPkgSchemaVer)
+	var t time.Time
+	var schemaV float64
+	var pkgSchemaV = map[string]float64{}
+	var err error
+	if len(installedSchemaVer) > 0 {
+		schemaV, _ = strconv.ParseFloat(strings.TrimSpace(installedSchemaVer), 64)
+	}
+	if len(installedPkgSchemaVer) > 0 {
+		err = com.JSONDecodeString(installedPkgSchemaVer, &pkgSchemaV)
+	}
+	if len(installedTime) > 0 {
+		t, _ = time.Parse(`2006-01-02 15:04:05`, strings.TrimSpace(installedTime))
+	}
+	return t, schemaV, pkgSchemaV, err
+}
+
 func SetInstalled(lockFile string) error {
 	now := time.Now()
-	err := os.WriteFile(lockFile, []byte(now.Format(`2006-01-02 15:04:05`)+"\n"+fmt.Sprint(Version.DBSchema)), os.ModePerm)
+	content, err := genInstalledLockFileContent(now, Version)
+	if err != nil {
+		return err
+	}
+	err = os.WriteFile(lockFile, []byte(content), os.ModePerm)
 	if err != nil {
 		return err
 	}
@@ -139,14 +176,9 @@ func IsInstalled() bool {
 	if len(lockFile) > 0 {
 		if b, e := os.ReadFile(lockFile); e == nil {
 			content := string(b)
-			content = strings.TrimSpace(content)
-			lines := strings.Split(content, "\n")
-			switch len(lines) {
-			case 2:
-				installedSchemaVer, _ = strconv.ParseFloat(strings.TrimSpace(lines[1]), 64)
-				fallthrough
-			case 1:
-				installedTime, _ = time.Parse(`2006-01-02 15:04:05`, strings.TrimSpace(lines[0]))
+			installedTime, installedSchemaVer, installedPkgSchemaVer, e = parseInstalledLockFileContent(content)
+			if e != nil {
+				log.Error(e)
 			}
 		}
 		Installed.Valid = true

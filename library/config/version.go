@@ -26,20 +26,28 @@ import (
 )
 
 // Version 版本信息
-var Version = &VersionInfo{Name: `Nging`}
+var Version = &VersionInfo{
+	Name:         `Nging`,
+	PkgDBSchemas: map[string]float64{},
+}
 
 type VersionInfo struct {
-	Name      string    //软件名称
-	Number    string    //版本号 1.0.1
-	Package   string    //套餐
-	Label     string    //版本标签 beta/alpha/stable
-	DBSchema  float64   //数据库表版本 例如：1.2
-	BuildTime string    //构建时间
-	BuildOS   string    //构建目标系统
-	BuildArch string    //构建目标架构
-	CommitID  string    //GIT提交ID
-	Licensed  bool      //是否已授权
-	Expired   time.Time //过期时间
+	Name         string  //软件名称
+	Number       string  //版本号 1.0.1
+	Package      string  //套餐
+	Label        string  //版本标签 beta/alpha/stable
+	DBSchema     float64 //数据库表版本 例如：1.2
+	PkgDBSchemas map[string]float64
+	BuildTime    string    //构建时间
+	BuildOS      string    //构建目标系统
+	BuildArch    string    //构建目标架构
+	CommitID     string    //GIT提交ID
+	Licensed     bool      //是否已授权
+	Expired      time.Time //过期时间
+}
+
+func (v *VersionInfo) SetPkgDBSchemas(pkg string, dbSchema float64) {
+	v.PkgDBSchemas[pkg] = dbSchema
 }
 
 func (v *VersionInfo) IsExpired() bool {
