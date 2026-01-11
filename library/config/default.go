@@ -60,6 +60,14 @@ var (
 	ErrUnknowDatabaseType = errors.New(`unkown database type`)
 )
 
+func GetInstalledPkgSchemaVer(pkg string) float64 {
+	v, ok := installedPkgSchemaVer[pkg]
+	if !ok {
+		return -1
+	}
+	return v
+}
+
 func initCLIConfig() {
 	defaultCLIConfig = NewCLIConfig()
 }
