@@ -2,7 +2,6 @@ package config
 
 import (
 	"database/sql"
-	"fmt"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -128,7 +127,7 @@ func GetPreupgradeSQLs() map[string]map[string][]string {
 // - A string containing the content of the installed lock file.
 // - An error if there is an error when generating the JSON string.
 func genInstalledLockFileContent(now time.Time, verInfo *VersionInfo) (string, error) {
-	content := now.Format(`2006-01-02 15:04:05`) + "\n" + fmt.Sprint(verInfo.DBSchema)
+	content := now.Format(`2006-01-02 15:04:05`) + "\n" + com.String(verInfo.DBSchema)
 	jsonV, err := com.JSONEncodeToString(verInfo.PkgDBSchemas)
 	if err != nil {
 		return content, err

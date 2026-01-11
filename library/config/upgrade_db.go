@@ -59,7 +59,11 @@ func UpgradeDB() {
 	echo.PanicIf(echo.FireByNameWithMap(`nging.upgrade.db.after`, eventParams))
 	installedSchemaVer = Version.DBSchema
 	lockFile := filepath.Join(FromCLI().ConfDir(), LockFileName)
-	err := os.WriteFile(lockFile, []byte(installedTime.Format(`2006-01-02 15:04:05`)+"\n"+fmt.Sprint(Version.DBSchema)), os.ModePerm)
+	content, err := genInstalledLockFileContent(installedTime, Version)
+	if err != nil {
+		log.Errorf(`failed to generate installed lock file content: %v`, err)
+	}
+	err = os.WriteFile(lockFile, []byte(content), os.ModePerm)
 	if err != nil {
 		log.Errorf(`%v: %s`, err, lockFile)
 	}
