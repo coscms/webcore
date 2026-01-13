@@ -3,6 +3,8 @@ package testutils
 import (
 	"os"
 	"path/filepath"
+	"runtime"
+	"strings"
 
 	"github.com/admpub/log"
 	"github.com/coscms/webcore/library/config"
@@ -12,6 +14,13 @@ import (
 func InitConfig() {
 	log.Sync()
 	config.FromCLI().Conf = os.Getenv(`COSCMS_CONF`)
+	if len(config.FromCLI().Conf) == 0 {
+		if _, file, _, ok := runtime.Caller(0); ok {
+			if before, _, found := strings.Cut(file, `/vendor/`); found {
+				config.FromCLI().Conf = filepath.Join(before, `config/config.yaml`)
+			}
+		}
+	}
 	if len(config.FromCLI().Conf) == 0 || !com.FileExists(config.FromCLI().Conf) {
 		config.FromCLI().Conf = filepath.Join(os.Getenv("GOPATH"), `src`, `github.com/admpub/nging/config/config.yaml`)
 	}
