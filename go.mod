@@ -33,7 +33,7 @@ require (
 	github.com/admpub/goth v0.0.4
 	github.com/admpub/httpscerts v0.0.0-20180907121630-a2990e2af45c
 	github.com/admpub/imageproxy v0.10.1
-	github.com/admpub/ip2region/v3 v3.0.4
+	github.com/admpub/ip2region/v3 v3.0.5
 	github.com/admpub/license_gen v0.1.2
 	github.com/admpub/log v1.4.0
 	github.com/admpub/mahonia v0.0.0-20151019004008-c528b747d92d
@@ -42,7 +42,7 @@ require (
 	github.com/admpub/mysql-schema-sync v0.2.6
 	github.com/admpub/null v8.0.5+incompatible
 	github.com/admpub/oauth2/v4 v4.0.3
-	github.com/admpub/once v0.0.1
+	github.com/admpub/once v0.0.2
 	github.com/admpub/pp v0.0.7
 	github.com/admpub/qrcode v0.0.5
 	github.com/admpub/realip v0.2.7

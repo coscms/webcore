@@ -94,8 +94,8 @@ github.com/admpub/imageproxy v0.10.1 h1:wesf2QLhhr5lXzgzqipU7Zdgj8XxfIj3usC9zFI5
 github.com/admpub/imageproxy v0.10.1/go.mod h1:Q2IWHqO+nhz/JeyHbtFNtRxAsTz0H56ZQIWYeE+xsFM=
 github.com/admpub/imaging v1.6.3 h1:MCc/eATbjynupG7N39HpGsbIQbOUYEjfKhzKA0WNL4g=
 github.com/admpub/imaging v1.6.3/go.mod h1:krwZ51a7U69i7Jsi3lENxZsUu8k9vk+k+oekV99E2W4=
-github.com/admpub/ip2region/v3 v3.0.4 h1:qhmP0vMpGNIAgGakQ4K5nQZ2Oc7PoyTPnnb5rYpuQdc=
-github.com/admpub/ip2region/v3 v3.0.4/go.mod h1:n3kW+J79jQAQPZjD689zlSCsnuuAu0JuofOiYbxcsIc=
+github.com/admpub/ip2region/v3 v3.0.5 h1:KUeEX5JwUijx2+NKF41McK8QxEe72/2apC7vVbKp/Yo=
+github.com/admpub/ip2region/v3 v3.0.5/go.mod h1:n3kW+J79jQAQPZjD689zlSCsnuuAu0JuofOiYbxcsIc=
 github.com/admpub/json5 v0.0.1 h1:ZgD9YKNEpOqjcg553hqi1Zv8f8tNWLjxZrFcoksCRCw=
 github.com/admpub/json5 v0.0.1/go.mod h1:spt0tC/we4imVn3yB/FUuENv2qDJRSi7cxnt+buqWVE=
 github.com/admpub/license_gen v0.1.2 h1:v9SVFwPG/ZGGH2CuZFfu6ruUQF0AjT9ixEFoeu5Sd9s=
@@ -116,8 +116,8 @@ github.com/admpub/null v8.0.5+incompatible h1:doltajgwv+ffEOFBvGL4f59E01+7xYbkS1
 github.com/admpub/null v8.0.5+incompatible/go.mod h1:DMV9RC+JZv6AhaX1E62ur1mS7gyGLYRh+r0s8MF7mHA=
 github.com/admpub/oauth2/v4 v4.0.3 h1:I+UiBoSWdpt4STGTIjmNCQUlrkI819WPLtdrf/vjBpM=
 github.com/admpub/oauth2/v4 v4.0.3/go.mod h1:xyiRIflYxQH8T9VntnV6tjMHc0mX7j4RdLVypbTIlvg=
-github.com/admpub/once v0.0.1 h1:HiFavms0UQG08iR1cwE8N96StFEkv3Hvy2sjCLZD1dg=
-github.com/admpub/once v0.0.1/go.mod h1:okXnIoCMU1fozAvmd+QfE/wDzhYODdWSYhEb4ZlcYPM=
+github.com/admpub/once v0.0.2 h1:3qwBjS/9EYRCda3NLwcbETMhEJUEXhjGTU62oTfDLzs=
+github.com/admpub/once v0.0.2/go.mod h1:zxi+CLC6n8/DQ7te3AfLEJiBuLnMyjiA4F/eeeyiVTA=
 github.com/admpub/pp v0.0.7 h1:nIWtBf0ohTBaYH+nB25mGsUd3OR5x+4PHHzln3TIgVE=
 github.com/admpub/pp v0.0.7/go.mod h1:6wSDZgDpuysnqYKffOz0KajEg8q/k+CVZ+PnHKyR1yI=
 github.com/admpub/qrcode v0.0.5 h1:C0+KGtTein69wgrZJpsNbIcJSP+KbGNfSXYxucPXTDY=
