@@ -56,6 +56,10 @@ func (f *FormBuilder) ParseConfigFile(jsonformat ...bool) (*formsconfig.Config, 
 			return nil, fmt.Errorf(`renderer.Manager() is nil: %s`, configFile)
 		}
 		cfg = f.ToConfig()
+		if f.snippet {
+			cfg.Template = `allfields`
+			cfg.WithButtons = false
+		}
 		if isJSON {
 			b, err = f.ToJSONBlob(cfg)
 			if err != nil {
@@ -122,6 +126,10 @@ func (f *FormBuilder) InitConfig() error {
 		if err != nil {
 			return err
 		}
+	}
+
+	if f.snippet {
+		f.setSnippetConfig(cfg)
 	}
 
 	if f.Languages() != nil {

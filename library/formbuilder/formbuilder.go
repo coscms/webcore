@@ -9,6 +9,7 @@ import (
 	formsconfig "github.com/coscms/forms/config"
 	"github.com/coscms/forms/fields"
 
+	"github.com/webx-top/com"
 	"github.com/webx-top/db/lib/factory"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/engine"
@@ -23,6 +24,11 @@ var (
 
 var LanguageConfigGetter func(echo.Context) language.Config
 var TranslateableGetter func(echo.Context) bool
+
+func NewSnippet(ctx echo.Context, model interface{}, options ...Option) *FormBuilder {
+	options = append(options, Snippet(true))
+	return New(ctx, model, options...)
+}
 
 // New 创建表单构建器实例
 func New(ctx echo.Context, model interface{}, options ...Option) *FormBuilder {
@@ -58,7 +64,7 @@ func New(ctx echo.Context, model interface{}, options ...Option) *FormBuilder {
 	}
 	f.SetLabelFunc(func(txt string) string {
 		return ctx.T(txt)
-	})
+	}).SetNameFunc(com.CamelCase)
 	f.AddBeforeRender(func() {
 		nextURL := ctx.Form(echo.DefaultNextURLVarName)
 		if len(nextURL) > 0 {
@@ -81,6 +87,7 @@ type FormBuilder struct {
 	*forms.Forms
 	hooks               MethodHooks
 	exit                bool
+	snippet             bool
 	err                 error
 	ctx                 echo.Context
 	configFile          string
@@ -184,10 +191,27 @@ func (f *FormBuilder) Generate(emptyValue ...bool) *FormBuilder {
 	return f
 }
 
+// SetSnippet sets whether to generate a snippet for the form.
+// Returns the FormBuilder instance for method chaining.
+// If snippet is true, the form will generate a snippet containing only the form fields.
+// Otherwise, the form will generate a full HTML page.
+func (f *FormBuilder) SetSnippet(snippet bool) *FormBuilder {
+	f.snippet = snippet
+	return f
+}
+
 // Snippet 表单片段
 func (f *FormBuilder) Snippet() *FormBuilder {
-	f.Config().Template = `allfields`
-	f.Config().WithButtons = false
+	return f.setSnippetConfig(f.Config())
+}
+
+func (f *FormBuilder) setSnippetConfig(cfg *formsconfig.Config) *FormBuilder {
+	if cfg.Template != `allfields` {
+		cfg.Template = `allfields`
+	}
+	if cfg.WithButtons {
+		cfg.WithButtons = false
+	}
 	return f
 }
 

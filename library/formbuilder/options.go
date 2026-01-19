@@ -125,3 +125,13 @@ func Renames(renames map[string]string) Option {
 		f.renames = renames
 	}
 }
+
+// Snippet sets whether to generate a snippet for the form.
+// Returns the FormBuilder instance for method chaining.
+// If snippet is true, the form will generate a snippet containing only the form fields.
+// Otherwise, the form will generate a full HTML form with all the form elements.
+func Snippet(snippet bool) Option {
+	return func(f *FormBuilder) {
+		f.snippet = snippet
+	}
+}
