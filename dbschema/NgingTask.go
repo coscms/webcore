@@ -15,81 +15,7 @@ import (
 	"github.com/webx-top/echo/param"
 )
 
-type Slice_NgingTask []*NgingTask
-
-func (s Slice_NgingTask) Range(fn func(m factory.Model) error) error {
-	for _, v := range s {
-		if err := fn(v); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (s Slice_NgingTask) RangeRaw(fn func(m *NgingTask) error) error {
-	for _, v := range s {
-		if err := fn(v); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (s Slice_NgingTask) GroupBy(keyField string) map[string][]*NgingTask {
-	r := map[string][]*NgingTask{}
-	for _, row := range s {
-		dmap := row.AsMap()
-		vkey := fmt.Sprint(dmap[keyField])
-		if _, y := r[vkey]; !y {
-			r[vkey] = []*NgingTask{}
-		}
-		r[vkey] = append(r[vkey], row)
-	}
-	return r
-}
-
-func (s Slice_NgingTask) KeyBy(keyField string) map[string]*NgingTask {
-	r := map[string]*NgingTask{}
-	for _, row := range s {
-		dmap := row.AsMap()
-		vkey := fmt.Sprint(dmap[keyField])
-		r[vkey] = row
-	}
-	return r
-}
-
-func (s Slice_NgingTask) AsKV(keyField string, valueField string) param.Store {
-	r := param.Store{}
-	for _, row := range s {
-		dmap := row.AsMap()
-		vkey := fmt.Sprint(dmap[keyField])
-		r[vkey] = dmap[valueField]
-	}
-	return r
-}
-
-func (s Slice_NgingTask) Transform(transfers map[string]param.Transfer) []param.Store {
-	r := make([]param.Store, len(s))
-	for idx, row := range s {
-		r[idx] = row.AsMap().Transform(transfers)
-	}
-	return r
-}
-
-func (s Slice_NgingTask) FromList(data interface{}) Slice_NgingTask {
-	values, ok := data.([]*NgingTask)
-	if !ok {
-		for _, value := range data.([]interface{}) {
-			row := &NgingTask{}
-			row.FromRow(value.(map[string]interface{}))
-			s = append(s, row)
-		}
-		return s
-	}
-	s = append(s, values...)
-
-	return s
-}
+type Slice_NgingTask = factory.Slicex[*NgingTask]
 
 func NewNgingTask(ctx echo.Context) *NgingTask {
 	m := &NgingTask{}
@@ -119,8 +45,8 @@ type NgingTask struct {
 	Timeout       uint64 `db:"timeout" bson:"timeout" comment:"超时设置" json:"timeout" xml:"timeout"`
 	ExecuteTimes  uint   `db:"execute_times" bson:"execute_times" comment:"累计执行次数" json:"execute_times" xml:"execute_times"`
 	PrevTime      uint   `db:"prev_time" bson:"prev_time" comment:"上次执行时间" json:"prev_time" xml:"prev_time"`
-	Created       uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created"`
-	Updated       uint   `db:"updated" bson:"updated" comment:"修改时间" json:"updated" xml:"updated"`
+	Created       uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created" form_decoder:"time2unix" form_encoder:"unix2time"`
+	Updated       uint   `db:"updated" bson:"updated" comment:"修改时间" json:"updated" xml:"updated" form_decoder:"time2unix" form_encoder:"unix2time"`
 	ClosedLog     string `db:"closed_log" bson:"closed_log" comment:"是否(Y/N)关闭日志" json:"closed_log" xml:"closed_log"`
 }
 
@@ -237,10 +163,13 @@ func (a *NgingTask) Name_() string {
 	return WithPrefix(factory.TableNamerGet(b.Short_())(b))
 }
 
+// CPAFrom Deprecated: Use CtxFrom instead.
 func (a *NgingTask) CPAFrom(source factory.Model) factory.Model {
-	a.SetContext(source.Context())
-	a.SetConnID(source.ConnID())
-	a.SetNamer(source.Namer())
+	return a.CtxFrom(source)
+}
+
+func (a *NgingTask) CtxFrom(source factory.Model) factory.Model {
+	a.base.CtxFrom(source)
 	return a
 }
 
@@ -252,13 +181,13 @@ func (a *NgingTask) Get(mw func(db.Result) db.Result, args ...interface{}) (err 
 		return
 	}
 	queryParam := a.Param(mw, args...).SetRecv(a)
-	if err = DBI.FireReading(a, queryParam); err != nil {
+	if err = a.base.FireReading(a, queryParam); err != nil {
 		return
 	}
 	err = queryParam.One()
 	a.base = base
 	if err == nil {
-		err = DBI.FireReaded(a, queryParam)
+		err = a.base.FireReaded(a, queryParam)
 	}
 	return
 }
@@ -271,18 +200,18 @@ func (a *NgingTask) List(recv interface{}, mw func(db.Result) db.Result, page, s
 		return a.Param(mw, args...).SetPage(page).SetSize(size).SetRecv(recv).List()
 	}
 	queryParam := a.Param(mw, args...).SetPage(page).SetSize(size).SetRecv(recv)
-	if err := DBI.FireReading(a, queryParam); err != nil {
+	if err := a.base.FireReading(a, queryParam); err != nil {
 		return nil, err
 	}
 	cnt, err := queryParam.List()
 	if err == nil {
 		switch v := recv.(type) {
 		case *[]*NgingTask:
-			err = DBI.FireReaded(a, queryParam, Slice_NgingTask(*v))
+			err = a.base.FireReaded(a, queryParam, Slice_NgingTask(*v))
 		case []*NgingTask:
-			err = DBI.FireReaded(a, queryParam, Slice_NgingTask(v))
+			err = a.base.FireReaded(a, queryParam, Slice_NgingTask(v))
 		case factory.Ranger:
-			err = DBI.FireReaded(a, queryParam, v)
+			err = a.base.FireReaded(a, queryParam, v)
 		}
 	}
 	return cnt, err
@@ -326,18 +255,18 @@ func (a *NgingTask) ListByOffset(recv interface{}, mw func(db.Result) db.Result,
 		return a.Param(mw, args...).SetOffset(offset).SetSize(size).SetRecv(recv).List()
 	}
 	queryParam := a.Param(mw, args...).SetOffset(offset).SetSize(size).SetRecv(recv)
-	if err := DBI.FireReading(a, queryParam); err != nil {
+	if err := a.base.FireReading(a, queryParam); err != nil {
 		return nil, err
 	}
 	cnt, err := queryParam.List()
 	if err == nil {
 		switch v := recv.(type) {
 		case *[]*NgingTask:
-			err = DBI.FireReaded(a, queryParam, Slice_NgingTask(*v))
+			err = a.base.FireReaded(a, queryParam, Slice_NgingTask(*v))
 		case []*NgingTask:
-			err = DBI.FireReaded(a, queryParam, Slice_NgingTask(v))
+			err = a.base.FireReaded(a, queryParam, Slice_NgingTask(v))
 		case factory.Ranger:
-			err = DBI.FireReaded(a, queryParam, v)
+			err = a.base.FireReaded(a, queryParam, v)
 		}
 	}
 	return cnt, err
@@ -353,7 +282,7 @@ func (a *NgingTask) Insert() (pk interface{}, err error) {
 		a.ClosedLog = "N"
 	}
 	if a.base.Eventable() {
-		err = DBI.Fire("creating", a, nil)
+		err = a.base.Fire(factory.EventCreating, a, nil)
 		if err != nil {
 			return
 		}
@@ -367,7 +296,7 @@ func (a *NgingTask) Insert() (pk interface{}, err error) {
 		}
 	}
 	if err == nil && a.base.Eventable() {
-		err = DBI.Fire("created", a, nil)
+		err = a.base.Fire(factory.EventCreated, a, nil)
 	}
 	return
 }
@@ -383,13 +312,13 @@ func (a *NgingTask) Update(mw func(db.Result) db.Result, args ...interface{}) (e
 	if !a.base.Eventable() {
 		return a.Param(mw, args...).SetSend(a).Update()
 	}
-	if err = DBI.Fire("updating", a, mw, args...); err != nil {
+	if err = a.base.Fire(factory.EventUpdating, a, mw, args...); err != nil {
 		return
 	}
 	if err = a.Param(mw, args...).SetSend(a).Update(); err != nil {
 		return
 	}
-	return DBI.Fire("updated", a, mw, args...)
+	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
 func (a *NgingTask) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
@@ -403,13 +332,13 @@ func (a *NgingTask) Updatex(mw func(db.Result) db.Result, args ...interface{}) (
 	if !a.base.Eventable() {
 		return a.Param(mw, args...).SetSend(a).Updatex()
 	}
-	if err = DBI.Fire("updating", a, mw, args...); err != nil {
+	if err = a.base.Fire(factory.EventUpdating, a, mw, args...); err != nil {
 		return
 	}
 	if affected, err = a.Param(mw, args...).SetSend(a).Updatex(); err != nil {
 		return
 	}
-	err = DBI.Fire("updated", a, mw, args...)
+	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
 }
 
@@ -428,13 +357,13 @@ func (a *NgingTask) UpdateByFields(mw func(db.Result) db.Result, fields []string
 	for index, field := range fields {
 		editColumns[index] = com.SnakeCase(field)
 	}
-	if err = DBI.FireUpdate("updating", a, editColumns, mw, args...); err != nil {
+	if err = a.base.FireUpdate(factory.EventUpdating, a, editColumns, mw, args...); err != nil {
 		return
 	}
 	if err = a.Param(mw, args...).UpdateByStruct(a, fields...); err != nil {
 		return
 	}
-	err = DBI.FireUpdate("updated", a, editColumns, mw, args...)
+	err = a.base.FireUpdate(factory.EventUpdated, a, editColumns, mw, args...)
 	return
 }
 
@@ -453,13 +382,13 @@ func (a *NgingTask) UpdatexByFields(mw func(db.Result) db.Result, fields []strin
 	for index, field := range fields {
 		editColumns[index] = com.SnakeCase(field)
 	}
-	if err = DBI.FireUpdate("updating", a, editColumns, mw, args...); err != nil {
+	if err = a.base.FireUpdate(factory.EventUpdating, a, editColumns, mw, args...); err != nil {
 		return
 	}
 	if affected, err = a.Param(mw, args...).UpdatexByStruct(a, fields...); err != nil {
 		return
 	}
-	err = DBI.FireUpdate("updated", a, editColumns, mw, args...)
+	err = a.base.FireUpdate(factory.EventUpdated, a, editColumns, mw, args...)
 	return
 }
 
@@ -496,13 +425,13 @@ func (a *NgingTask) UpdateFields(mw func(db.Result) db.Result, kvset map[string]
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
-	if err = DBI.FireUpdate("updating", &m, editColumns, mw, args...); err != nil {
+	if err = a.base.FireUpdate(factory.EventUpdating, &m, editColumns, mw, args...); err != nil {
 		return
 	}
 	if err = a.Param(mw, args...).SetSend(kvset).Update(); err != nil {
 		return
 	}
-	return DBI.FireUpdate("updated", &m, editColumns, mw, args...)
+	return a.base.FireUpdate(factory.EventUpdated, &m, editColumns, mw, args...)
 }
 
 func (a *NgingTask) UpdatexFields(mw func(db.Result) db.Result, kvset map[string]interface{}, args ...interface{}) (affected int64, err error) {
@@ -526,13 +455,13 @@ func (a *NgingTask) UpdatexFields(mw func(db.Result) db.Result, kvset map[string
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
-	if err = DBI.FireUpdate("updating", &m, editColumns, mw, args...); err != nil {
+	if err = a.base.FireUpdate(factory.EventUpdating, &m, editColumns, mw, args...); err != nil {
 		return
 	}
 	if affected, err = a.Param(mw, args...).SetSend(kvset).Updatex(); err != nil {
 		return
 	}
-	err = DBI.FireUpdate("updated", &m, editColumns, mw, args...)
+	err = a.base.FireUpdate(factory.EventUpdated, &m, editColumns, mw, args...)
 	return
 }
 
@@ -542,13 +471,13 @@ func (a *NgingTask) UpdateValues(mw func(db.Result) db.Result, keysValues *db.Ke
 	}
 	m := *a
 	m.FromRow(keysValues.Map())
-	if err = DBI.FireUpdate("updating", &m, keysValues.Keys(), mw, args...); err != nil {
+	if err = a.base.FireUpdate(factory.EventUpdating, &m, keysValues.Keys(), mw, args...); err != nil {
 		return
 	}
 	if err = a.Param(mw, args...).SetSend(keysValues).Update(); err != nil {
 		return
 	}
-	return DBI.FireUpdate("updated", &m, keysValues.Keys(), mw, args...)
+	return a.base.FireUpdate(factory.EventUpdated, &m, keysValues.Keys(), mw, args...)
 }
 
 func (a *NgingTask) Upsert(mw func(db.Result) db.Result, args ...interface{}) (pk interface{}, err error) {
@@ -563,7 +492,7 @@ func (a *NgingTask) Upsert(mw func(db.Result) db.Result, args ...interface{}) (p
 		if !a.base.Eventable() {
 			return nil
 		}
-		return DBI.Fire("updating", a, mw, args...)
+		return a.base.Fire(factory.EventUpdating, a, mw, args...)
 	}, func() error {
 		a.Created = uint(time.Now().Unix())
 		a.Id = 0
@@ -576,7 +505,7 @@ func (a *NgingTask) Upsert(mw func(db.Result) db.Result, args ...interface{}) (p
 		if !a.base.Eventable() {
 			return nil
 		}
-		return DBI.Fire("creating", a, nil)
+		return a.base.Fire(factory.EventCreating, a, nil)
 	})
 	if err == nil && pk != nil {
 		if v, y := pk.(uint); y {
@@ -587,9 +516,9 @@ func (a *NgingTask) Upsert(mw func(db.Result) db.Result, args ...interface{}) (p
 	}
 	if err == nil && a.base.Eventable() {
 		if pk == nil {
-			err = DBI.Fire("updated", a, mw, args...)
+			err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 		} else {
-			err = DBI.Fire("created", a, nil)
+			err = a.base.Fire(factory.EventCreated, a, nil)
 		}
 	}
 	return
@@ -600,13 +529,13 @@ func (a *NgingTask) Delete(mw func(db.Result) db.Result, args ...interface{}) (e
 	if !a.base.Eventable() {
 		return a.Param(mw, args...).Delete()
 	}
-	if err = DBI.Fire("deleting", a, mw, args...); err != nil {
+	if err = a.base.Fire(factory.EventDeleting, a, mw, args...); err != nil {
 		return
 	}
 	if err = a.Param(mw, args...).Delete(); err != nil {
 		return
 	}
-	return DBI.Fire("deleted", a, mw, args...)
+	return a.base.Fire(factory.EventDeleted, a, mw, args...)
 }
 
 func (a *NgingTask) Deletex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
@@ -614,13 +543,13 @@ func (a *NgingTask) Deletex(mw func(db.Result) db.Result, args ...interface{}) (
 	if !a.base.Eventable() {
 		return a.Param(mw, args...).Deletex()
 	}
-	if err = DBI.Fire("deleting", a, mw, args...); err != nil {
+	if err = a.base.Fire(factory.EventDeleting, a, mw, args...); err != nil {
 		return
 	}
 	if affected, err = a.Param(mw, args...).Deletex(); err != nil {
 		return
 	}
-	err = DBI.Fire("deleted", a, mw, args...)
+	err = a.base.Fire(factory.EventDeleted, a, mw, args...)
 	return
 }
 
@@ -726,6 +655,12 @@ func (a *NgingTask) AsMap(onlyFields ...string) param.Store {
 		}
 	}
 	return r
+}
+
+func (a *NgingTask) Clone() *NgingTask {
+	cloned := NgingTask{Id: a.Id, Uid: a.Uid, GroupId: a.GroupId, Name: a.Name, Type: a.Type, Description: a.Description, CronSpec: a.CronSpec, Concurrent: a.Concurrent, Command: a.Command, WorkDirectory: a.WorkDirectory, Env: a.Env, Disabled: a.Disabled, EnableNotify: a.EnableNotify, NotifyEmail: a.NotifyEmail, Timeout: a.Timeout, ExecuteTimes: a.ExecuteTimes, PrevTime: a.PrevTime, Created: a.Created, Updated: a.Updated, ClosedLog: a.ClosedLog}
+	cloned.CtxFrom(a)
+	return &cloned
 }
 
 func (a *NgingTask) FromRow(row map[string]interface{}) {
@@ -1050,12 +985,13 @@ func (a *NgingTask) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sor
 }
 
 func (a *NgingTask) BatchValidate(kvset map[string]interface{}) error {
-	if kvset == nil {
-		kvset = a.AsRow()
-	}
-	return DBI.Fields.BatchValidate(a.Short_(), kvset)
+	return a.base.BatchValidate(a, kvset)
 }
 
-func (a *NgingTask) Validate(field string, value interface{}) error {
-	return DBI.Fields.Validate(a.Short_(), field, value)
+func (a *NgingTask) Validate(column string, value interface{}) error {
+	return a.base.Validate(a, column, value)
+}
+
+func (a *NgingTask) TrimOverflowText(column string, value string) string {
+	return a.base.TrimOverflowText(a, column, value)
 }

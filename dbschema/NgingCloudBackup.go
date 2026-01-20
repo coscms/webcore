@@ -15,81 +15,7 @@ import (
 	"github.com/webx-top/echo/param"
 )
 
-type Slice_NgingCloudBackup []*NgingCloudBackup
-
-func (s Slice_NgingCloudBackup) Range(fn func(m factory.Model) error) error {
-	for _, v := range s {
-		if err := fn(v); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (s Slice_NgingCloudBackup) RangeRaw(fn func(m *NgingCloudBackup) error) error {
-	for _, v := range s {
-		if err := fn(v); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (s Slice_NgingCloudBackup) GroupBy(keyField string) map[string][]*NgingCloudBackup {
-	r := map[string][]*NgingCloudBackup{}
-	for _, row := range s {
-		dmap := row.AsMap()
-		vkey := fmt.Sprint(dmap[keyField])
-		if _, y := r[vkey]; !y {
-			r[vkey] = []*NgingCloudBackup{}
-		}
-		r[vkey] = append(r[vkey], row)
-	}
-	return r
-}
-
-func (s Slice_NgingCloudBackup) KeyBy(keyField string) map[string]*NgingCloudBackup {
-	r := map[string]*NgingCloudBackup{}
-	for _, row := range s {
-		dmap := row.AsMap()
-		vkey := fmt.Sprint(dmap[keyField])
-		r[vkey] = row
-	}
-	return r
-}
-
-func (s Slice_NgingCloudBackup) AsKV(keyField string, valueField string) param.Store {
-	r := param.Store{}
-	for _, row := range s {
-		dmap := row.AsMap()
-		vkey := fmt.Sprint(dmap[keyField])
-		r[vkey] = dmap[valueField]
-	}
-	return r
-}
-
-func (s Slice_NgingCloudBackup) Transform(transfers map[string]param.Transfer) []param.Store {
-	r := make([]param.Store, len(s))
-	for idx, row := range s {
-		r[idx] = row.AsMap().Transform(transfers)
-	}
-	return r
-}
-
-func (s Slice_NgingCloudBackup) FromList(data interface{}) Slice_NgingCloudBackup {
-	values, ok := data.([]*NgingCloudBackup)
-	if !ok {
-		for _, value := range data.([]interface{}) {
-			row := &NgingCloudBackup{}
-			row.FromRow(value.(map[string]interface{}))
-			s = append(s, row)
-		}
-		return s
-	}
-	s = append(s, values...)
-
-	return s
-}
+type Slice_NgingCloudBackup = factory.Slicex[*NgingCloudBackup]
 
 func NewNgingCloudBackup(ctx echo.Context) *NgingCloudBackup {
 	m := &NgingCloudBackup{}
@@ -121,8 +47,8 @@ type NgingCloudBackup struct {
 	Disabled          string `db:"disabled" bson:"disabled" comment:"是否(Y/N)禁用" json:"disabled" xml:"disabled"`
 	LogDisabled       string `db:"log_disabled" bson:"log_disabled" comment:"是否(Y/N)禁用日志" json:"log_disabled" xml:"log_disabled"`
 	LogType           string `db:"log_type" bson:"log_type" comment:"日志类型(error-仅记录报错;all-记录所有)" json:"log_type" xml:"log_type"`
-	Created           uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created"`
-	Updated           uint   `db:"updated" bson:"updated" comment:"更新时间" json:"updated" xml:"updated"`
+	Created           uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created" form_decoder:"time2unix" form_encoder:"unix2time"`
+	Updated           uint   `db:"updated" bson:"updated" comment:"更新时间" json:"updated" xml:"updated" form_decoder:"time2unix" form_encoder:"unix2time"`
 }
 
 // - base function
@@ -238,10 +164,13 @@ func (a *NgingCloudBackup) Name_() string {
 	return WithPrefix(factory.TableNamerGet(b.Short_())(b))
 }
 
+// CPAFrom Deprecated: Use CtxFrom instead.
 func (a *NgingCloudBackup) CPAFrom(source factory.Model) factory.Model {
-	a.SetContext(source.Context())
-	a.SetConnID(source.ConnID())
-	a.SetNamer(source.Namer())
+	return a.CtxFrom(source)
+}
+
+func (a *NgingCloudBackup) CtxFrom(source factory.Model) factory.Model {
+	a.base.CtxFrom(source)
 	return a
 }
 
@@ -253,13 +182,13 @@ func (a *NgingCloudBackup) Get(mw func(db.Result) db.Result, args ...interface{}
 		return
 	}
 	queryParam := a.Param(mw, args...).SetRecv(a)
-	if err = DBI.FireReading(a, queryParam); err != nil {
+	if err = a.base.FireReading(a, queryParam); err != nil {
 		return
 	}
 	err = queryParam.One()
 	a.base = base
 	if err == nil {
-		err = DBI.FireReaded(a, queryParam)
+		err = a.base.FireReaded(a, queryParam)
 	}
 	return
 }
@@ -272,18 +201,18 @@ func (a *NgingCloudBackup) List(recv interface{}, mw func(db.Result) db.Result, 
 		return a.Param(mw, args...).SetPage(page).SetSize(size).SetRecv(recv).List()
 	}
 	queryParam := a.Param(mw, args...).SetPage(page).SetSize(size).SetRecv(recv)
-	if err := DBI.FireReading(a, queryParam); err != nil {
+	if err := a.base.FireReading(a, queryParam); err != nil {
 		return nil, err
 	}
 	cnt, err := queryParam.List()
 	if err == nil {
 		switch v := recv.(type) {
 		case *[]*NgingCloudBackup:
-			err = DBI.FireReaded(a, queryParam, Slice_NgingCloudBackup(*v))
+			err = a.base.FireReaded(a, queryParam, Slice_NgingCloudBackup(*v))
 		case []*NgingCloudBackup:
-			err = DBI.FireReaded(a, queryParam, Slice_NgingCloudBackup(v))
+			err = a.base.FireReaded(a, queryParam, Slice_NgingCloudBackup(v))
 		case factory.Ranger:
-			err = DBI.FireReaded(a, queryParam, v)
+			err = a.base.FireReaded(a, queryParam, v)
 		}
 	}
 	return cnt, err
@@ -327,18 +256,18 @@ func (a *NgingCloudBackup) ListByOffset(recv interface{}, mw func(db.Result) db.
 		return a.Param(mw, args...).SetOffset(offset).SetSize(size).SetRecv(recv).List()
 	}
 	queryParam := a.Param(mw, args...).SetOffset(offset).SetSize(size).SetRecv(recv)
-	if err := DBI.FireReading(a, queryParam); err != nil {
+	if err := a.base.FireReading(a, queryParam); err != nil {
 		return nil, err
 	}
 	cnt, err := queryParam.List()
 	if err == nil {
 		switch v := recv.(type) {
 		case *[]*NgingCloudBackup:
-			err = DBI.FireReaded(a, queryParam, Slice_NgingCloudBackup(*v))
+			err = a.base.FireReaded(a, queryParam, Slice_NgingCloudBackup(*v))
 		case []*NgingCloudBackup:
-			err = DBI.FireReaded(a, queryParam, Slice_NgingCloudBackup(v))
+			err = a.base.FireReaded(a, queryParam, Slice_NgingCloudBackup(v))
 		case factory.Ranger:
-			err = DBI.FireReaded(a, queryParam, v)
+			err = a.base.FireReaded(a, queryParam, v)
 		}
 	}
 	return cnt, err
@@ -366,7 +295,7 @@ func (a *NgingCloudBackup) Insert() (pk interface{}, err error) {
 		a.LogType = "all"
 	}
 	if a.base.Eventable() {
-		err = DBI.Fire("creating", a, nil)
+		err = a.base.Fire(factory.EventCreating, a, nil)
 		if err != nil {
 			return
 		}
@@ -380,7 +309,7 @@ func (a *NgingCloudBackup) Insert() (pk interface{}, err error) {
 		}
 	}
 	if err == nil && a.base.Eventable() {
-		err = DBI.Fire("created", a, nil)
+		err = a.base.Fire(factory.EventCreated, a, nil)
 	}
 	return
 }
@@ -408,13 +337,13 @@ func (a *NgingCloudBackup) Update(mw func(db.Result) db.Result, args ...interfac
 	if !a.base.Eventable() {
 		return a.Param(mw, args...).SetSend(a).Update()
 	}
-	if err = DBI.Fire("updating", a, mw, args...); err != nil {
+	if err = a.base.Fire(factory.EventUpdating, a, mw, args...); err != nil {
 		return
 	}
 	if err = a.Param(mw, args...).SetSend(a).Update(); err != nil {
 		return
 	}
-	return DBI.Fire("updated", a, mw, args...)
+	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
 func (a *NgingCloudBackup) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
@@ -440,13 +369,13 @@ func (a *NgingCloudBackup) Updatex(mw func(db.Result) db.Result, args ...interfa
 	if !a.base.Eventable() {
 		return a.Param(mw, args...).SetSend(a).Updatex()
 	}
-	if err = DBI.Fire("updating", a, mw, args...); err != nil {
+	if err = a.base.Fire(factory.EventUpdating, a, mw, args...); err != nil {
 		return
 	}
 	if affected, err = a.Param(mw, args...).SetSend(a).Updatex(); err != nil {
 		return
 	}
-	err = DBI.Fire("updated", a, mw, args...)
+	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
 }
 
@@ -477,13 +406,13 @@ func (a *NgingCloudBackup) UpdateByFields(mw func(db.Result) db.Result, fields [
 	for index, field := range fields {
 		editColumns[index] = com.SnakeCase(field)
 	}
-	if err = DBI.FireUpdate("updating", a, editColumns, mw, args...); err != nil {
+	if err = a.base.FireUpdate(factory.EventUpdating, a, editColumns, mw, args...); err != nil {
 		return
 	}
 	if err = a.Param(mw, args...).UpdateByStruct(a, fields...); err != nil {
 		return
 	}
-	err = DBI.FireUpdate("updated", a, editColumns, mw, args...)
+	err = a.base.FireUpdate(factory.EventUpdated, a, editColumns, mw, args...)
 	return
 }
 
@@ -514,13 +443,13 @@ func (a *NgingCloudBackup) UpdatexByFields(mw func(db.Result) db.Result, fields 
 	for index, field := range fields {
 		editColumns[index] = com.SnakeCase(field)
 	}
-	if err = DBI.FireUpdate("updating", a, editColumns, mw, args...); err != nil {
+	if err = a.base.FireUpdate(factory.EventUpdating, a, editColumns, mw, args...); err != nil {
 		return
 	}
 	if affected, err = a.Param(mw, args...).UpdatexByStruct(a, fields...); err != nil {
 		return
 	}
-	err = DBI.FireUpdate("updated", a, editColumns, mw, args...)
+	err = a.base.FireUpdate(factory.EventUpdated, a, editColumns, mw, args...)
 	return
 }
 
@@ -577,13 +506,13 @@ func (a *NgingCloudBackup) UpdateFields(mw func(db.Result) db.Result, kvset map[
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
-	if err = DBI.FireUpdate("updating", &m, editColumns, mw, args...); err != nil {
+	if err = a.base.FireUpdate(factory.EventUpdating, &m, editColumns, mw, args...); err != nil {
 		return
 	}
 	if err = a.Param(mw, args...).SetSend(kvset).Update(); err != nil {
 		return
 	}
-	return DBI.FireUpdate("updated", &m, editColumns, mw, args...)
+	return a.base.FireUpdate(factory.EventUpdated, &m, editColumns, mw, args...)
 }
 
 func (a *NgingCloudBackup) UpdatexFields(mw func(db.Result) db.Result, kvset map[string]interface{}, args ...interface{}) (affected int64, err error) {
@@ -627,13 +556,13 @@ func (a *NgingCloudBackup) UpdatexFields(mw func(db.Result) db.Result, kvset map
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
-	if err = DBI.FireUpdate("updating", &m, editColumns, mw, args...); err != nil {
+	if err = a.base.FireUpdate(factory.EventUpdating, &m, editColumns, mw, args...); err != nil {
 		return
 	}
 	if affected, err = a.Param(mw, args...).SetSend(kvset).Updatex(); err != nil {
 		return
 	}
-	err = DBI.FireUpdate("updated", &m, editColumns, mw, args...)
+	err = a.base.FireUpdate(factory.EventUpdated, &m, editColumns, mw, args...)
 	return
 }
 
@@ -643,13 +572,13 @@ func (a *NgingCloudBackup) UpdateValues(mw func(db.Result) db.Result, keysValues
 	}
 	m := *a
 	m.FromRow(keysValues.Map())
-	if err = DBI.FireUpdate("updating", &m, keysValues.Keys(), mw, args...); err != nil {
+	if err = a.base.FireUpdate(factory.EventUpdating, &m, keysValues.Keys(), mw, args...); err != nil {
 		return
 	}
 	if err = a.Param(mw, args...).SetSend(keysValues).Update(); err != nil {
 		return
 	}
-	return DBI.FireUpdate("updated", &m, keysValues.Keys(), mw, args...)
+	return a.base.FireUpdate(factory.EventUpdated, &m, keysValues.Keys(), mw, args...)
 }
 
 func (a *NgingCloudBackup) Upsert(mw func(db.Result) db.Result, args ...interface{}) (pk interface{}, err error) {
@@ -676,7 +605,7 @@ func (a *NgingCloudBackup) Upsert(mw func(db.Result) db.Result, args ...interfac
 		if !a.base.Eventable() {
 			return nil
 		}
-		return DBI.Fire("updating", a, mw, args...)
+		return a.base.Fire(factory.EventUpdating, a, mw, args...)
 	}, func() error {
 		a.Created = uint(time.Now().Unix())
 		a.Id = 0
@@ -701,7 +630,7 @@ func (a *NgingCloudBackup) Upsert(mw func(db.Result) db.Result, args ...interfac
 		if !a.base.Eventable() {
 			return nil
 		}
-		return DBI.Fire("creating", a, nil)
+		return a.base.Fire(factory.EventCreating, a, nil)
 	})
 	if err == nil && pk != nil {
 		if v, y := pk.(uint); y {
@@ -712,9 +641,9 @@ func (a *NgingCloudBackup) Upsert(mw func(db.Result) db.Result, args ...interfac
 	}
 	if err == nil && a.base.Eventable() {
 		if pk == nil {
-			err = DBI.Fire("updated", a, mw, args...)
+			err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 		} else {
-			err = DBI.Fire("created", a, nil)
+			err = a.base.Fire(factory.EventCreated, a, nil)
 		}
 	}
 	return
@@ -725,13 +654,13 @@ func (a *NgingCloudBackup) Delete(mw func(db.Result) db.Result, args ...interfac
 	if !a.base.Eventable() {
 		return a.Param(mw, args...).Delete()
 	}
-	if err = DBI.Fire("deleting", a, mw, args...); err != nil {
+	if err = a.base.Fire(factory.EventDeleting, a, mw, args...); err != nil {
 		return
 	}
 	if err = a.Param(mw, args...).Delete(); err != nil {
 		return
 	}
-	return DBI.Fire("deleted", a, mw, args...)
+	return a.base.Fire(factory.EventDeleted, a, mw, args...)
 }
 
 func (a *NgingCloudBackup) Deletex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
@@ -739,13 +668,13 @@ func (a *NgingCloudBackup) Deletex(mw func(db.Result) db.Result, args ...interfa
 	if !a.base.Eventable() {
 		return a.Param(mw, args...).Deletex()
 	}
-	if err = DBI.Fire("deleting", a, mw, args...); err != nil {
+	if err = a.base.Fire(factory.EventDeleting, a, mw, args...); err != nil {
 		return
 	}
 	if affected, err = a.Param(mw, args...).Deletex(); err != nil {
 		return
 	}
-	err = DBI.Fire("deleted", a, mw, args...)
+	err = a.base.Fire(factory.EventDeleted, a, mw, args...)
 	return
 }
 
@@ -855,6 +784,12 @@ func (a *NgingCloudBackup) AsMap(onlyFields ...string) param.Store {
 		}
 	}
 	return r
+}
+
+func (a *NgingCloudBackup) Clone() *NgingCloudBackup {
+	cloned := NgingCloudBackup{Id: a.Id, Name: a.Name, SourcePath: a.SourcePath, IgnoreRule: a.IgnoreRule, MatchRule: a.MatchRule, WaitFillCompleted: a.WaitFillCompleted, MinModifyInterval: a.MinModifyInterval, IgnoreWaitRule: a.IgnoreWaitRule, Delay: a.Delay, StorageEngine: a.StorageEngine, StorageConfig: a.StorageConfig, DestStorage: a.DestStorage, DestPath: a.DestPath, Result: a.Result, LastExecuted: a.LastExecuted, Status: a.Status, Disabled: a.Disabled, LogDisabled: a.LogDisabled, LogType: a.LogType, Created: a.Created, Updated: a.Updated}
+	cloned.CtxFrom(a)
+	return &cloned
 }
 
 func (a *NgingCloudBackup) FromRow(row map[string]interface{}) {
@@ -1191,12 +1126,13 @@ func (a *NgingCloudBackup) ListPageByOffsetAs(recv interface{}, cond *db.Compoun
 }
 
 func (a *NgingCloudBackup) BatchValidate(kvset map[string]interface{}) error {
-	if kvset == nil {
-		kvset = a.AsRow()
-	}
-	return DBI.Fields.BatchValidate(a.Short_(), kvset)
+	return a.base.BatchValidate(a, kvset)
 }
 
-func (a *NgingCloudBackup) Validate(field string, value interface{}) error {
-	return DBI.Fields.Validate(a.Short_(), field, value)
+func (a *NgingCloudBackup) Validate(column string, value interface{}) error {
+	return a.base.Validate(a, column, value)
+}
+
+func (a *NgingCloudBackup) TrimOverflowText(column string, value string) string {
+	return a.base.TrimOverflowText(a, column, value)
 }

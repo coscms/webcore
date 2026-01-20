@@ -15,81 +15,7 @@ import (
 	"github.com/webx-top/echo/param"
 )
 
-type Slice_NgingSendingLog []*NgingSendingLog
-
-func (s Slice_NgingSendingLog) Range(fn func(m factory.Model) error) error {
-	for _, v := range s {
-		if err := fn(v); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (s Slice_NgingSendingLog) RangeRaw(fn func(m *NgingSendingLog) error) error {
-	for _, v := range s {
-		if err := fn(v); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (s Slice_NgingSendingLog) GroupBy(keyField string) map[string][]*NgingSendingLog {
-	r := map[string][]*NgingSendingLog{}
-	for _, row := range s {
-		dmap := row.AsMap()
-		vkey := fmt.Sprint(dmap[keyField])
-		if _, y := r[vkey]; !y {
-			r[vkey] = []*NgingSendingLog{}
-		}
-		r[vkey] = append(r[vkey], row)
-	}
-	return r
-}
-
-func (s Slice_NgingSendingLog) KeyBy(keyField string) map[string]*NgingSendingLog {
-	r := map[string]*NgingSendingLog{}
-	for _, row := range s {
-		dmap := row.AsMap()
-		vkey := fmt.Sprint(dmap[keyField])
-		r[vkey] = row
-	}
-	return r
-}
-
-func (s Slice_NgingSendingLog) AsKV(keyField string, valueField string) param.Store {
-	r := param.Store{}
-	for _, row := range s {
-		dmap := row.AsMap()
-		vkey := fmt.Sprint(dmap[keyField])
-		r[vkey] = dmap[valueField]
-	}
-	return r
-}
-
-func (s Slice_NgingSendingLog) Transform(transfers map[string]param.Transfer) []param.Store {
-	r := make([]param.Store, len(s))
-	for idx, row := range s {
-		r[idx] = row.AsMap().Transform(transfers)
-	}
-	return r
-}
-
-func (s Slice_NgingSendingLog) FromList(data interface{}) Slice_NgingSendingLog {
-	values, ok := data.([]*NgingSendingLog)
-	if !ok {
-		for _, value := range data.([]interface{}) {
-			row := &NgingSendingLog{}
-			row.FromRow(value.(map[string]interface{}))
-			s = append(s, row)
-		}
-		return s
-	}
-	s = append(s, values...)
-
-	return s
-}
+type Slice_NgingSendingLog = factory.Slicex[*NgingSendingLog]
 
 func NewNgingSendingLog(ctx echo.Context) *NgingSendingLog {
 	m := &NgingSendingLog{}
@@ -103,7 +29,7 @@ type NgingSendingLog struct {
 	objects []*NgingSendingLog
 
 	Id              uint64 `db:"id,omitempty,pk" bson:"id,omitempty" comment:"ID" json:"id" xml:"id"`
-	Created         uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created"`
+	Created         uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created" form_decoder:"time2unix" form_encoder:"unix2time"`
 	SentAt          uint   `db:"sent_at" bson:"sent_at" comment:"发送时间" json:"sent_at" xml:"sent_at"`
 	SourceId        uint64 `db:"source_id" bson:"source_id" comment:"来源ID" json:"source_id" xml:"source_id"`
 	SourceType      string `db:"source_type" bson:"source_type" comment:"来源类型" json:"source_type" xml:"source_type"`
@@ -231,10 +157,13 @@ func (a *NgingSendingLog) Name_() string {
 	return WithPrefix(factory.TableNamerGet(b.Short_())(b))
 }
 
+// CPAFrom Deprecated: Use CtxFrom instead.
 func (a *NgingSendingLog) CPAFrom(source factory.Model) factory.Model {
-	a.SetContext(source.Context())
-	a.SetConnID(source.ConnID())
-	a.SetNamer(source.Namer())
+	return a.CtxFrom(source)
+}
+
+func (a *NgingSendingLog) CtxFrom(source factory.Model) factory.Model {
+	a.base.CtxFrom(source)
 	return a
 }
 
@@ -246,13 +175,13 @@ func (a *NgingSendingLog) Get(mw func(db.Result) db.Result, args ...interface{})
 		return
 	}
 	queryParam := a.Param(mw, args...).SetRecv(a)
-	if err = DBI.FireReading(a, queryParam); err != nil {
+	if err = a.base.FireReading(a, queryParam); err != nil {
 		return
 	}
 	err = queryParam.One()
 	a.base = base
 	if err == nil {
-		err = DBI.FireReaded(a, queryParam)
+		err = a.base.FireReaded(a, queryParam)
 	}
 	return
 }
@@ -265,18 +194,18 @@ func (a *NgingSendingLog) List(recv interface{}, mw func(db.Result) db.Result, p
 		return a.Param(mw, args...).SetPage(page).SetSize(size).SetRecv(recv).List()
 	}
 	queryParam := a.Param(mw, args...).SetPage(page).SetSize(size).SetRecv(recv)
-	if err := DBI.FireReading(a, queryParam); err != nil {
+	if err := a.base.FireReading(a, queryParam); err != nil {
 		return nil, err
 	}
 	cnt, err := queryParam.List()
 	if err == nil {
 		switch v := recv.(type) {
 		case *[]*NgingSendingLog:
-			err = DBI.FireReaded(a, queryParam, Slice_NgingSendingLog(*v))
+			err = a.base.FireReaded(a, queryParam, Slice_NgingSendingLog(*v))
 		case []*NgingSendingLog:
-			err = DBI.FireReaded(a, queryParam, Slice_NgingSendingLog(v))
+			err = a.base.FireReaded(a, queryParam, Slice_NgingSendingLog(v))
 		case factory.Ranger:
-			err = DBI.FireReaded(a, queryParam, v)
+			err = a.base.FireReaded(a, queryParam, v)
 		}
 	}
 	return cnt, err
@@ -320,18 +249,18 @@ func (a *NgingSendingLog) ListByOffset(recv interface{}, mw func(db.Result) db.R
 		return a.Param(mw, args...).SetOffset(offset).SetSize(size).SetRecv(recv).List()
 	}
 	queryParam := a.Param(mw, args...).SetOffset(offset).SetSize(size).SetRecv(recv)
-	if err := DBI.FireReading(a, queryParam); err != nil {
+	if err := a.base.FireReading(a, queryParam); err != nil {
 		return nil, err
 	}
 	cnt, err := queryParam.List()
 	if err == nil {
 		switch v := recv.(type) {
 		case *[]*NgingSendingLog:
-			err = DBI.FireReaded(a, queryParam, Slice_NgingSendingLog(*v))
+			err = a.base.FireReaded(a, queryParam, Slice_NgingSendingLog(*v))
 		case []*NgingSendingLog:
-			err = DBI.FireReaded(a, queryParam, Slice_NgingSendingLog(v))
+			err = a.base.FireReaded(a, queryParam, Slice_NgingSendingLog(v))
 		case factory.Ranger:
-			err = DBI.FireReaded(a, queryParam, v)
+			err = a.base.FireReaded(a, queryParam, v)
 		}
 	}
 	return cnt, err
@@ -350,7 +279,7 @@ func (a *NgingSendingLog) Insert() (pk interface{}, err error) {
 		a.Status = "waiting"
 	}
 	if a.base.Eventable() {
-		err = DBI.Fire("creating", a, nil)
+		err = a.base.Fire(factory.EventCreating, a, nil)
 		if err != nil {
 			return
 		}
@@ -364,7 +293,7 @@ func (a *NgingSendingLog) Insert() (pk interface{}, err error) {
 		}
 	}
 	if err == nil && a.base.Eventable() {
-		err = DBI.Fire("created", a, nil)
+		err = a.base.Fire(factory.EventCreated, a, nil)
 	}
 	return
 }
@@ -383,13 +312,13 @@ func (a *NgingSendingLog) Update(mw func(db.Result) db.Result, args ...interface
 	if !a.base.Eventable() {
 		return a.Param(mw, args...).SetSend(a).Update()
 	}
-	if err = DBI.Fire("updating", a, mw, args...); err != nil {
+	if err = a.base.Fire(factory.EventUpdating, a, mw, args...); err != nil {
 		return
 	}
 	if err = a.Param(mw, args...).SetSend(a).Update(); err != nil {
 		return
 	}
-	return DBI.Fire("updated", a, mw, args...)
+	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
 func (a *NgingSendingLog) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
@@ -406,13 +335,13 @@ func (a *NgingSendingLog) Updatex(mw func(db.Result) db.Result, args ...interfac
 	if !a.base.Eventable() {
 		return a.Param(mw, args...).SetSend(a).Updatex()
 	}
-	if err = DBI.Fire("updating", a, mw, args...); err != nil {
+	if err = a.base.Fire(factory.EventUpdating, a, mw, args...); err != nil {
 		return
 	}
 	if affected, err = a.Param(mw, args...).SetSend(a).Updatex(); err != nil {
 		return
 	}
-	err = DBI.Fire("updated", a, mw, args...)
+	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
 }
 
@@ -434,13 +363,13 @@ func (a *NgingSendingLog) UpdateByFields(mw func(db.Result) db.Result, fields []
 	for index, field := range fields {
 		editColumns[index] = com.SnakeCase(field)
 	}
-	if err = DBI.FireUpdate("updating", a, editColumns, mw, args...); err != nil {
+	if err = a.base.FireUpdate(factory.EventUpdating, a, editColumns, mw, args...); err != nil {
 		return
 	}
 	if err = a.Param(mw, args...).UpdateByStruct(a, fields...); err != nil {
 		return
 	}
-	err = DBI.FireUpdate("updated", a, editColumns, mw, args...)
+	err = a.base.FireUpdate(factory.EventUpdated, a, editColumns, mw, args...)
 	return
 }
 
@@ -462,13 +391,13 @@ func (a *NgingSendingLog) UpdatexByFields(mw func(db.Result) db.Result, fields [
 	for index, field := range fields {
 		editColumns[index] = com.SnakeCase(field)
 	}
-	if err = DBI.FireUpdate("updating", a, editColumns, mw, args...); err != nil {
+	if err = a.base.FireUpdate(factory.EventUpdating, a, editColumns, mw, args...); err != nil {
 		return
 	}
 	if affected, err = a.Param(mw, args...).UpdatexByStruct(a, fields...); err != nil {
 		return
 	}
-	err = DBI.FireUpdate("updated", a, editColumns, mw, args...)
+	err = a.base.FireUpdate(factory.EventUpdated, a, editColumns, mw, args...)
 	return
 }
 
@@ -510,13 +439,13 @@ func (a *NgingSendingLog) UpdateFields(mw func(db.Result) db.Result, kvset map[s
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
-	if err = DBI.FireUpdate("updating", &m, editColumns, mw, args...); err != nil {
+	if err = a.base.FireUpdate(factory.EventUpdating, &m, editColumns, mw, args...); err != nil {
 		return
 	}
 	if err = a.Param(mw, args...).SetSend(kvset).Update(); err != nil {
 		return
 	}
-	return DBI.FireUpdate("updated", &m, editColumns, mw, args...)
+	return a.base.FireUpdate(factory.EventUpdated, &m, editColumns, mw, args...)
 }
 
 func (a *NgingSendingLog) UpdatexFields(mw func(db.Result) db.Result, kvset map[string]interface{}, args ...interface{}) (affected int64, err error) {
@@ -545,13 +474,13 @@ func (a *NgingSendingLog) UpdatexFields(mw func(db.Result) db.Result, kvset map[
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
-	if err = DBI.FireUpdate("updating", &m, editColumns, mw, args...); err != nil {
+	if err = a.base.FireUpdate(factory.EventUpdating, &m, editColumns, mw, args...); err != nil {
 		return
 	}
 	if affected, err = a.Param(mw, args...).SetSend(kvset).Updatex(); err != nil {
 		return
 	}
-	err = DBI.FireUpdate("updated", &m, editColumns, mw, args...)
+	err = a.base.FireUpdate(factory.EventUpdated, &m, editColumns, mw, args...)
 	return
 }
 
@@ -561,13 +490,13 @@ func (a *NgingSendingLog) UpdateValues(mw func(db.Result) db.Result, keysValues 
 	}
 	m := *a
 	m.FromRow(keysValues.Map())
-	if err = DBI.FireUpdate("updating", &m, keysValues.Keys(), mw, args...); err != nil {
+	if err = a.base.FireUpdate(factory.EventUpdating, &m, keysValues.Keys(), mw, args...); err != nil {
 		return
 	}
 	if err = a.Param(mw, args...).SetSend(keysValues).Update(); err != nil {
 		return
 	}
-	return DBI.FireUpdate("updated", &m, keysValues.Keys(), mw, args...)
+	return a.base.FireUpdate(factory.EventUpdated, &m, keysValues.Keys(), mw, args...)
 }
 
 func (a *NgingSendingLog) Upsert(mw func(db.Result) db.Result, args ...interface{}) (pk interface{}, err error) {
@@ -584,7 +513,7 @@ func (a *NgingSendingLog) Upsert(mw func(db.Result) db.Result, args ...interface
 		if !a.base.Eventable() {
 			return nil
 		}
-		return DBI.Fire("updating", a, mw, args...)
+		return a.base.Fire(factory.EventUpdating, a, mw, args...)
 	}, func() error {
 		a.Created = uint(time.Now().Unix())
 		a.Id = 0
@@ -600,7 +529,7 @@ func (a *NgingSendingLog) Upsert(mw func(db.Result) db.Result, args ...interface
 		if !a.base.Eventable() {
 			return nil
 		}
-		return DBI.Fire("creating", a, nil)
+		return a.base.Fire(factory.EventCreating, a, nil)
 	})
 	if err == nil && pk != nil {
 		if v, y := pk.(uint64); y {
@@ -611,9 +540,9 @@ func (a *NgingSendingLog) Upsert(mw func(db.Result) db.Result, args ...interface
 	}
 	if err == nil && a.base.Eventable() {
 		if pk == nil {
-			err = DBI.Fire("updated", a, mw, args...)
+			err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 		} else {
-			err = DBI.Fire("created", a, nil)
+			err = a.base.Fire(factory.EventCreated, a, nil)
 		}
 	}
 	return
@@ -624,13 +553,13 @@ func (a *NgingSendingLog) Delete(mw func(db.Result) db.Result, args ...interface
 	if !a.base.Eventable() {
 		return a.Param(mw, args...).Delete()
 	}
-	if err = DBI.Fire("deleting", a, mw, args...); err != nil {
+	if err = a.base.Fire(factory.EventDeleting, a, mw, args...); err != nil {
 		return
 	}
 	if err = a.Param(mw, args...).Delete(); err != nil {
 		return
 	}
-	return DBI.Fire("deleted", a, mw, args...)
+	return a.base.Fire(factory.EventDeleted, a, mw, args...)
 }
 
 func (a *NgingSendingLog) Deletex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
@@ -638,13 +567,13 @@ func (a *NgingSendingLog) Deletex(mw func(db.Result) db.Result, args ...interfac
 	if !a.base.Eventable() {
 		return a.Param(mw, args...).Deletex()
 	}
-	if err = DBI.Fire("deleting", a, mw, args...); err != nil {
+	if err = a.base.Fire(factory.EventDeleting, a, mw, args...); err != nil {
 		return
 	}
 	if affected, err = a.Param(mw, args...).Deletex(); err != nil {
 		return
 	}
-	err = DBI.Fire("deleted", a, mw, args...)
+	err = a.base.Fire(factory.EventDeleted, a, mw, args...)
 	return
 }
 
@@ -726,6 +655,12 @@ func (a *NgingSendingLog) AsMap(onlyFields ...string) param.Store {
 		}
 	}
 	return r
+}
+
+func (a *NgingSendingLog) Clone() *NgingSendingLog {
+	cloned := NgingSendingLog{Id: a.Id, Created: a.Created, SentAt: a.SentAt, SourceId: a.SourceId, SourceType: a.SourceType, Method: a.Method, To: a.To, Provider: a.Provider, Result: a.Result, Status: a.Status, Retries: a.Retries, Content: a.Content, Params: a.Params, AppointmentTime: a.AppointmentTime}
+	cloned.CtxFrom(a)
+	return &cloned
 }
 
 func (a *NgingSendingLog) FromRow(row map[string]interface{}) {
@@ -978,12 +913,13 @@ func (a *NgingSendingLog) ListPageByOffsetAs(recv interface{}, cond *db.Compound
 }
 
 func (a *NgingSendingLog) BatchValidate(kvset map[string]interface{}) error {
-	if kvset == nil {
-		kvset = a.AsRow()
-	}
-	return DBI.Fields.BatchValidate(a.Short_(), kvset)
+	return a.base.BatchValidate(a, kvset)
 }
 
-func (a *NgingSendingLog) Validate(field string, value interface{}) error {
-	return DBI.Fields.Validate(a.Short_(), field, value)
+func (a *NgingSendingLog) Validate(column string, value interface{}) error {
+	return a.base.Validate(a, column, value)
+}
+
+func (a *NgingSendingLog) TrimOverflowText(column string, value string) string {
+	return a.base.TrimOverflowText(a, column, value)
 }
