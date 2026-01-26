@@ -42,6 +42,13 @@ func New(ctx echo.Context, model interface{}, options ...Option) *FormBuilder {
 		translateable:       TranslateableGetter,
 		ctxStoreKey:         `forms`,
 	}
+	if model == nil && len(options) == 0 {
+		return f
+	}
+	return f.Init(model, options...)
+}
+
+func (f *FormBuilder) Init(model interface{}, options ...Option) *FormBuilder {
 	f.setDefaultLanguage()
 	defaultHooks := []MethodHook{
 		BindModel(f),
@@ -63,21 +70,21 @@ func New(ctx echo.Context, model interface{}, options ...Option) *FormBuilder {
 		f.exit = true
 	}
 	f.SetLabelFunc(func(txt string) string {
-		return ctx.T(txt)
+		return f.ctx.T(txt)
 	}).SetNameFunc(com.CamelCase)
 	f.AddBeforeRender(func() {
-		nextURL := ctx.Form(echo.DefaultNextURLVarName)
+		nextURL := f.ctx.Form(echo.DefaultNextURLVarName)
 		if len(nextURL) > 0 {
 			f.Elements(fields.HiddenField(echo.DefaultNextURLVarName).SetValue(nextURL))
 		}
 	})
-	if csrfToken := ctx.Internal().String(echoMw.DefaultCSRFConfig.ContextKey); len(csrfToken) > 0 {
+	if csrfToken := f.ctx.Internal().String(echoMw.DefaultCSRFConfig.ContextKey); len(csrfToken) > 0 {
 		f.AddBeforeRender(func() {
 			f.Elements(fields.HiddenField(echoMw.DefaultCSRFConfig.ContextKey).SetValue(csrfToken))
 		})
 	}
 	if len(f.ctxStoreKey) > 0 {
-		ctx.Set(f.ctxStoreKey, f.Forms)
+		f.ctx.Set(f.ctxStoreKey, f.Forms)
 	}
 	return f
 }
