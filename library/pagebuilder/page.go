@@ -5,7 +5,7 @@ import (
 )
 
 type Page struct {
-	Tmpl          string
+	Template      string
 	Title         string
 	Header        string
 	Data          interface{}
@@ -18,13 +18,13 @@ type Page struct {
 
 func (p *Page) Render(ctx echo.Context) error {
 	ctx.Set(`pageData`, p)
-	if len(p.Tmpl) == 0 {
+	if len(p.Template) == 0 {
 		switch p.Data.(type) {
 		case *Table, Table:
-			p.Tmpl = `common/page_table`
+			p.Template = `common/page_table`
 		case *Form, Form:
-			p.Tmpl = `common/page_form`
+			p.Template = `common/page_form`
 		}
 	}
-	return ctx.Render(p.Tmpl, p.Data)
+	return ctx.Render(p.Template, p.Data)
 }
