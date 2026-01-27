@@ -136,6 +136,6 @@ func (f *FormBuilder) InitConfig() error {
 		f.toLangset(cfg)
 	}
 
-	f.Init(cfg)
+	f.Forms.Init(cfg)
 	return err
 }
