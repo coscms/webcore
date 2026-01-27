@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"os"
 	"strings"
-	"sync/atomic"
 
 	"github.com/admpub/ip2region/v3/binding/golang/ip2region"
 	"github.com/admpub/ip2region/v3/binding/golang/xdb"
@@ -22,12 +21,6 @@ import (
 )
 
 var (
-	// region4 holds the IPv4 database instance for IP address lookups
-	region4 *ip2region.Ip2Region
-
-	// region6 holds the IPv6 database instance for IP address lookups
-	region6 *ip2region.Ip2Region
-
 	// dict4File specifies the file path for IPv4 database
 	dict4File string
 
@@ -35,12 +28,10 @@ var (
 	dict6File string
 
 	// once4 ensures thread-safe initialization of IPv4 database
-	once4    syncOnce.Once
-	once4Err atomic.Value
+	once4, once4Cancel = syncOnce.OnceValues[*ip2region.Ip2Region, error](initialize4)
 
 	// once6 ensures thread-safe initialization of IPv6 database
-	once6    syncOnce.Once
-	once6Err atomic.Value
+	once6, once6Cancel = syncOnce.OnceValues[*ip2region.Ip2Region, error](initialize6)
 
 	// memoryMode indicates whether to load the database into memory for faster lookups
 	memoryMode bool
@@ -58,59 +49,38 @@ func init() {
 // SetDict4File sets the dictionary file path for the IPv4 dictionary and resets the initialization state.
 func SetDict4File(f4 string) {
 	dict4File = f4
-	once4.Reset()
+	if once4Cancel != nil {
+		once6Cancel()
+	}
 }
 
 // SetDict6File sets the dictionary file path for the IPv6 dictionary and resets the initialization state.
 func SetDict6File(f6 string) {
 	dict6File = f6
-	once6.Reset()
-}
-
-// SetInstance4 sets the IPv4 IP2Region instance, replacing any existing instance.
-// It safely closes the previous instance if one exists.
-func SetInstance4(new4Instance *ip2region.Ip2Region) {
-	if region4 == nil {
-		region4 = new4Instance
-	} else {
-		oldRegion4 := *region4
-		*region4 = *new4Instance
-		oldRegion4.Close()
-	}
-}
-
-// SetInstance6 sets the IPv6 region instance and properly closes the old instance if it exists.
-// The function ensures proper cleanup of the previous instance before replacing it with the new one.
-func SetInstance6(new6Instance *ip2region.Ip2Region) {
-	if region6 == nil {
-		region4 = new6Instance
-	} else {
-		oldRegion6 := *region6
-		*region6 = *new6Instance
-		oldRegion6.Close()
+	if once6Cancel != nil {
+		once6Cancel()
 	}
 }
 
 // initialize4 initializes the IPv4 IP2Region database.
 // It closes any existing database connection first, then loads the new database from dict4File.
 // Returns error if the database fails to load.
-func initialize4(cfg *IP2RegionConfig) (err error) {
-	if region4 != nil {
-		region4.Close()
-	}
+func initialize4() (region4 *ip2region.Ip2Region, err error) {
 	var isMemoryMode bool
+	dictFile := dict4File
+	cfg, _ := GetIP2RegionConfig()
 	if cfg != nil {
 		if len(cfg.IPv4Dict) > 0 {
-			SetDict4File(cfg.IPv4Dict)
+			dictFile = cfg.IPv4Dict
 		}
 		isMemoryMode = cfg.Mode == `local-memory`
 	}
 	if !isMemoryMode {
 		isMemoryMode = memoryMode
 	}
-	region4, err = ip2region.New(dict4File, isMemoryMode)
+	region4, err = ip2region.New(dictFile, isMemoryMode)
 	if err != nil {
-		err = fmt.Errorf(`ip2region.New(%s) error: %w`, dict4File, err)
+		err = fmt.Errorf(`ip2region.New(%s) error: %w`, dictFile, err)
 		log.Error(err)
 	}
 	return
@@ -119,36 +89,25 @@ func initialize4(cfg *IP2RegionConfig) (err error) {
 // initialize6 initializes the IPv6 region database by loading the specified dictionary file.
 // It closes any existing database connection before attempting to create a new one.
 // Returns an error if the database initialization fails.
-func initialize6(cfg *IP2RegionConfig) (err error) {
-	if region6 != nil {
-		region6.Close()
-	}
+func initialize6() (region6 *ip2region.Ip2Region, err error) {
 	var isMemoryMode bool
+	dictFile := dict6File
+	cfg, _ := GetIP2RegionConfig()
 	if cfg != nil {
 		if len(cfg.IPv6Dict) > 0 {
-			SetDict6File(cfg.IPv6Dict)
+			dictFile = cfg.IPv6Dict
 		}
 		isMemoryMode = cfg.Mode == `local-memory`
 	}
 	if !isMemoryMode {
 		isMemoryMode = memoryMode
 	}
-	region6, err = ip2region.New(dict6File, isMemoryMode)
+	region6, err = ip2region.New(dictFile, isMemoryMode)
 	if err != nil {
-		err = fmt.Errorf(`ip2region.New(%s) error: %w`, dict6File, err)
+		err = fmt.Errorf(`ip2region.New(%s) error: %w`, dictFile, err)
 		log.Error(err)
 	}
 	return
-}
-
-// IsInitialized4 returns true if the IPv4 region data has been initialized.
-func IsInitialized4() bool {
-	return region4 != nil
-}
-
-// IsInitialized6 reports whether the IPv6 region data has been initialized.
-func IsInitialized6() bool {
-	return region6 != nil
 }
 
 // ErrIsInvalidIP 解析 IPv6 时会报这个错误
@@ -203,7 +162,7 @@ func requestAPI(cfg *IP2RegionConfig, ip string) (ip2region.IpInfo, error) {
 // It handles both IPv4 and IPv6 addresses, initializing the appropriate dictionary if needed.
 // Returns IpInfo containing location details or an error if the search fails.
 // Panics are recovered and logged, converting them to error returns.
-func searchByLocalDict(cfg *IP2RegionConfig, ip string) (info ip2region.IpInfo, err error) {
+func searchByLocalDict(ip string) (info ip2region.IpInfo, err error) {
 	defer func() {
 		if e := recover(); e != nil {
 			panicErr := echo.NewPanicError(e, nil).Parse(15)
@@ -212,28 +171,16 @@ func searchByLocalDict(cfg *IP2RegionConfig, ip string) (info ip2region.IpInfo, 
 		}
 	}()
 	if net.ParseIP(ip).To4() != nil {
-		once4.Do(func() {
-			err = initialize4(cfg)
-			once4Err.Store(err)
-		})
-		if err != nil {
-			return
-		}
-		err, _ = once4Err.Load().(error)
+		var region4 *ip2region.Ip2Region
+		region4, err = once4()
 		if err != nil {
 			return
 		}
 		info, err = region4.MemorySearch(ip)
 		return
 	}
-	once6.Do(func() {
-		err = initialize6(cfg)
-		once6Err.Store(err)
-	})
-	if err != nil {
-		return
-	}
-	err, _ = once6Err.Load().(error)
+	var region6 *ip2region.Ip2Region
+	region6, err = once6()
 	if err != nil {
 		return
 	}
@@ -267,7 +214,7 @@ func IP2RegionHandler(c echo.Context) error {
 			}
 		}
 	}
-	info, err := searchByLocalDict(cfg, ip)
+	info, err := searchByLocalDict(ip)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -323,7 +270,7 @@ func IPInfo(ip string) (info ip2region.IpInfo, err error) {
 	if ok && cfg.Mode == `api` {
 		return requestAPI(cfg, ip)
 	}
-	return searchByLocalDict(cfg, ip)
+	return searchByLocalDict(ip)
 }
 
 // ClearZero removes "0" values from IpInfo fields by replacing them with empty strings.
