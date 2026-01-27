@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"sync/atomic"
 
 	"github.com/admpub/ip2region/v3/binding/golang/ip2region"
 	"github.com/admpub/ip2region/v3/binding/golang/xdb"
@@ -34,10 +35,12 @@ var (
 	dict6File string
 
 	// once4 ensures thread-safe initialization of IPv4 database
-	once4 syncOnce.Once
+	once4    syncOnce.Once
+	once4Err atomic.Value
 
 	// once6 ensures thread-safe initialization of IPv6 database
-	once6 syncOnce.Once
+	once6    syncOnce.Once
+	once6Err atomic.Value
 
 	// memoryMode indicates whether to load the database into memory for faster lookups
 	memoryMode bool
@@ -91,11 +94,15 @@ func SetInstance6(new6Instance *ip2region.Ip2Region) {
 // initialize4 initializes the IPv4 IP2Region database.
 // It closes any existing database connection first, then loads the new database from dict4File.
 // Returns error if the database fails to load.
-func initialize4() (err error) {
+func initialize4(cfg *IP2RegionConfig) (err error) {
 	if region4 != nil {
 		region4.Close()
 	}
-	region4, err = ip2region.New(dict4File, memoryMode)
+	isMemoryMode := cfg.Mode == `local-memory`
+	if !isMemoryMode {
+		isMemoryMode = memoryMode
+	}
+	region4, err = ip2region.New(dict4File, isMemoryMode)
 	if err != nil {
 		err = fmt.Errorf(`ip2region.New(%s) error: %w`, dict4File, err)
 		log.Error(err)
@@ -106,11 +113,15 @@ func initialize4() (err error) {
 // initialize6 initializes the IPv6 region database by loading the specified dictionary file.
 // It closes any existing database connection before attempting to create a new one.
 // Returns an error if the database initialization fails.
-func initialize6() (err error) {
+func initialize6(cfg *IP2RegionConfig) (err error) {
 	if region6 != nil {
 		region6.Close()
 	}
-	region6, err = ip2region.New(dict6File, memoryMode)
+	isMemoryMode := cfg.Mode == `local-memory`
+	if !isMemoryMode {
+		isMemoryMode = memoryMode
+	}
+	region6, err = ip2region.New(dict6File, isMemoryMode)
 	if err != nil {
 		err = fmt.Errorf(`ip2region.New(%s) error: %w`, dict6File, err)
 		log.Error(err)
@@ -193,8 +204,13 @@ func searchByLocalDict(cfg *IP2RegionConfig, ip string) (info ip2region.IpInfo, 
 			if cfg != nil && len(cfg.IPv4Dict) > 0 {
 				SetDict4File(cfg.IPv4Dict)
 			}
-			err = initialize4()
+			err = initialize4(cfg)
+			once4Err.Store(err)
 		})
+		if err != nil {
+			return
+		}
+		err, _ = once4Err.Load().(error)
 		if err != nil {
 			return
 		}
@@ -205,8 +221,13 @@ func searchByLocalDict(cfg *IP2RegionConfig, ip string) (info ip2region.IpInfo, 
 		if cfg != nil && len(cfg.IPv6Dict) > 0 {
 			SetDict6File(cfg.IPv6Dict)
 		}
-		err = initialize6()
+		err = initialize6(cfg)
+		once6Err.Store(err)
 	})
+	if err != nil {
+		return
+	}
+	err, _ = once6Err.Load().(error)
 	if err != nil {
 		return
 	}
@@ -265,13 +286,17 @@ type APIBasicAuth struct {
 //   - IPv4Dict: Path to IPv4 database file for local mode (optional)
 //   - IPv6Dict: Path to IPv6 database file for local mode (optional)
 type IP2RegionConfig struct {
-	Mode         string            `json:"mode"` // api / local
+	Mode string `json:"mode"` // api / local / local-memory
+
+	// API 模式
 	APIURL       string            `json:"apiUrl"`
 	APIKey       string            `json:"apiKey,omitempty"`
 	APIBasicAuth *APIBasicAuth     `json:"apiBasicAuth,omitempty"`
 	APIHeaders   map[string]string `json:"apiHeaders,omitempty"`
-	IPv4Dict     string            `json:"ipv4Dict,omitempty"`
-	IPv6Dict     string            `json:"ipv6Dict,omitempty"`
+
+	// 本地模式
+	IPv4Dict string `json:"ipv4Dict,omitempty"`
+	IPv6Dict string `json:"ipv6Dict,omitempty"`
 }
 
 // GetIP2RegionConfig retrieves the IP2Region configuration from the extended config file.
