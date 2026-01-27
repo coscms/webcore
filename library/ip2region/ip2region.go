@@ -98,7 +98,13 @@ func initialize4(cfg *IP2RegionConfig) (err error) {
 	if region4 != nil {
 		region4.Close()
 	}
-	isMemoryMode := cfg.Mode == `local-memory`
+	var isMemoryMode bool
+	if cfg != nil {
+		if len(cfg.IPv4Dict) > 0 {
+			SetDict4File(cfg.IPv4Dict)
+		}
+		isMemoryMode = cfg.Mode == `local-memory`
+	}
 	if !isMemoryMode {
 		isMemoryMode = memoryMode
 	}
@@ -117,7 +123,13 @@ func initialize6(cfg *IP2RegionConfig) (err error) {
 	if region6 != nil {
 		region6.Close()
 	}
-	isMemoryMode := cfg.Mode == `local-memory`
+	var isMemoryMode bool
+	if cfg != nil {
+		if len(cfg.IPv6Dict) > 0 {
+			SetDict6File(cfg.IPv6Dict)
+		}
+		isMemoryMode = cfg.Mode == `local-memory`
+	}
 	if !isMemoryMode {
 		isMemoryMode = memoryMode
 	}
@@ -201,9 +213,6 @@ func searchByLocalDict(cfg *IP2RegionConfig, ip string) (info ip2region.IpInfo, 
 	}()
 	if net.ParseIP(ip).To4() != nil {
 		once4.Do(func() {
-			if cfg != nil && len(cfg.IPv4Dict) > 0 {
-				SetDict4File(cfg.IPv4Dict)
-			}
 			err = initialize4(cfg)
 			once4Err.Store(err)
 		})
@@ -218,9 +227,6 @@ func searchByLocalDict(cfg *IP2RegionConfig, ip string) (info ip2region.IpInfo, 
 		return
 	}
 	once6.Do(func() {
-		if cfg != nil && len(cfg.IPv6Dict) > 0 {
-			SetDict6File(cfg.IPv6Dict)
-		}
 		err = initialize6(cfg)
 		once6Err.Store(err)
 	})
@@ -286,7 +292,7 @@ type APIBasicAuth struct {
 //   - IPv4Dict: Path to IPv4 database file for local mode (optional)
 //   - IPv6Dict: Path to IPv6 database file for local mode (optional)
 type IP2RegionConfig struct {
-	Mode string `json:"mode"` // api / local / local-memory
+	Mode string `json:"mode"` // api / local / local-memory(or set env IP2REGION_MEMORY_MODE=true)
 
 	// API 模式
 	APIURL       string            `json:"apiUrl"`
