@@ -35,7 +35,7 @@ require (
 	github.com/admpub/imageproxy v0.10.1
 	github.com/admpub/ip2region/v3 v3.0.5
 	github.com/admpub/license_gen v0.1.2
-	github.com/admpub/log v1.4.0
+	github.com/admpub/log v1.5.0
 	github.com/admpub/mahonia v0.0.0-20151019004008-c528b747d92d
 	github.com/admpub/mail v0.0.0-20170408110349-d63147b0317b
 	github.com/admpub/map2struct v0.1.3
