@@ -35,7 +35,7 @@ require (
 	github.com/admpub/imageproxy v0.10.1
 	github.com/admpub/ip2region/v3 v3.0.5
 	github.com/admpub/license_gen v0.1.2
-	github.com/admpub/log v1.5.0
+	github.com/admpub/log v1.5.2
 	github.com/admpub/mahonia v0.0.0-20151019004008-c528b747d92d
 	github.com/admpub/mail v0.0.0-20170408110349-d63147b0317b
 	github.com/admpub/map2struct v0.1.3
@@ -93,7 +93,7 @@ require (
 	github.com/webx-top/codec v0.3.0
 	github.com/webx-top/com v1.4.1
 	github.com/webx-top/db v1.29.5
-	github.com/webx-top/echo v1.22.28
+	github.com/webx-top/echo v1.22.29
 	github.com/webx-top/image v0.1.2
 	github.com/webx-top/restyclient v0.0.6
 	github.com/webx-top/validation v0.0.3
@@ -168,7 +168,7 @@ require (
 	github.com/go-sql-driver/mysql v1.9.3 // indirect
 	github.com/goccy/go-json v0.10.5 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
-	github.com/golang-jwt/jwt/v5 v5.3.0 // indirect
+	github.com/golang-jwt/jwt/v5 v5.3.1 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/golang/snappy v1.0.0 // indirect
 	github.com/gomodule/redigo v1.9.3 // indirect
