@@ -109,6 +109,6 @@ func (f *file) Readdir(count int) (fileInfoList []os.FileInfo, err error) {
 		}
 	}
 	ctx := defaults.NewMockContext()
-	pagination.SetPageDefaultSize(ctx, 2000)
+	pagination.SetDefaultSize(ctx, 2000)
 	return f.mgr.listByMinio(ctx, objectPrefix)
 }

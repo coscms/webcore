@@ -39,8 +39,10 @@ var (
 	NewLister                  = dbPagination.NewLister
 	NewListParam               = dbPagination.NewListParam
 	NewOffsetLister            = dbPagination.NewOffsetLister
-	SetPageDefaultSize         = dbPagination.SetPageDefaultSize
-	SetPageDisableCount        = dbPagination.DisableCount
+	SetPagingDefaultSize       = dbPagination.SetDefaultSize
+	SetPagingForceSize         = dbPagination.SetForceSize
+	SetPagingForcePage         = dbPagination.SetForcePage
+	SetPagingDisableCount      = dbPagination.DisableCount
 )
 
 type (
