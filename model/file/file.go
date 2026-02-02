@@ -310,3 +310,8 @@ func (f *File) GetAvatar() (*dbschema.NgingFile, error) {
 	err := m.Get(nil, db.Cond{`view_url`: f.ViewUrl})
 	return m, err
 }
+
+func (f *File) GetByMd5(md5 string) (err error) {
+	err = f.Get(nil, db.Cond{`md5`: md5})
+	return
+}
