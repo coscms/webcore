@@ -298,6 +298,47 @@ func (a *NgingUserU2f) Update(mw func(db.Result) db.Result, args ...interface{})
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *NgingUserU2f) GetDiffColumns(old *NgingUserU2f) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.Uid != a.Uid {
+		changedCols = append(changedCols, `uid`)
+	}
+
+	if old.Name != a.Name {
+		changedCols = append(changedCols, `name`)
+	}
+
+	if old.Token != a.Token {
+		changedCols = append(changedCols, `token`)
+	}
+
+	if old.Type != a.Type {
+		changedCols = append(changedCols, `type`)
+	}
+
+	if old.Extra != a.Extra {
+		changedCols = append(changedCols, `extra`)
+	}
+
+	if old.Step != a.Step {
+		changedCols = append(changedCols, `step`)
+	}
+
+	if old.Precondition != a.Precondition {
+		changedCols = append(changedCols, `precondition`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	return
+}
+
 func (a *NgingUserU2f) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 
 	if !a.base.Eventable() {
@@ -311,6 +352,25 @@ func (a *NgingUserU2f) Updatex(mw func(db.Result) db.Result, args ...interface{}
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *NgingUserU2f) Save(old *NgingUserU2f, args ...interface{}) (affected int64, err error) {
+
+	if old == nil {
+		old = NewNgingUserU2f(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *NgingUserU2f) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

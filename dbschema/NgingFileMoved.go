@@ -295,6 +295,35 @@ func (a *NgingFileMoved) Update(mw func(db.Result) db.Result, args ...interface{
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *NgingFileMoved) GetDiffColumns(old *NgingFileMoved) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.FileId != a.FileId {
+		changedCols = append(changedCols, `file_id`)
+	}
+
+	if old.From != a.From {
+		changedCols = append(changedCols, `from`)
+	}
+
+	if old.To != a.To {
+		changedCols = append(changedCols, `to`)
+	}
+
+	if old.ThumbId != a.ThumbId {
+		changedCols = append(changedCols, `thumb_id`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	return
+}
+
 func (a *NgingFileMoved) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 
 	if !a.base.Eventable() {
@@ -308,6 +337,25 @@ func (a *NgingFileMoved) Updatex(mw func(db.Result) db.Result, args ...interface
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *NgingFileMoved) Save(old *NgingFileMoved, args ...interface{}) (affected int64, err error) {
+
+	if old == nil {
+		old = NewNgingFileMoved(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *NgingFileMoved) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

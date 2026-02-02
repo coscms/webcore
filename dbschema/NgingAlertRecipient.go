@@ -311,6 +311,51 @@ func (a *NgingAlertRecipient) Update(mw func(db.Result) db.Result, args ...inter
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *NgingAlertRecipient) GetDiffColumns(old *NgingAlertRecipient) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.Name != a.Name {
+		changedCols = append(changedCols, `name`)
+	}
+
+	if old.Account != a.Account {
+		changedCols = append(changedCols, `account`)
+	}
+
+	if old.Extra != a.Extra {
+		changedCols = append(changedCols, `extra`)
+	}
+
+	if old.Type != a.Type {
+		changedCols = append(changedCols, `type`)
+	}
+
+	if old.Platform != a.Platform {
+		changedCols = append(changedCols, `platform`)
+	}
+
+	if old.Description != a.Description {
+		changedCols = append(changedCols, `description`)
+	}
+
+	if old.Disabled != a.Disabled {
+		changedCols = append(changedCols, `disabled`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	if old.Updated != a.Updated {
+		changedCols = append(changedCols, `updated`)
+	}
+
+	return
+}
+
 func (a *NgingAlertRecipient) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 	a.Updated = uint(time.Now().Unix())
 	if len(a.Type) == 0 {
@@ -330,6 +375,31 @@ func (a *NgingAlertRecipient) Updatex(mw func(db.Result) db.Result, args ...inte
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *NgingAlertRecipient) Save(old *NgingAlertRecipient, args ...interface{}) (affected int64, err error) {
+	a.Updated = uint(time.Now().Unix())
+	if len(a.Type) == 0 {
+		a.Type = "email"
+	}
+	if len(a.Disabled) == 0 {
+		a.Disabled = "N"
+	}
+	if old == nil {
+		old = NewNgingAlertRecipient(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *NgingAlertRecipient) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

@@ -319,6 +319,59 @@ func (a *NgingCodeVerification) Update(mw func(db.Result) db.Result, args ...int
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *NgingCodeVerification) GetDiffColumns(old *NgingCodeVerification) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.Code != a.Code {
+		changedCols = append(changedCols, `code`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	if old.OwnerId != a.OwnerId {
+		changedCols = append(changedCols, `owner_id`)
+	}
+
+	if old.OwnerType != a.OwnerType {
+		changedCols = append(changedCols, `owner_type`)
+	}
+
+	if old.Used != a.Used {
+		changedCols = append(changedCols, `used`)
+	}
+
+	if old.Purpose != a.Purpose {
+		changedCols = append(changedCols, `purpose`)
+	}
+
+	if old.Start != a.Start {
+		changedCols = append(changedCols, `start`)
+	}
+
+	if old.End != a.End {
+		changedCols = append(changedCols, `end`)
+	}
+
+	if old.Disabled != a.Disabled {
+		changedCols = append(changedCols, `disabled`)
+	}
+
+	if old.SendMethod != a.SendMethod {
+		changedCols = append(changedCols, `send_method`)
+	}
+
+	if old.SendTo != a.SendTo {
+		changedCols = append(changedCols, `send_to`)
+	}
+
+	return
+}
+
 func (a *NgingCodeVerification) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 
 	if len(a.OwnerType) == 0 {
@@ -341,6 +394,34 @@ func (a *NgingCodeVerification) Updatex(mw func(db.Result) db.Result, args ...in
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *NgingCodeVerification) Save(old *NgingCodeVerification, args ...interface{}) (affected int64, err error) {
+
+	if len(a.OwnerType) == 0 {
+		a.OwnerType = "user"
+	}
+	if len(a.Disabled) == 0 {
+		a.Disabled = "N"
+	}
+	if len(a.SendMethod) == 0 {
+		a.SendMethod = "mobile"
+	}
+	if old == nil {
+		old = NewNgingCodeVerification(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *NgingCodeVerification) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

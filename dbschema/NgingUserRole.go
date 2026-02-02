@@ -302,6 +302,39 @@ func (a *NgingUserRole) Update(mw func(db.Result) db.Result, args ...interface{}
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *NgingUserRole) GetDiffColumns(old *NgingUserRole) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.Name != a.Name {
+		changedCols = append(changedCols, `name`)
+	}
+
+	if old.Description != a.Description {
+		changedCols = append(changedCols, `description`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	if old.Updated != a.Updated {
+		changedCols = append(changedCols, `updated`)
+	}
+
+	if old.Disabled != a.Disabled {
+		changedCols = append(changedCols, `disabled`)
+	}
+
+	if old.ParentId != a.ParentId {
+		changedCols = append(changedCols, `parent_id`)
+	}
+
+	return
+}
+
 func (a *NgingUserRole) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 	a.Updated = uint(time.Now().Unix())
 	if len(a.Disabled) == 0 {
@@ -318,6 +351,28 @@ func (a *NgingUserRole) Updatex(mw func(db.Result) db.Result, args ...interface{
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *NgingUserRole) Save(old *NgingUserRole, args ...interface{}) (affected int64, err error) {
+	a.Updated = uint(time.Now().Unix())
+	if len(a.Disabled) == 0 {
+		a.Disabled = "N"
+	}
+	if old == nil {
+		old = NewNgingUserRole(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *NgingUserRole) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

@@ -313,6 +313,63 @@ func (a *NgingLoginLog) Update(mw func(db.Result) db.Result, args ...interface{}
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *NgingLoginLog) GetDiffColumns(old *NgingLoginLog) (changedCols []interface{}) {
+
+	if old.OwnerType != a.OwnerType {
+		changedCols = append(changedCols, `owner_type`)
+	}
+
+	if old.OwnerId != a.OwnerId {
+		changedCols = append(changedCols, `owner_id`)
+	}
+
+	if old.SessionId != a.SessionId {
+		changedCols = append(changedCols, `session_id`)
+	}
+
+	if old.Username != a.Username {
+		changedCols = append(changedCols, `username`)
+	}
+
+	if old.AuthType != a.AuthType {
+		changedCols = append(changedCols, `auth_type`)
+	}
+
+	if old.Errpwd != a.Errpwd {
+		changedCols = append(changedCols, `errpwd`)
+	}
+
+	if old.IpAddress != a.IpAddress {
+		changedCols = append(changedCols, `ip_address`)
+	}
+
+	if old.IpLocation != a.IpLocation {
+		changedCols = append(changedCols, `ip_location`)
+	}
+
+	if old.UserAgent != a.UserAgent {
+		changedCols = append(changedCols, `user_agent`)
+	}
+
+	if old.Success != a.Success {
+		changedCols = append(changedCols, `success`)
+	}
+
+	if old.Failmsg != a.Failmsg {
+		changedCols = append(changedCols, `failmsg`)
+	}
+
+	if old.Day != a.Day {
+		changedCols = append(changedCols, `day`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	return
+}
+
 func (a *NgingLoginLog) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 
 	if len(a.OwnerType) == 0 {
@@ -335,6 +392,34 @@ func (a *NgingLoginLog) Updatex(mw func(db.Result) db.Result, args ...interface{
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *NgingLoginLog) Save(old *NgingLoginLog, args ...interface{}) (affected int64, err error) {
+
+	if len(a.OwnerType) == 0 {
+		a.OwnerType = "user"
+	}
+	if len(a.AuthType) == 0 {
+		a.AuthType = "password"
+	}
+	if len(a.Success) == 0 {
+		a.Success = "N"
+	}
+	if old == nil {
+		old = NewNgingLoginLog(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *NgingLoginLog) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

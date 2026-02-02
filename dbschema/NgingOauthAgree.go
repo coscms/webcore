@@ -287,6 +287,31 @@ func (a *NgingOauthAgree) Update(mw func(db.Result) db.Result, args ...interface
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *NgingOauthAgree) GetDiffColumns(old *NgingOauthAgree) (changedCols []interface{}) {
+
+	if old.Uid != a.Uid {
+		changedCols = append(changedCols, `uid`)
+	}
+
+	if old.AppId != a.AppId {
+		changedCols = append(changedCols, `app_id`)
+	}
+
+	if old.Scopes != a.Scopes {
+		changedCols = append(changedCols, `scopes`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	if old.Updated != a.Updated {
+		changedCols = append(changedCols, `updated`)
+	}
+
+	return
+}
+
 func (a *NgingOauthAgree) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 	a.Updated = uint(time.Now().Unix())
 	if !a.base.Eventable() {
@@ -300,6 +325,25 @@ func (a *NgingOauthAgree) Updatex(mw func(db.Result) db.Result, args ...interfac
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *NgingOauthAgree) Save(old *NgingOauthAgree, args ...interface{}) (affected int64, err error) {
+	a.Updated = uint(time.Now().Unix())
+	if old == nil {
+		old = NewNgingOauthAgree(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *NgingOauthAgree) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

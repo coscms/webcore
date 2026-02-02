@@ -302,6 +302,39 @@ func (a *NgingTaskLog) Update(mw func(db.Result) db.Result, args ...interface{})
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *NgingTaskLog) GetDiffColumns(old *NgingTaskLog) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.TaskId != a.TaskId {
+		changedCols = append(changedCols, `task_id`)
+	}
+
+	if old.Output != a.Output {
+		changedCols = append(changedCols, `output`)
+	}
+
+	if old.Error != a.Error {
+		changedCols = append(changedCols, `error`)
+	}
+
+	if old.Status != a.Status {
+		changedCols = append(changedCols, `status`)
+	}
+
+	if old.Elapsed != a.Elapsed {
+		changedCols = append(changedCols, `elapsed`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	return
+}
+
 func (a *NgingTaskLog) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 
 	if len(a.Status) == 0 {
@@ -318,6 +351,28 @@ func (a *NgingTaskLog) Updatex(mw func(db.Result) db.Result, args ...interface{}
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *NgingTaskLog) Save(old *NgingTaskLog, args ...interface{}) (affected int64, err error) {
+
+	if len(a.Status) == 0 {
+		a.Status = "success"
+	}
+	if old == nil {
+		old = NewNgingTaskLog(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *NgingTaskLog) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

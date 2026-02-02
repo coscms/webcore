@@ -310,6 +310,51 @@ func (a *NgingConfig) Update(mw func(db.Result) db.Result, args ...interface{}) 
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *NgingConfig) GetDiffColumns(old *NgingConfig) (changedCols []interface{}) {
+
+	if old.Key != a.Key {
+		changedCols = append(changedCols, `key`)
+	}
+
+	if old.Group != a.Group {
+		changedCols = append(changedCols, `group`)
+	}
+
+	if old.Label != a.Label {
+		changedCols = append(changedCols, `label`)
+	}
+
+	if old.Value != a.Value {
+		changedCols = append(changedCols, `value`)
+	}
+
+	if old.Description != a.Description {
+		changedCols = append(changedCols, `description`)
+	}
+
+	if old.Type != a.Type {
+		changedCols = append(changedCols, `type`)
+	}
+
+	if old.Sort != a.Sort {
+		changedCols = append(changedCols, `sort`)
+	}
+
+	if old.Disabled != a.Disabled {
+		changedCols = append(changedCols, `disabled`)
+	}
+
+	if old.Encrypted != a.Encrypted {
+		changedCols = append(changedCols, `encrypted`)
+	}
+
+	if old.Updated != a.Updated {
+		changedCols = append(changedCols, `updated`)
+	}
+
+	return
+}
+
 func (a *NgingConfig) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 	a.Updated = uint(time.Now().Unix())
 	if len(a.Type) == 0 {
@@ -332,6 +377,34 @@ func (a *NgingConfig) Updatex(mw func(db.Result) db.Result, args ...interface{})
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *NgingConfig) Save(old *NgingConfig, args ...interface{}) (affected int64, err error) {
+	a.Updated = uint(time.Now().Unix())
+	if len(a.Type) == 0 {
+		a.Type = "text"
+	}
+	if len(a.Disabled) == 0 {
+		a.Disabled = "N"
+	}
+	if len(a.Encrypted) == 0 {
+		a.Encrypted = "N"
+	}
+	if old == nil {
+		old = NewNgingConfig(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *NgingConfig) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

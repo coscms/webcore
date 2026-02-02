@@ -305,6 +305,51 @@ func (a *NgingCodeInvitation) Update(mw func(db.Result) db.Result, args ...inter
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *NgingCodeInvitation) GetDiffColumns(old *NgingCodeInvitation) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.Uid != a.Uid {
+		changedCols = append(changedCols, `uid`)
+	}
+
+	if old.RecvUid != a.RecvUid {
+		changedCols = append(changedCols, `recv_uid`)
+	}
+
+	if old.Code != a.Code {
+		changedCols = append(changedCols, `code`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	if old.Used != a.Used {
+		changedCols = append(changedCols, `used`)
+	}
+
+	if old.Start != a.Start {
+		changedCols = append(changedCols, `start`)
+	}
+
+	if old.End != a.End {
+		changedCols = append(changedCols, `end`)
+	}
+
+	if old.Disabled != a.Disabled {
+		changedCols = append(changedCols, `disabled`)
+	}
+
+	if old.RoleIds != a.RoleIds {
+		changedCols = append(changedCols, `role_ids`)
+	}
+
+	return
+}
+
 func (a *NgingCodeInvitation) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 
 	if len(a.Disabled) == 0 {
@@ -321,6 +366,28 @@ func (a *NgingCodeInvitation) Updatex(mw func(db.Result) db.Result, args ...inte
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *NgingCodeInvitation) Save(old *NgingCodeInvitation, args ...interface{}) (affected int64, err error) {
+
+	if len(a.Disabled) == 0 {
+		a.Disabled = "N"
+	}
+	if old == nil {
+		old = NewNgingCodeInvitation(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *NgingCodeInvitation) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

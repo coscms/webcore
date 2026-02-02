@@ -318,6 +318,55 @@ func (a *NgingCloudBackupLog) Update(mw func(db.Result) db.Result, args ...inter
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *NgingCloudBackupLog) GetDiffColumns(old *NgingCloudBackupLog) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.BackupId != a.BackupId {
+		changedCols = append(changedCols, `backup_id`)
+	}
+
+	if old.BackupType != a.BackupType {
+		changedCols = append(changedCols, `backup_type`)
+	}
+
+	if old.BackupFile != a.BackupFile {
+		changedCols = append(changedCols, `backup_file`)
+	}
+
+	if old.RemoteFile != a.RemoteFile {
+		changedCols = append(changedCols, `remote_file`)
+	}
+
+	if old.Operation != a.Operation {
+		changedCols = append(changedCols, `operation`)
+	}
+
+	if old.Error != a.Error {
+		changedCols = append(changedCols, `error`)
+	}
+
+	if old.Status != a.Status {
+		changedCols = append(changedCols, `status`)
+	}
+
+	if old.Size != a.Size {
+		changedCols = append(changedCols, `size`)
+	}
+
+	if old.Elapsed != a.Elapsed {
+		changedCols = append(changedCols, `elapsed`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	return
+}
+
 func (a *NgingCloudBackupLog) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 
 	if len(a.BackupType) == 0 {
@@ -340,6 +389,34 @@ func (a *NgingCloudBackupLog) Updatex(mw func(db.Result) db.Result, args ...inte
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *NgingCloudBackupLog) Save(old *NgingCloudBackupLog, args ...interface{}) (affected int64, err error) {
+
+	if len(a.BackupType) == 0 {
+		a.BackupType = "change"
+	}
+	if len(a.Operation) == 0 {
+		a.Operation = "none"
+	}
+	if len(a.Status) == 0 {
+		a.Status = "success"
+	}
+	if old == nil {
+		old = NewNgingCloudBackupLog(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *NgingCloudBackupLog) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

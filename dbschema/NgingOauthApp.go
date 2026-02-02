@@ -306,6 +306,55 @@ func (a *NgingOauthApp) Update(mw func(db.Result) db.Result, args ...interface{}
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *NgingOauthApp) GetDiffColumns(old *NgingOauthApp) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.AppId != a.AppId {
+		changedCols = append(changedCols, `app_id`)
+	}
+
+	if old.AppSecret != a.AppSecret {
+		changedCols = append(changedCols, `app_secret`)
+	}
+
+	if old.SiteName != a.SiteName {
+		changedCols = append(changedCols, `site_name`)
+	}
+
+	if old.SiteDescription != a.SiteDescription {
+		changedCols = append(changedCols, `site_description`)
+	}
+
+	if old.SiteDomains != a.SiteDomains {
+		changedCols = append(changedCols, `site_domains`)
+	}
+
+	if old.Scopes != a.Scopes {
+		changedCols = append(changedCols, `scopes`)
+	}
+
+	if old.GroupId != a.GroupId {
+		changedCols = append(changedCols, `group_id`)
+	}
+
+	if old.Disabled != a.Disabled {
+		changedCols = append(changedCols, `disabled`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	if old.Updated != a.Updated {
+		changedCols = append(changedCols, `updated`)
+	}
+
+	return
+}
+
 func (a *NgingOauthApp) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 	a.Updated = uint(time.Now().Unix())
 	if len(a.Disabled) == 0 {
@@ -322,6 +371,28 @@ func (a *NgingOauthApp) Updatex(mw func(db.Result) db.Result, args ...interface{
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *NgingOauthApp) Save(old *NgingOauthApp, args ...interface{}) (affected int64, err error) {
+	a.Updated = uint(time.Now().Unix())
+	if len(a.Disabled) == 0 {
+		a.Disabled = "N"
+	}
+	if old == nil {
+		old = NewNgingOauthApp(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *NgingOauthApp) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

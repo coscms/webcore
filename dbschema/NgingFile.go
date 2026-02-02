@@ -326,6 +326,111 @@ func (a *NgingFile) Update(mw func(db.Result) db.Result, args ...interface{}) (e
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *NgingFile) GetDiffColumns(old *NgingFile) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.OwnerType != a.OwnerType {
+		changedCols = append(changedCols, `owner_type`)
+	}
+
+	if old.OwnerId != a.OwnerId {
+		changedCols = append(changedCols, `owner_id`)
+	}
+
+	if old.Name != a.Name {
+		changedCols = append(changedCols, `name`)
+	}
+
+	if old.SaveName != a.SaveName {
+		changedCols = append(changedCols, `save_name`)
+	}
+
+	if old.SavePath != a.SavePath {
+		changedCols = append(changedCols, `save_path`)
+	}
+
+	if old.ViewUrl != a.ViewUrl {
+		changedCols = append(changedCols, `view_url`)
+	}
+
+	if old.Ext != a.Ext {
+		changedCols = append(changedCols, `ext`)
+	}
+
+	if old.Mime != a.Mime {
+		changedCols = append(changedCols, `mime`)
+	}
+
+	if old.Type != a.Type {
+		changedCols = append(changedCols, `type`)
+	}
+
+	if old.Size != a.Size {
+		changedCols = append(changedCols, `size`)
+	}
+
+	if old.Width != a.Width {
+		changedCols = append(changedCols, `width`)
+	}
+
+	if old.Height != a.Height {
+		changedCols = append(changedCols, `height`)
+	}
+
+	if old.Dpi != a.Dpi {
+		changedCols = append(changedCols, `dpi`)
+	}
+
+	if old.Md5 != a.Md5 {
+		changedCols = append(changedCols, `md5`)
+	}
+
+	if old.StorerName != a.StorerName {
+		changedCols = append(changedCols, `storer_name`)
+	}
+
+	if old.StorerId != a.StorerId {
+		changedCols = append(changedCols, `storer_id`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	if old.Updated != a.Updated {
+		changedCols = append(changedCols, `updated`)
+	}
+
+	if old.Sort != a.Sort {
+		changedCols = append(changedCols, `sort`)
+	}
+
+	if old.Status != a.Status {
+		changedCols = append(changedCols, `status`)
+	}
+
+	if old.CategoryId != a.CategoryId {
+		changedCols = append(changedCols, `category_id`)
+	}
+
+	if old.Tags != a.Tags {
+		changedCols = append(changedCols, `tags`)
+	}
+
+	if old.Subdir != a.Subdir {
+		changedCols = append(changedCols, `subdir`)
+	}
+
+	if old.UsedTimes != a.UsedTimes {
+		changedCols = append(changedCols, `used_times`)
+	}
+
+	return
+}
+
 func (a *NgingFile) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 	a.Updated = uint(time.Now().Unix())
 	if len(a.OwnerType) == 0 {
@@ -345,6 +450,31 @@ func (a *NgingFile) Updatex(mw func(db.Result) db.Result, args ...interface{}) (
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *NgingFile) Save(old *NgingFile, args ...interface{}) (affected int64, err error) {
+	a.Updated = uint(time.Now().Unix())
+	if len(a.OwnerType) == 0 {
+		a.OwnerType = "user"
+	}
+	if len(a.Type) == 0 {
+		a.Type = "image"
+	}
+	if old == nil {
+		old = NewNgingFile(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *NgingFile) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

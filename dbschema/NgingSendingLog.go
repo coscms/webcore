@@ -321,6 +321,67 @@ func (a *NgingSendingLog) Update(mw func(db.Result) db.Result, args ...interface
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *NgingSendingLog) GetDiffColumns(old *NgingSendingLog) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	if old.SentAt != a.SentAt {
+		changedCols = append(changedCols, `sent_at`)
+	}
+
+	if old.SourceId != a.SourceId {
+		changedCols = append(changedCols, `source_id`)
+	}
+
+	if old.SourceType != a.SourceType {
+		changedCols = append(changedCols, `source_type`)
+	}
+
+	if old.Method != a.Method {
+		changedCols = append(changedCols, `method`)
+	}
+
+	if old.To != a.To {
+		changedCols = append(changedCols, `to`)
+	}
+
+	if old.Provider != a.Provider {
+		changedCols = append(changedCols, `provider`)
+	}
+
+	if old.Result != a.Result {
+		changedCols = append(changedCols, `result`)
+	}
+
+	if old.Status != a.Status {
+		changedCols = append(changedCols, `status`)
+	}
+
+	if old.Retries != a.Retries {
+		changedCols = append(changedCols, `retries`)
+	}
+
+	if old.Content != a.Content {
+		changedCols = append(changedCols, `content`)
+	}
+
+	if old.Params != a.Params {
+		changedCols = append(changedCols, `params`)
+	}
+
+	if old.AppointmentTime != a.AppointmentTime {
+		changedCols = append(changedCols, `appointment_time`)
+	}
+
+	return
+}
+
 func (a *NgingSendingLog) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 
 	if len(a.SourceType) == 0 {
@@ -343,6 +404,34 @@ func (a *NgingSendingLog) Updatex(mw func(db.Result) db.Result, args ...interfac
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *NgingSendingLog) Save(old *NgingSendingLog, args ...interface{}) (affected int64, err error) {
+
+	if len(a.SourceType) == 0 {
+		a.SourceType = "user"
+	}
+	if len(a.Method) == 0 {
+		a.Method = "mobile"
+	}
+	if len(a.Status) == 0 {
+		a.Status = "waiting"
+	}
+	if old == nil {
+		old = NewNgingSendingLog(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *NgingSendingLog) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

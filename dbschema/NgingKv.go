@@ -303,6 +303,47 @@ func (a *NgingKv) Update(mw func(db.Result) db.Result, args ...interface{}) (err
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *NgingKv) GetDiffColumns(old *NgingKv) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.Key != a.Key {
+		changedCols = append(changedCols, `key`)
+	}
+
+	if old.Value != a.Value {
+		changedCols = append(changedCols, `value`)
+	}
+
+	if old.Description != a.Description {
+		changedCols = append(changedCols, `description`)
+	}
+
+	if old.Help != a.Help {
+		changedCols = append(changedCols, `help`)
+	}
+
+	if old.Type != a.Type {
+		changedCols = append(changedCols, `type`)
+	}
+
+	if old.Sort != a.Sort {
+		changedCols = append(changedCols, `sort`)
+	}
+
+	if old.Updated != a.Updated {
+		changedCols = append(changedCols, `updated`)
+	}
+
+	if old.ChildKeyType != a.ChildKeyType {
+		changedCols = append(changedCols, `child_key_type`)
+	}
+
+	return
+}
+
 func (a *NgingKv) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 	a.Updated = uint(time.Now().Unix())
 	if len(a.ChildKeyType) == 0 {
@@ -319,6 +360,28 @@ func (a *NgingKv) Updatex(mw func(db.Result) db.Result, args ...interface{}) (af
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *NgingKv) Save(old *NgingKv, args ...interface{}) (affected int64, err error) {
+	a.Updated = uint(time.Now().Unix())
+	if len(a.ChildKeyType) == 0 {
+		a.ChildKeyType = "text"
+	}
+	if old == nil {
+		old = NewNgingKv(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *NgingKv) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

@@ -297,6 +297,43 @@ func (a *NgingTaskGroup) Update(mw func(db.Result) db.Result, args ...interface{
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *NgingTaskGroup) GetDiffColumns(old *NgingTaskGroup) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.Uid != a.Uid {
+		changedCols = append(changedCols, `uid`)
+	}
+
+	if old.Name != a.Name {
+		changedCols = append(changedCols, `name`)
+	}
+
+	if old.Description != a.Description {
+		changedCols = append(changedCols, `description`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	if old.Updated != a.Updated {
+		changedCols = append(changedCols, `updated`)
+	}
+
+	if old.CmdPrefix != a.CmdPrefix {
+		changedCols = append(changedCols, `cmd_prefix`)
+	}
+
+	if old.CmdSuffix != a.CmdSuffix {
+		changedCols = append(changedCols, `cmd_suffix`)
+	}
+
+	return
+}
+
 func (a *NgingTaskGroup) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 	a.Updated = uint(time.Now().Unix())
 	if !a.base.Eventable() {
@@ -310,6 +347,25 @@ func (a *NgingTaskGroup) Updatex(mw func(db.Result) db.Result, args ...interface
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *NgingTaskGroup) Save(old *NgingTaskGroup, args ...interface{}) (affected int64, err error) {
+	a.Updated = uint(time.Now().Unix())
+	if old == nil {
+		old = NewNgingTaskGroup(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *NgingTaskGroup) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

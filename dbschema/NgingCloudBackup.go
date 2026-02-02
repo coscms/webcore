@@ -346,6 +346,95 @@ func (a *NgingCloudBackup) Update(mw func(db.Result) db.Result, args ...interfac
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *NgingCloudBackup) GetDiffColumns(old *NgingCloudBackup) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.Name != a.Name {
+		changedCols = append(changedCols, `name`)
+	}
+
+	if old.SourcePath != a.SourcePath {
+		changedCols = append(changedCols, `source_path`)
+	}
+
+	if old.IgnoreRule != a.IgnoreRule {
+		changedCols = append(changedCols, `ignore_rule`)
+	}
+
+	if old.MatchRule != a.MatchRule {
+		changedCols = append(changedCols, `match_rule`)
+	}
+
+	if old.WaitFillCompleted != a.WaitFillCompleted {
+		changedCols = append(changedCols, `wait_fill_completed`)
+	}
+
+	if old.MinModifyInterval != a.MinModifyInterval {
+		changedCols = append(changedCols, `min_modify_interval`)
+	}
+
+	if old.IgnoreWaitRule != a.IgnoreWaitRule {
+		changedCols = append(changedCols, `ignore_wait_rule`)
+	}
+
+	if old.Delay != a.Delay {
+		changedCols = append(changedCols, `delay`)
+	}
+
+	if old.StorageEngine != a.StorageEngine {
+		changedCols = append(changedCols, `storage_engine`)
+	}
+
+	if old.StorageConfig != a.StorageConfig {
+		changedCols = append(changedCols, `storage_config`)
+	}
+
+	if old.DestStorage != a.DestStorage {
+		changedCols = append(changedCols, `dest_storage`)
+	}
+
+	if old.DestPath != a.DestPath {
+		changedCols = append(changedCols, `dest_path`)
+	}
+
+	if old.Result != a.Result {
+		changedCols = append(changedCols, `result`)
+	}
+
+	if old.LastExecuted != a.LastExecuted {
+		changedCols = append(changedCols, `last_executed`)
+	}
+
+	if old.Status != a.Status {
+		changedCols = append(changedCols, `status`)
+	}
+
+	if old.Disabled != a.Disabled {
+		changedCols = append(changedCols, `disabled`)
+	}
+
+	if old.LogDisabled != a.LogDisabled {
+		changedCols = append(changedCols, `log_disabled`)
+	}
+
+	if old.LogType != a.LogType {
+		changedCols = append(changedCols, `log_type`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	if old.Updated != a.Updated {
+		changedCols = append(changedCols, `updated`)
+	}
+
+	return
+}
+
 func (a *NgingCloudBackup) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 	a.Updated = uint(time.Now().Unix())
 	if len(a.WaitFillCompleted) == 0 {
@@ -377,6 +466,43 @@ func (a *NgingCloudBackup) Updatex(mw func(db.Result) db.Result, args ...interfa
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *NgingCloudBackup) Save(old *NgingCloudBackup, args ...interface{}) (affected int64, err error) {
+	a.Updated = uint(time.Now().Unix())
+	if len(a.WaitFillCompleted) == 0 {
+		a.WaitFillCompleted = "N"
+	}
+	if len(a.StorageEngine) == 0 {
+		a.StorageEngine = "s3"
+	}
+	if len(a.Status) == 0 {
+		a.Status = "idle"
+	}
+	if len(a.Disabled) == 0 {
+		a.Disabled = "N"
+	}
+	if len(a.LogDisabled) == 0 {
+		a.LogDisabled = "N"
+	}
+	if len(a.LogType) == 0 {
+		a.LogType = "all"
+	}
+	if old == nil {
+		old = NewNgingCloudBackup(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *NgingCloudBackup) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

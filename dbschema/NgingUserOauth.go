@@ -310,6 +310,71 @@ func (a *NgingUserOauth) Update(mw func(db.Result) db.Result, args ...interface{
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *NgingUserOauth) GetDiffColumns(old *NgingUserOauth) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.Uid != a.Uid {
+		changedCols = append(changedCols, `uid`)
+	}
+
+	if old.Name != a.Name {
+		changedCols = append(changedCols, `name`)
+	}
+
+	if old.NickName != a.NickName {
+		changedCols = append(changedCols, `nick_name`)
+	}
+
+	if old.UnionId != a.UnionId {
+		changedCols = append(changedCols, `union_id`)
+	}
+
+	if old.OpenId != a.OpenId {
+		changedCols = append(changedCols, `open_id`)
+	}
+
+	if old.Type != a.Type {
+		changedCols = append(changedCols, `type`)
+	}
+
+	if old.Avatar != a.Avatar {
+		changedCols = append(changedCols, `avatar`)
+	}
+
+	if old.Email != a.Email {
+		changedCols = append(changedCols, `email`)
+	}
+
+	if old.Mobile != a.Mobile {
+		changedCols = append(changedCols, `mobile`)
+	}
+
+	if old.AccessToken != a.AccessToken {
+		changedCols = append(changedCols, `access_token`)
+	}
+
+	if old.RefreshToken != a.RefreshToken {
+		changedCols = append(changedCols, `refresh_token`)
+	}
+
+	if old.Expired != a.Expired {
+		changedCols = append(changedCols, `expired`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	if old.Updated != a.Updated {
+		changedCols = append(changedCols, `updated`)
+	}
+
+	return
+}
+
 func (a *NgingUserOauth) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 	a.Updated = uint(time.Now().Unix())
 	if len(a.Type) == 0 {
@@ -326,6 +391,28 @@ func (a *NgingUserOauth) Updatex(mw func(db.Result) db.Result, args ...interface
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *NgingUserOauth) Save(old *NgingUserOauth, args ...interface{}) (affected int64, err error) {
+	a.Updated = uint(time.Now().Unix())
+	if len(a.Type) == 0 {
+		a.Type = "nging"
+	}
+	if old == nil {
+		old = NewNgingUserOauth(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *NgingUserOauth) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

@@ -297,6 +297,55 @@ func (a *NgingFileThumb) Update(mw func(db.Result) db.Result, args ...interface{
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *NgingFileThumb) GetDiffColumns(old *NgingFileThumb) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.FileId != a.FileId {
+		changedCols = append(changedCols, `file_id`)
+	}
+
+	if old.Size != a.Size {
+		changedCols = append(changedCols, `size`)
+	}
+
+	if old.Width != a.Width {
+		changedCols = append(changedCols, `width`)
+	}
+
+	if old.Height != a.Height {
+		changedCols = append(changedCols, `height`)
+	}
+
+	if old.Dpi != a.Dpi {
+		changedCols = append(changedCols, `dpi`)
+	}
+
+	if old.SaveName != a.SaveName {
+		changedCols = append(changedCols, `save_name`)
+	}
+
+	if old.SavePath != a.SavePath {
+		changedCols = append(changedCols, `save_path`)
+	}
+
+	if old.ViewUrl != a.ViewUrl {
+		changedCols = append(changedCols, `view_url`)
+	}
+
+	if old.UsedTimes != a.UsedTimes {
+		changedCols = append(changedCols, `used_times`)
+	}
+
+	if old.Md5 != a.Md5 {
+		changedCols = append(changedCols, `md5`)
+	}
+
+	return
+}
+
 func (a *NgingFileThumb) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 
 	if !a.base.Eventable() {
@@ -310,6 +359,25 @@ func (a *NgingFileThumb) Updatex(mw func(db.Result) db.Result, args ...interface
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *NgingFileThumb) Save(old *NgingFileThumb, args ...interface{}) (affected int64, err error) {
+
+	if old == nil {
+		old = NewNgingFileThumb(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *NgingFileThumb) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

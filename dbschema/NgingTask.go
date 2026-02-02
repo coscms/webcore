@@ -321,6 +321,91 @@ func (a *NgingTask) Update(mw func(db.Result) db.Result, args ...interface{}) (e
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *NgingTask) GetDiffColumns(old *NgingTask) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.Uid != a.Uid {
+		changedCols = append(changedCols, `uid`)
+	}
+
+	if old.GroupId != a.GroupId {
+		changedCols = append(changedCols, `group_id`)
+	}
+
+	if old.Name != a.Name {
+		changedCols = append(changedCols, `name`)
+	}
+
+	if old.Type != a.Type {
+		changedCols = append(changedCols, `type`)
+	}
+
+	if old.Description != a.Description {
+		changedCols = append(changedCols, `description`)
+	}
+
+	if old.CronSpec != a.CronSpec {
+		changedCols = append(changedCols, `cron_spec`)
+	}
+
+	if old.Concurrent != a.Concurrent {
+		changedCols = append(changedCols, `concurrent`)
+	}
+
+	if old.Command != a.Command {
+		changedCols = append(changedCols, `command`)
+	}
+
+	if old.WorkDirectory != a.WorkDirectory {
+		changedCols = append(changedCols, `work_directory`)
+	}
+
+	if old.Env != a.Env {
+		changedCols = append(changedCols, `env`)
+	}
+
+	if old.Disabled != a.Disabled {
+		changedCols = append(changedCols, `disabled`)
+	}
+
+	if old.EnableNotify != a.EnableNotify {
+		changedCols = append(changedCols, `enable_notify`)
+	}
+
+	if old.NotifyEmail != a.NotifyEmail {
+		changedCols = append(changedCols, `notify_email`)
+	}
+
+	if old.Timeout != a.Timeout {
+		changedCols = append(changedCols, `timeout`)
+	}
+
+	if old.ExecuteTimes != a.ExecuteTimes {
+		changedCols = append(changedCols, `execute_times`)
+	}
+
+	if old.PrevTime != a.PrevTime {
+		changedCols = append(changedCols, `prev_time`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	if old.Updated != a.Updated {
+		changedCols = append(changedCols, `updated`)
+	}
+
+	if old.ClosedLog != a.ClosedLog {
+		changedCols = append(changedCols, `closed_log`)
+	}
+
+	return
+}
+
 func (a *NgingTask) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 	a.Updated = uint(time.Now().Unix())
 	if len(a.Disabled) == 0 {
@@ -340,6 +425,31 @@ func (a *NgingTask) Updatex(mw func(db.Result) db.Result, args ...interface{}) (
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *NgingTask) Save(old *NgingTask, args ...interface{}) (affected int64, err error) {
+	a.Updated = uint(time.Now().Unix())
+	if len(a.Disabled) == 0 {
+		a.Disabled = "N"
+	}
+	if len(a.ClosedLog) == 0 {
+		a.ClosedLog = "N"
+	}
+	if old == nil {
+		old = NewNgingTask(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *NgingTask) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

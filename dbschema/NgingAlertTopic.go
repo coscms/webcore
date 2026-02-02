@@ -301,6 +301,35 @@ func (a *NgingAlertTopic) Update(mw func(db.Result) db.Result, args ...interface
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *NgingAlertTopic) GetDiffColumns(old *NgingAlertTopic) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.Topic != a.Topic {
+		changedCols = append(changedCols, `topic`)
+	}
+
+	if old.RecipientId != a.RecipientId {
+		changedCols = append(changedCols, `recipient_id`)
+	}
+
+	if old.Disabled != a.Disabled {
+		changedCols = append(changedCols, `disabled`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	if old.Updated != a.Updated {
+		changedCols = append(changedCols, `updated`)
+	}
+
+	return
+}
+
 func (a *NgingAlertTopic) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 	a.Updated = uint(time.Now().Unix())
 	if len(a.Disabled) == 0 {
@@ -317,6 +346,28 @@ func (a *NgingAlertTopic) Updatex(mw func(db.Result) db.Result, args ...interfac
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *NgingAlertTopic) Save(old *NgingAlertTopic, args ...interface{}) (affected int64, err error) {
+	a.Updated = uint(time.Now().Unix())
+	if len(a.Disabled) == 0 {
+		a.Disabled = "N"
+	}
+	if old == nil {
+		old = NewNgingAlertTopic(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *NgingAlertTopic) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

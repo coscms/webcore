@@ -305,6 +305,39 @@ func (a *NgingFileEmbedded) Update(mw func(db.Result) db.Result, args ...interfa
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *NgingFileEmbedded) GetDiffColumns(old *NgingFileEmbedded) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.Project != a.Project {
+		changedCols = append(changedCols, `project`)
+	}
+
+	if old.TableId != a.TableId {
+		changedCols = append(changedCols, `table_id`)
+	}
+
+	if old.TableName != a.TableName {
+		changedCols = append(changedCols, `table_name`)
+	}
+
+	if old.FieldName != a.FieldName {
+		changedCols = append(changedCols, `field_name`)
+	}
+
+	if old.FileIds != a.FileIds {
+		changedCols = append(changedCols, `file_ids`)
+	}
+
+	if old.Embedded != a.Embedded {
+		changedCols = append(changedCols, `embedded`)
+	}
+
+	return
+}
+
 func (a *NgingFileEmbedded) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 
 	if len(a.TableId) == 0 {
@@ -324,6 +357,31 @@ func (a *NgingFileEmbedded) Updatex(mw func(db.Result) db.Result, args ...interf
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *NgingFileEmbedded) Save(old *NgingFileEmbedded, args ...interface{}) (affected int64, err error) {
+
+	if len(a.TableId) == 0 {
+		a.TableId = "0"
+	}
+	if len(a.Embedded) == 0 {
+		a.Embedded = "Y"
+	}
+	if old == nil {
+		old = NewNgingFileEmbedded(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *NgingFileEmbedded) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {

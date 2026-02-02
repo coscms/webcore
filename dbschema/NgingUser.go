@@ -327,6 +327,91 @@ func (a *NgingUser) Update(mw func(db.Result) db.Result, args ...interface{}) (e
 	return a.base.Fire(factory.EventUpdated, a, mw, args...)
 }
 
+func (a *NgingUser) GetDiffColumns(old *NgingUser) (changedCols []interface{}) {
+
+	if old.Id != a.Id {
+		changedCols = append(changedCols, `id`)
+	}
+
+	if old.Username != a.Username {
+		changedCols = append(changedCols, `username`)
+	}
+
+	if old.Email != a.Email {
+		changedCols = append(changedCols, `email`)
+	}
+
+	if old.Mobile != a.Mobile {
+		changedCols = append(changedCols, `mobile`)
+	}
+
+	if old.Password != a.Password {
+		changedCols = append(changedCols, `password`)
+	}
+
+	if old.Salt != a.Salt {
+		changedCols = append(changedCols, `salt`)
+	}
+
+	if old.SafePwd != a.SafePwd {
+		changedCols = append(changedCols, `safe_pwd`)
+	}
+
+	if old.SessionId != a.SessionId {
+		changedCols = append(changedCols, `session_id`)
+	}
+
+	if old.Avatar != a.Avatar {
+		changedCols = append(changedCols, `avatar`)
+	}
+
+	if old.Gender != a.Gender {
+		changedCols = append(changedCols, `gender`)
+	}
+
+	if old.LastLogin != a.LastLogin {
+		changedCols = append(changedCols, `last_login`)
+	}
+
+	if old.LastIp != a.LastIp {
+		changedCols = append(changedCols, `last_ip`)
+	}
+
+	if old.LoginFails != a.LoginFails {
+		changedCols = append(changedCols, `login_fails`)
+	}
+
+	if old.Disabled != a.Disabled {
+		changedCols = append(changedCols, `disabled`)
+	}
+
+	if old.Online != a.Online {
+		changedCols = append(changedCols, `online`)
+	}
+
+	if old.RoleIds != a.RoleIds {
+		changedCols = append(changedCols, `role_ids`)
+	}
+
+	if old.Created != a.Created {
+		changedCols = append(changedCols, `created`)
+	}
+
+	if old.Updated != a.Updated {
+		changedCols = append(changedCols, `updated`)
+	}
+
+	if old.FileSize != a.FileSize {
+		changedCols = append(changedCols, `file_size`)
+	}
+
+	if old.FileNum != a.FileNum {
+		changedCols = append(changedCols, `file_num`)
+	}
+
+	return
+}
+
 func (a *NgingUser) Updatex(mw func(db.Result) db.Result, args ...interface{}) (affected int64, err error) {
 	a.Updated = uint(time.Now().Unix())
 	if len(a.Gender) == 0 {
@@ -349,6 +434,34 @@ func (a *NgingUser) Updatex(mw func(db.Result) db.Result, args ...interface{}) (
 	}
 	err = a.base.Fire(factory.EventUpdated, a, mw, args...)
 	return
+}
+
+func (a *NgingUser) Save(old *NgingUser, args ...interface{}) (affected int64, err error) {
+	a.Updated = uint(time.Now().Unix())
+	if len(a.Gender) == 0 {
+		a.Gender = "secret"
+	}
+	if len(a.Disabled) == 0 {
+		a.Disabled = "N"
+	}
+	if len(a.Online) == 0 {
+		a.Online = "N"
+	}
+	if old == nil {
+		old = NewNgingUser(a.Context())
+		old.CtxFrom(a)
+		if err = old.Get(nil, args...); err != nil {
+			return
+		}
+	}
+	changedCols := a.GetDiffColumns(old)
+	if len(changedCols) == 0 {
+		return
+	}
+	mw := func(r db.Result) db.Result {
+		return r.Select(changedCols...).Limit(1)
+	}
+	return a.Updatex(mw, args...)
 }
 
 func (a *NgingUser) UpdateByFields(mw func(db.Result) db.Result, fields []string, args ...interface{}) (err error) {
