@@ -255,8 +255,8 @@ github.com/coscms/session-sqlitestore v0.0.4 h1:GAp5r0tuo66fGwa5vhnkWGza1pt0Cwj1
 github.com/coscms/session-sqlitestore v0.0.4/go.mod h1:UNuztwiivqHPL2cYzwdsp004lG7NdRXA7wQhPGCHw74=
 github.com/coscms/session-sqlstore v0.0.1 h1:L1ef74QILW4RXrAcG2Se6K+zakmnE7sE735Yu62d21Q=
 github.com/coscms/session-sqlstore v0.0.1/go.mod h1:n1mHOa5RJRVCXjliFkVcgg8A+TEDY6BPqFkyi3qVbTc=
-github.com/coscms/tables v0.0.0-20260204124716-7b9bea96228e h1:mfLQG0UmcA8Npwxd4vNZo+ZfW9mzkVwTv/G11rPEKvI=
-github.com/coscms/tables v0.0.0-20260204124716-7b9bea96228e/go.mod h1:t6pipEM3+Ia8ZTFgwSWCEyE3KdsRrhmew468mLVCrJo=
+github.com/coscms/tables v0.0.0-20260204125825-b465a0e15b85 h1:VupIc7bpIdf2IrGH+YbxQYyDyNdBtjWJhOHcYKVSAqg=
+github.com/coscms/tables v0.0.0-20260204125825-b465a0e15b85/go.mod h1:t6pipEM3+Ia8ZTFgwSWCEyE3KdsRrhmew468mLVCrJo=
 github.com/cpuguy83/go-md2man/v2 v2.0.6/go.mod h1:oOW0eioCTA6cOiMLiUPZOpcVxMig6NIQQ7OS05n1F4g=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
