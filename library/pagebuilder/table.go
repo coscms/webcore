@@ -7,6 +7,8 @@ import (
 	"github.com/webx-top/echo"
 )
 
+var _ echo.RenderContextWithData = (*Table)(nil)
+
 // NewTable 创建并返回一个新的 Table 实例
 func NewTable() *Table {
 	return &Table{
@@ -18,6 +20,6 @@ type Table struct {
 	*tables.Table
 }
 
-func (f *Table) RenderContextWithData(ctx echo.Context, data interface{}) template.HTML {
+func (f *Table) RenderWithData(ctx echo.Context, data interface{}) template.HTML {
 	return f.Table.Render()
 }
