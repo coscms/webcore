@@ -104,10 +104,10 @@ func (p *Page) AddBottomButton(buttons ...*Button) *Page {
 func (p *Page) Render(ctx echo.Context) error {
 	ctx.Set(`pageData`, p)
 	if len(p.Template) == 0 {
-		switch p.Data.(type) {
-		case *Table, Table:
+		switch p.Body.(type) {
+		case *Table:
 			p.Template = `common/page_table`
-		case *Form, Form:
+		case *Form:
 			p.Template = `common/page_form`
 		}
 	}
