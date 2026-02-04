@@ -1,6 +1,7 @@
 package pagebuilder
 
 import (
+	"github.com/coscms/tables"
 	"github.com/webx-top/echo"
 )
 
@@ -18,8 +19,8 @@ type Page struct {
 	Body          echo.RenderContextWithData // 主体
 	Footer        string                     // 尾部include html文件
 	Breadcrumb    []*Breadcrumb              // 面包屑
-	TopButtons    []*Button                  // 顶部按钮
-	BottomButtons []*Button                  // 底部按钮
+	TopButtons    tables.Links               // 顶部按钮
+	BottomButtons tables.Links               // 底部按钮
 }
 
 // SetData 设置页面数据并返回当前页面对象
@@ -69,25 +70,25 @@ func (p *Page) AddBreadcrumb(breadcrumb ...*Breadcrumb) *Page {
 }
 
 // SetTopButtons 设置页面顶部的按钮列表并返回当前页面对象
-func (p *Page) SetTopButtons(buttons []*Button) *Page {
+func (p *Page) SetTopButtons(buttons tables.Links) *Page {
 	p.TopButtons = buttons
 	return p
 }
 
 // AddTopButton 向页面顶部添加一个或多个按钮，并返回页面对象以便链式调用
-func (p *Page) AddTopButton(buttons ...*Button) *Page {
+func (p *Page) AddTopButton(buttons ...*tables.Link) *Page {
 	p.TopButtons = append(p.TopButtons, buttons...)
 	return p
 }
 
 // SetBottomButtons 设置页面底部按钮列表并返回当前页面对象
-func (p *Page) SetBottomButtons(buttons []*Button) *Page {
+func (p *Page) SetBottomButtons(buttons tables.Links) *Page {
 	p.BottomButtons = buttons
 	return p
 }
 
 // AddBottomButton 向页面底部添加一个或多个按钮，并返回页面对象以便链式调用
-func (p *Page) AddBottomButton(buttons ...*Button) *Page {
+func (p *Page) AddBottomButton(buttons ...*tables.Link) *Page {
 	p.BottomButtons = append(p.BottomButtons, buttons...)
 	return p
 }
