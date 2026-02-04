@@ -70,7 +70,7 @@ require (
 	github.com/coscms/session-redisstore v0.0.0-20250624032337-117cf04cfaf4
 	github.com/coscms/session-sqlitestore v0.0.4
 	github.com/coscms/session-sqlstore v0.0.1
-	github.com/coscms/tables v0.0.0-20260204114852-441c73ac327a
+	github.com/coscms/tables v0.0.0-20260204124716-7b9bea96228e
 	github.com/fynelabs/selfupdate v0.2.1
 	github.com/gabriel-vasile/mimetype v1.4.12
 	github.com/go-playground/validator/v10 v10.30.1
