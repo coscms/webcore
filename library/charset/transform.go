@@ -27,20 +27,21 @@ import (
 
 	"github.com/webx-top/com"
 	"golang.org/x/text/encoding"
+	"golang.org/x/text/encoding/htmlindex"
 	"golang.org/x/text/encoding/simplifiedchinese"
 	"golang.org/x/text/transform"
 )
 
 var aliases = map[string]string{
-	`UTF8`:      `UTF-8`,
-	`HZ-GB2312`: `GB2312`,
+	`utf8`:      `utf-8`,
+	`hz-gb2312`: `gb2312`,
 }
 
 var encodings = map[string]encoding.Encoding{
-	`GB18030`: simplifiedchinese.GB18030,
-	`GB2312`:  simplifiedchinese.HZGB2312,
-	`GBK`:     simplifiedchinese.GBK,
-	`UTF-8`:   encoding.Nop,
+	`gb18030`: simplifiedchinese.GB18030,
+	`gb2312`:  simplifiedchinese.HZGB2312,
+	`gbk`:     simplifiedchinese.GBK,
+	`utf-8`:   encoding.Nop,
 }
 
 func Supported() []string {
@@ -53,20 +54,23 @@ func Supported() []string {
 }
 
 func Register(charset string, encoding encoding.Encoding, alias ...string) {
-	charset = strings.ToUpper(charset)
+	charset = strings.ToLower(charset)
 	encodings[charset] = encoding
 	for _, a := range alias {
-		a = strings.ToUpper(a)
+		a = strings.ToLower(a)
 		aliases[a] = charset
 	}
 }
 
 func Encoding(charset string) encoding.Encoding {
-	charset = strings.ToUpper(charset)
+	charset = strings.ToLower(charset)
 	if cs, ok := aliases[charset]; ok {
 		charset = cs
 	}
 	if enc, ok := encodings[charset]; ok {
+		return enc
+	}
+	if enc, err := htmlindex.Get(charset); err == nil {
 		return enc
 	}
 	return nil
