@@ -27,6 +27,7 @@ import (
 	"time"
 
 	figure "github.com/admpub/go-figure"
+	_ "github.com/admpub/go-figure/fonts/big"
 	"github.com/admpub/go-ps"
 	"github.com/admpub/log"
 	"github.com/admpub/service"

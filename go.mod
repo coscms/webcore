@@ -23,7 +23,7 @@ require (
 	github.com/admpub/go-bindata-assetfs v0.0.1
 	github.com/admpub/go-captcha/v2 v2.0.7
 	github.com/admpub/go-download/v2 v2.2.0
-	github.com/admpub/go-figure v0.0.2
+	github.com/admpub/go-figure v0.1.0
 	github.com/admpub/go-isatty v0.0.11
 	github.com/admpub/go-password v0.1.3
 	github.com/admpub/go-pretty/v6 v6.0.4

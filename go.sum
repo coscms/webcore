@@ -60,8 +60,8 @@ github.com/admpub/go-captcha/v2 v2.0.7 h1:+jyBC3W3W6NnmuAcbH3P59UwAEU83R6CBDYro+
 github.com/admpub/go-captcha/v2 v2.0.7/go.mod h1:X48enqEymrJnsEZBbyiabhWPIyVRxSAxY6PEdaDbGsA=
 github.com/admpub/go-download/v2 v2.2.0 h1:kbRBK9nnynSXs5m92dHOjhoDuyEkyM8G7YCfg6EzawY=
 github.com/admpub/go-download/v2 v2.2.0/go.mod h1:RXS7p/O4j1eWJ0+wnTctLkrprXGKa0Lt43rrgc4/ZuM=
-github.com/admpub/go-figure v0.0.2 h1:4AhVWjR5KtN1H+1NWkVw92nk+1FQcBSLVe7fAfqU4NE=
-github.com/admpub/go-figure v0.0.2/go.mod h1:CxKVUQhbIjqp/1ezj8GSDHEV5KZnQj9qr3SmDb7JlTU=
+github.com/admpub/go-figure v0.1.0 h1:yrdYzuWOVx2yLyHyWSdSCydQzP5swiAykzIADKvGs8w=
+github.com/admpub/go-figure v0.1.0/go.mod h1:CxKVUQhbIjqp/1ezj8GSDHEV5KZnQj9qr3SmDb7JlTU=
 github.com/admpub/go-isatty v0.0.11 h1:jOUJR3gc3eUM4pBaHZoOWqkjr5DGYPGrp3xalspA+5U=
 github.com/admpub/go-isatty v0.0.11/go.mod h1:EsPQsKLbNzPWj/avtgWBP509ZqC8PGYw2ZrQKwDCFNs=
 github.com/admpub/go-password v0.1.3 h1:FkQWmfZL/Jl6miew350Rf4xFqjzflJdPKA+IMSBYpdo=
