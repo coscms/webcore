@@ -20,6 +20,7 @@ package nlog
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/admpub/tail"
 	charsetTransform "github.com/coscms/webcore/library/charset"
@@ -55,12 +56,12 @@ func LogShow(ctx echo.Context, logFile string, extensions ...echo.H) error {
 	} else if result.Has(`charset`) {
 		result.Set(`charset`, charset)
 	}
-	transform := func(v string) string {
-		return v
+	transform := func(v string) (string, error) {
+		return v, nil
 	}
 	if len(charset) > 0 {
 		var err error
-		transform, err = charsetTransform.NewConvertFunc(charset, `UTF8`)
+		transform, err = charsetTransform.NewTransformFunc(charset)
 		if err != nil {
 			data.SetError(err)
 			return ctx.JSON(data)
@@ -69,40 +70,50 @@ func LogShow(ctx echo.Context, logFile string, extensions ...echo.H) error {
 	obj, err := tail.TailFile(logFile, config)
 	if err != nil {
 		data.SetError(fmt.Errorf(`%w: %s`, err, logFile))
-	} else {
-		pipe := ctx.Query(`pipe`)
-		if len(pipe) > 0 {
-			parser, ok := LogParsers[pipe]
-			if !ok {
-				return ctx.JSON(data.SetInfo(ctx.T(`Invalid pipe: %s`, pipe), 0))
+		return ctx.JSON(data)
+	}
+	defer obj.Cleanup()
+	pipe := ctx.Query(`pipe`)
+	if len(pipe) > 0 {
+		parser, ok := LogParsers[pipe]
+		if !ok {
+			return ctx.JSON(data.SetInfo(ctx.T(`Invalid pipe: %s`, pipe), 0))
+		}
+		maxRows := 1000
+		if config.LastLines < maxRows {
+			maxRows = config.LastLines
+		}
+		rows := make([]interface{}, 0, maxRows)
+		for line := range obj.Lines {
+			line.Text, err = transform(line.Text)
+			if err != nil {
+				obj.Stop()
+				return ctx.JSON(data.SetError(err))
 			}
-			maxRows := 1000
-			if config.LastLines < maxRows {
-				maxRows = config.LastLines
-			}
-			rows := make([]interface{}, 0, maxRows)
-			for line := range obj.Lines {
-				line.Text = transform(line.Text)
-				row, err := parser(line)
-				if err != nil {
-					return ctx.JSON(data.SetError(err))
-				}
-				if row == nil {
-					continue
-				}
+			if row, err := parser(line); err != nil {
+				obj.Stop()
+				return ctx.JSON(data.SetError(err))
+			} else if row == nil {
+				continue
+			} else {
 				rows = append(rows, row)
 			}
-			result.Set(`list`, rows)
-			data.SetData(result)
-			return ctx.JSON(data)
 		}
-		var content string
-		for line := range obj.Lines {
-			line.Text = transform(line.Text)
-			content += line.Text + "\n"
-		}
-		result.Set(`content`, content)
+		result.Set(`list`, rows)
 		data.SetData(result)
+		return ctx.JSON(data)
 	}
+	var content strings.Builder
+	for line := range obj.Lines {
+		line.Text, err = transform(line.Text)
+		if err != nil {
+			obj.Stop()
+			return ctx.JSON(data.SetError(err))
+		}
+		content.WriteString(line.Text)
+		content.WriteString("\n")
+	}
+	result.Set(`content`, content.String())
+	data.SetData(result)
 	return ctx.JSON(data)
 }
