@@ -20,11 +20,12 @@ package charset
 
 import (
 	"fmt"
-	"os"
 	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/text/encoding/simplifiedchinese"
+	"golang.org/x/text/transform"
 )
 
 func TestString(t *testing.T) {
@@ -36,19 +37,24 @@ func TestString(t *testing.T) {
 }
 
 func TestConvert(t *testing.T) {
-	b, err := os.ReadFile(`gbktest.txt`)
-	assert.NoError(t, err)
-	charset, err := DetectText(b)
-	assert.NoError(t, err)
-	assert.Equal(t, `GB18030`, charset)
-	r, err := Convert(charset, `utf8`, b)
-	assert.NoError(t, err)
 	str := `炎黄子孙
 华夏民族
 "测试"`
+	encoder := simplifiedchinese.GBK.NewEncoder()       // 创建GBK编码器
+	resultGBK, _, err := transform.String(encoder, str) // 转换字符串
+	if err != nil {
+		panic(err)
+	}
+	bGBK := []byte(resultGBK)
+	assert.NoError(t, err)
+	charset, err := DetectText(bGBK)
+	assert.NoError(t, err)
+	assert.Equal(t, `GB18030`, charset)
+	r, err := Convert(charset, `utf8`, bGBK)
+	assert.NoError(t, err)
 	assert.Equal(t, str, string(r))
 
 	r, err = Convert(`utf8`, `gbk`, r)
 	assert.NoError(t, err)
-	assert.Equal(t, b, r)
+	assert.Equal(t, bGBK, r)
 }

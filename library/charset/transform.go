@@ -75,7 +75,7 @@ func Encoding(charset string) encoding.Encoding {
 func NewTransformWriter(charset string, dst io.WriteCloser) (io.WriteCloser, error) {
 	cs := Encoding(charset)
 	if nil == cs {
-		return nil, fmt.Errorf("charset '%s' is unsupported", charset)
+		return nil, fmt.Errorf("%w: %s", ErrUnsupportedCharset, charset)
 	}
 	if cs == encoding.Nop {
 		return dst, nil
@@ -86,7 +86,7 @@ func NewTransformWriter(charset string, dst io.WriteCloser) (io.WriteCloser, err
 func NewTransformReader(charset string, src io.Reader) (io.Reader, error) {
 	cs := Encoding(charset)
 	if nil == cs {
-		return nil, fmt.Errorf("charset '%s' is unsupported", charset)
+		return nil, fmt.Errorf("%w: %s", ErrUnsupportedCharset, charset)
 	}
 	if cs == encoding.Nop {
 		return src, nil
@@ -123,7 +123,7 @@ func TransformBytes(charset string, content []byte) ([]byte, error) {
 func NewTransformFunc(charset string) (func(string) (string, error), error) {
 	cs := Encoding(charset)
 	if nil == cs {
-		return nil, fmt.Errorf("charset '%s' is unsupported", charset)
+		return nil, fmt.Errorf("%w: %s", ErrUnsupportedCharset, charset)
 	}
 	if cs == encoding.Nop {
 		return func(v string) (string, error) { return v, nil }, nil
@@ -143,7 +143,7 @@ func NewTransformFunc(charset string) (func(string) (string, error), error) {
 func NewTransformBytesFunc(charset string) (func([]byte) ([]byte, error), error) {
 	cs := Encoding(charset)
 	if nil == cs {
-		return nil, fmt.Errorf("charset '%s' is unsupported", charset)
+		return nil, fmt.Errorf("%w: %s", ErrUnsupportedCharset, charset)
 	}
 	if cs == encoding.Nop {
 		return func(v []byte) ([]byte, error) { return v, nil }, nil
