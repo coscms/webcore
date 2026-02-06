@@ -29,14 +29,12 @@ require (
 	github.com/admpub/go-pretty/v6 v6.0.4
 	github.com/admpub/go-ps v0.0.1
 	github.com/admpub/godotenv v1.4.4
-	github.com/admpub/goseaweedfs v0.1.2
 	github.com/admpub/goth v0.0.4
 	github.com/admpub/httpscerts v0.0.0-20180907121630-a2990e2af45c
 	github.com/admpub/imageproxy v0.10.1
 	github.com/admpub/ip2region/v3 v3.0.5
 	github.com/admpub/license_gen v0.1.2
 	github.com/admpub/log v1.5.2
-	github.com/admpub/mahonia v0.0.0-20151019004008-c528b747d92d
 	github.com/admpub/mail v0.0.0-20170408110349-d63147b0317b
 	github.com/admpub/map2struct v0.1.3
 	github.com/admpub/mysql-schema-sync v0.2.6
@@ -58,21 +56,21 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.41.1
 	github.com/aws/aws-sdk-go-v2/config v1.32.7
 	github.com/aws/aws-sdk-go-v2/credentials v1.19.7
-	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.21.0
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.95.1
+	github.com/aws/aws-sdk-go-v2/feature/s3/transfermanager v0.1.2
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.96.0
 	github.com/caddyserver/certmagic v0.25.1
 	github.com/coscms/captcha v0.2.3
 	github.com/coscms/forms v1.16.10
 	github.com/coscms/go-imgparse v0.0.1
 	github.com/coscms/oauth2s v0.5.0
-	github.com/coscms/session-boltstore v0.0.0-20250617034717-a58d8848fa61
-	github.com/coscms/session-mysqlstore v0.0.0-20250617035706-a20b648443b1
-	github.com/coscms/session-redisstore v0.0.0-20250624032337-117cf04cfaf4
+	github.com/coscms/session-boltstore v0.0.0-20260203210304-79c433bb1621
+	github.com/coscms/session-mysqlstore v0.0.0-20260127080438-1856d3685966
+	github.com/coscms/session-redisstore v0.0.0-20260127080202-3c5732ae77b4
 	github.com/coscms/session-sqlitestore v0.0.4
 	github.com/coscms/session-sqlstore v0.0.1
 	github.com/coscms/tables v0.0.0-20260204125825-b465a0e15b85
 	github.com/fynelabs/selfupdate v0.2.1
-	github.com/gabriel-vasile/mimetype v1.4.12
+	github.com/gabriel-vasile/mimetype v1.4.13
 	github.com/go-playground/validator/v10 v10.30.1
 	github.com/hirochachacha/go-smb2 v1.1.0
 	github.com/jlaffaye/ftp v0.2.0
@@ -82,7 +80,7 @@ require (
 	github.com/minio/minio-go/v7 v7.0.98
 	github.com/pkg/sftp v1.13.10
 	github.com/russross/blackfriday/v2 v2.1.0
-	github.com/shirou/gopsutil/v4 v4.25.12
+	github.com/shirou/gopsutil/v4 v4.26.1
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/pflag v1.0.10
 	github.com/stretchr/testify v1.11.1
@@ -150,7 +148,7 @@ require (
 	github.com/caddyserver/zerossl v0.1.4 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/clipperhouse/stringish v0.1.1 // indirect
-	github.com/clipperhouse/uax29/v2 v2.4.0 // indirect
+	github.com/clipperhouse/uax29/v2 v2.5.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/dsoprea/go-logging v0.0.0-20200710184922-b02d349568dd // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
@@ -193,7 +191,6 @@ require (
 	github.com/kr/fs v0.1.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/libdns/libdns v1.1.1 // indirect
-	github.com/linxGnu/gumble v1.0.6 // indirect
 	github.com/lufia/plan9stats v0.0.0-20251013123823-9fd1530e3ec3 // indirect
 	github.com/maruel/rs v1.1.0 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
@@ -258,7 +255,7 @@ require (
 	golang.org/x/tools v0.41.0 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
-	modernc.org/libc v1.67.6 // indirect
+	modernc.org/libc v1.67.7 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect
 	modernc.org/sqlite v1.44.3 // indirect

@@ -27,7 +27,7 @@ import (
 
 	"github.com/admpub/log"
 	"github.com/aws/aws-sdk-go-v2/aws"
-	s3manager "github.com/aws/aws-sdk-go-v2/feature/s3/manager"
+	transfermanager "github.com/aws/aws-sdk-go-v2/feature/s3/transfermanager"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/coscms/webcore/library/common"
@@ -208,9 +208,9 @@ func (s *AWSClient) ListPage(ctx echo.Context, objectPrefix string) (dirs []os.F
 	return
 }
 
-func (s *AWSClient) Upload(ctx context.Context, reader io.Reader, objectName string) (*s3manager.UploadOutput, error) {
-	uploader := s3manager.NewUploader(s.Client)
-	return uploader.Upload(ctx, &s3.PutObjectInput{
+func (s *AWSClient) Upload(ctx context.Context, reader io.Reader, objectName string) (*transfermanager.UploadObjectOutput, error) {
+	uploader := transfermanager.New(s.Client)
+	return uploader.UploadObject(ctx, &transfermanager.UploadObjectInput{
 		Body:   reader,
 		Bucket: aws.String(s.bucketName),
 		Key:    aws.String(objectName),
