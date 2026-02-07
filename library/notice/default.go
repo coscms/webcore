@@ -30,7 +30,7 @@ var (
 	once               sync.Once
 )
 
-func Initialize() {
+func initialize() {
 	defaultUserNotices = NewUserNotices(false, nil)
 	echo.OnCallback(`nging.user.logout.success`, onLogout, `notice.closeMessage`)
 }
@@ -42,7 +42,7 @@ func onLogout(e events.Event) error {
 }
 
 func Default() UserMessageSystem {
-	once.Do(Initialize)
+	once.Do(initialize)
 	return defaultUserNotices
 }
 
