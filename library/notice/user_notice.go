@@ -116,6 +116,18 @@ func (u *userNotices) CloseClient(user string, clientID string) bool {
 	return false
 }
 
+func (u *userNotices) CloseAllClient(user string) bool {
+	oUser, exists := u.users.GetOk(user)
+	if !exists {
+		return true
+	}
+	oUser.CloseAllClient()
+	if u.Debug() {
+		msgbox.Info(`[NOTICE]`, `[CloseAllClient]`)
+	}
+	return false
+}
+
 func (u *userNotices) IsOnline(user string) bool {
 	return u.users.IsOnline(user)
 }

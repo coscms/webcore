@@ -36,6 +36,7 @@ type UserMessageSystem interface {
 	Send(user string, message *Message) error
 	Recv(user string, clientID string) <-chan *Message
 	CloseClient(user string, clientID string) bool
+	CloseAllClient(user string) bool
 	IsOnline(user string) bool
 	OnlineStatus(users ...string) map[string]bool
 	OpenClient(user string) (oUser IOnlineUser, clientID string)
@@ -60,6 +61,7 @@ type IOnlineUser interface {
 	CountType() int
 	CountClient() int
 	CloseClient(clientID string) int
+	CloseAllClient()
 	OpenClient(clientID string)
 }
 

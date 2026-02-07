@@ -31,6 +31,10 @@ func (a *Notice) CloseClient(clientID string) int {
 	return a.messages.Delete(clientID)
 }
 
+func (a *Notice) CloseAllClient() {
+	a.messages.Clear()
+}
+
 func (a *Notice) OpenClient(clientID string) {
 	a.messages.Add(clientID)
 }
