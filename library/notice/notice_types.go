@@ -29,7 +29,7 @@ func newNoticeTypes() *noticeTypes {
 }
 
 type noticeTypes struct {
-	types map[string]bool
+	types map[string]bool // messageType => opened
 	lock  sync.RWMutex
 }
 

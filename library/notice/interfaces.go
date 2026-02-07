@@ -63,6 +63,7 @@ type IOnlineUser interface {
 	CloseClient(clientID string) int
 	CloseAllClient()
 	OpenClient(clientID string)
+	HasClientID(clientID string) bool
 }
 
 type IOnlineUsers interface {
@@ -83,6 +84,7 @@ type NoticeMessager interface {
 	Add(clientID string)
 	Send(message *Message) error
 	Recv(clientID string) <-chan *Message
+	Has(clientID string) bool
 }
 
 type NoticeTyper interface {

@@ -29,7 +29,7 @@ func newNoticeMessages() *noticeMessages {
 }
 
 type noticeMessages struct {
-	messages map[string]chan *Message
+	messages map[string]chan *Message // clientID -> message
 	lock     sync.RWMutex
 }
 
@@ -52,6 +52,13 @@ func (n *noticeMessages) Delete(clientID string) int {
 	return size
 }
 
+func (n *noticeMessages) Has(clientID string) bool {
+	n.lock.RLock()
+	_, ok := n.messages[clientID]
+	n.lock.RUnlock()
+	return ok
+}
+
 func (n *noticeMessages) Clear() {
 	n.lock.Lock()
 	for key, msg := range n.messages {
@@ -64,10 +71,11 @@ func (n *noticeMessages) Clear() {
 var NoticeMessageChanSize = 3
 
 func (n *noticeMessages) Add(clientID string) {
-	n.lock.Lock()
-	if _, ok := n.messages[clientID]; !ok {
-		n.messages[clientID] = make(chan *Message, NoticeMessageChanSize)
+	if n.Has(clientID) {
+		return
 	}
+	n.lock.Lock()
+	n.messages[clientID] = make(chan *Message, NoticeMessageChanSize)
 	n.lock.Unlock()
 }
 

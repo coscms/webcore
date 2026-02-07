@@ -39,6 +39,10 @@ func (a *Notice) OpenClient(clientID string) {
 	a.messages.Add(clientID)
 }
 
+func (a *Notice) HasClientID(clientID string) bool {
+	return a.messages.Has(clientID)
+}
+
 func NewMessageWithValue(typ string, title string, content interface{}, status ...int) *Message {
 	st := Succeed
 	if len(status) > 0 {
