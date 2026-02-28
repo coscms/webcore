@@ -244,16 +244,22 @@ func (f *File) RemoveUnusedAvatar(ownerType string, excludeID uint64) error {
 	))
 }
 
-func (f *File) RemoveUnused(ago int64, ownerType string, ownerID uint64) error {
+func (f *File) RemoveUnused(ago int64, ownerType string, ownerID uint64, subdir ...string) error {
 	cond := db.NewCompounds()
 	if len(ownerType) > 0 {
 		cond.AddKV(`owner_type`, ownerType)
 		cond.AddKV(`owner_id`, ownerID)
 	}
+	if len(subdir) > 0 {
+		if len(subdir) > 1 {
+			cond.Add(db.Cond{`subdir`: db.In(subdir)})
+		} else {
+			cond.AddKV(`subdir`, subdir[0])
+		}
+	}
 	cond.Add(
 		db.Cond{`used_times`: 0},
 		db.Cond{`created`: db.Lt(time.Now().Unix() - ago)},
-		db.Cond{`table_id`: 0},
 	)
 	return f.DeleteBy(cond.And())
 }
