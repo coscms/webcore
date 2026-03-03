@@ -86,7 +86,7 @@ func (p *PrepareData) MakeCallback(fileM *modelFile.File, storer driver.Storer) 
 				}
 				thumbURL := tplfunc.AddSuffix(result.FileURL, fmt.Sprintf(`_%v_%v`, thumbSize.Width, thumbSize.Height))
 				cropOpt := &modelFile.CropOptions{
-					Options:          modelFile.ImageOptions(thumbSize.Width, thumbSize.Height),
+					Options:          modelFile.ImageOptions(thumbSize.Width, thumbSize.Height, thumbSize.CropOptions),
 					File:             fileM.NgingFile,
 					SrcReader:        originalReader,
 					Storer:           storer,

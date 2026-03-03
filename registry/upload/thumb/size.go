@@ -3,6 +3,7 @@ package thumb
 import (
 	"fmt"
 
+	"github.com/admpub/imageproxy"
 	"github.com/coscms/webcore/library/fileupdater"
 )
 
@@ -65,14 +66,45 @@ func (s Sizes) Get(width, height float64) *Size {
 
 // Size 缩略图尺寸信息
 type Size struct {
-	AutoCrop bool
-	Width    float64
-	Height   float64
-	Quality  int
+	AutoCrop  bool
+	Width     float64
+	Height    float64
+	Quality   int
+	SmartCrop *bool
+	ScaleUp   *bool
+	Fit       *bool
 }
 
 func (t Size) String() string {
 	return fmt.Sprintf("%vx%v", t.Width, t.Height)
+}
+
+func (t *Size) SetAutoCrop(autoCrop bool) {
+	t.AutoCrop = autoCrop
+}
+
+func (t *Size) SetWidth(width float64) {
+	t.Width = width
+}
+
+func (t *Size) SetHeight(height float64) {
+	t.Height = height
+}
+
+func (t *Size) SetQuality(quality int) {
+	t.Quality = quality
+}
+
+func (t *Size) SetSmartCrop(smartCrop bool) {
+	t.SmartCrop = &smartCrop
+}
+
+func (t *Size) SetScaleUp(scaleUp bool) {
+	t.ScaleUp = &scaleUp
+}
+
+func (t *Size) SetFit(fit bool) {
+	t.Fit = &fit
 }
 
 // Suffix 文件名称尺寸后缀
@@ -82,4 +114,19 @@ func (t Size) Suffix() string {
 
 func (t Size) ThumbValue() fileupdater.ValueFunc {
 	return fileupdater.ThumbValue(int(t.Width), int(t.Height))
+}
+
+func (t Size) CropOptions(o *imageproxy.Options) {
+	if t.SmartCrop != nil {
+		o.SmartCrop = *t.SmartCrop
+	}
+	if t.ScaleUp != nil {
+		o.ScaleUp = *t.ScaleUp
+	}
+	if t.Fit != nil {
+		o.Fit = *t.Fit
+	}
+	if t.Quality > 0 {
+		o.Quality = t.Quality
+	}
 }
