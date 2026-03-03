@@ -52,6 +52,9 @@ func ErrorPageFunc(c echo.Context) error {
 	c.SetFunc(`CaptchaFormWithType`, func(typ string, tmpl string, args ...interface{}) template.HTML {
 		return captchabiz.CaptchaFormWithType(c, typ, tmpl, args...)
 	})
+	c.SetFunc(`ServerKind`, func() string {
+		return c.Echo().Extra().String(ServerKindKey)
+	})
 	return nil
 }
 
