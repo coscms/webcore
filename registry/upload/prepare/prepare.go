@@ -57,7 +57,7 @@ func (p *PrepareData) MakeModel(ownerType string, ownerID uint64) *modelFile.Fil
 	return NewModel(p.ctx, ownerType, ownerID, p.Subdir, p.FileType, p.StorerInfo)
 }
 
-func (p *PrepareData) MakeCallback(fileM *modelFile.File, storer driver.Storer, subdir string) func(*uploadClient.Result, io.Reader, io.Reader) error {
+func (p *PrepareData) MakeCallback(fileM *modelFile.File, storer driver.Storer) func(*uploadClient.Result, io.Reader, io.Reader) error {
 	ctx := fileM.Context()
 	callback := func(result *uploadClient.Result, originalReader io.Reader, _ io.Reader) error {
 		fileM.Id = 0
@@ -74,7 +74,8 @@ func (p *PrepareData) MakeCallback(fileM *modelFile.File, storer driver.Storer, 
 			ctx.Commit()
 			return nil
 		}
-		thumbSizes := thumb.Registry.Get(subdir).AutoCrop()
+		thumbSizes := thumb.Registry.Get(p.Subdir).AutoCrop()
+		//echo.Dump(echo.H{`thumbSizes`: thumbSizes})
 		if len(thumbSizes) > 0 {
 			thumbM := modelFile.NewThumb(ctx)
 			thumbM.CPAFrom(fileM.NgingFile)
@@ -183,7 +184,7 @@ func (p *PrepareData) Save(fileM *modelFile.File, clientName string, clients ...
 		return
 	}
 
-	callback := p.MakeCallback(fileM, storer, subdir)
+	callback := p.MakeCallback(fileM, storer)
 
 	optionsSetters := []uploadClient.OptionsSetter{
 		uploadClient.OptClientName(clientName),
