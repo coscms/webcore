@@ -9,6 +9,7 @@ import (
 	"github.com/coscms/webcore/library/navigate"
 	"github.com/coscms/webcore/library/ntemplate"
 	"github.com/coscms/webcore/library/route"
+	"github.com/coscms/webcore/registry/upload/checker"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/middleware"
 	"github.com/webx-top/echo/middleware/language"
@@ -177,9 +178,17 @@ func (h *HTTPServer) ValidateDomain(c echo.Context, domain string) (detected boo
 	return
 }
 
+func uploadURLGenerator(ctx echo.Context, subdir string, values ...interface{}) string {
+	if ctx.Echo().Extra().String(ServerKindKey) == KindBackend {
+		return checker.BackendUploadURL(subdir, values...)
+	}
+	return checker.FrontendUploadURL(subdir, values...)
+}
+
 func (h *HTTPServer) Apply() {
 	e := h.Router.Echo()
 	e.Extra().Set(ServerKindKey, h.Name)
+	e.SetUploadURLGenerator(uploadURLGenerator)
 	//e.SetRenderDataWrapper(echo.DefaultRenderDataWrapper)
 	e.PreUse(middleware.Recover())
 	if len(h.HostCheckerRegexpKey) > 0 {
