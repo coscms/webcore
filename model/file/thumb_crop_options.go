@@ -28,17 +28,45 @@ import (
 	"github.com/webx-top/image"
 )
 
+type CropOptionsDefault struct {
+	// If true, resize the image to fit in the specified dimensions.  Image
+	// will not be cropped, and aspect ratio will be maintained.
+	Fit bool
+
+	FlipVertical   bool
+	FlipHorizontal bool
+
+	// Quality of output image
+	Quality int
+
+	// Allow image to scale beyond its original dimensions.  This value
+	// will always be overwritten by the value of Proxy.ScaleUp.
+	ScaleUp bool
+
+	// Automatically find good crop points based on image content.
+	SmartCrop bool
+}
+
+var DefaultCropOptions = CropOptionsDefault{
+	Quality:   75,
+	ScaleUp:   true,
+	SmartCrop: true,
+}
+
 func ImageOptions(width, height float64, cropOptionsSetters ...func(*imageproxy.Options)) *imageproxy.Options {
 	cropOptions := &imageproxy.Options{
 		//CropX:          x,   //裁剪X轴起始位置
 		//CropY:          y,   //裁剪Y轴起始位置
 		//CropWidth:      width,  //裁剪宽度
 		//CropHeight:     height, //裁剪高度
-		Width:     width,  //缩略图宽度
-		Height:    height, //缩略图高度
-		Quality:   75,
-		ScaleUp:   true,
-		SmartCrop: true,
+		Width:          width,  //缩略图宽度
+		Height:         height, //缩略图高度
+		Fit:            DefaultCropOptions.Fit,
+		FlipVertical:   DefaultCropOptions.FlipVertical,
+		FlipHorizontal: DefaultCropOptions.FlipHorizontal,
+		Quality:        DefaultCropOptions.Quality,
+		ScaleUp:        DefaultCropOptions.ScaleUp,
+		SmartCrop:      DefaultCropOptions.SmartCrop,
 	}
 	for _, set := range cropOptionsSetters {
 		set(cropOptions)
