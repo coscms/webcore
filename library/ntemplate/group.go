@@ -51,6 +51,7 @@ type cachedPathData struct {
 
 type Template struct {
 	handler      PathHandle
+	Project      string
 	TmplDir      string
 	Kind         string
 	PathAliases  *PathAliases
@@ -182,14 +183,16 @@ func (t *Template) ThemeInfo(c echo.Context) *ThemeInfo {
 }
 
 func (t *Template) loadThemeInfo(c echo.Context) {
-	var err error
-	t.themeInfo, err = t.themeInfoStorer.Get(c, ``)
+	themeInfo, err := t.themeInfoStorer.Get(c, ``)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return
 		}
 		log.Error(err)
 		return
+	}
+	if len(t.Project) == 0 || t.Project == themeInfo.Project {
+		t.themeInfo = themeInfo
 	}
 }
 
