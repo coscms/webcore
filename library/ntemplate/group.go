@@ -14,6 +14,7 @@ import (
 )
 
 var groups = map[string]*Template{}
+var DefaultTheme = `default`
 
 func New(kind string, pa *PathAliases, registerToGroup ...bool) *Template {
 	if pa == nil {
@@ -23,7 +24,8 @@ func New(kind string, pa *PathAliases, registerToGroup ...bool) *Template {
 		Kind:            kind,
 		PathFixers:      &PathFixers{},
 		PathAliases:     pa,
-		themeInfo:       &ThemeInfo{Name: `default`},
+		DefaultTheme:    DefaultTheme,
+		themeInfo:       &ThemeInfo{Name: DefaultTheme},
 		themeMutex:      sync.RWMutex{},
 		themeOnce:       sync.Once{},
 		cachedPathData:  newCachedPathData(),
@@ -48,12 +50,13 @@ type cachedPathData struct {
 }
 
 type Template struct {
-	handler     PathHandle
-	TmplDir     string
-	Kind        string
-	PathAliases *PathAliases
-	customFS    http.FileSystem
-	enableTheme bool
+	handler      PathHandle
+	TmplDir      string
+	Kind         string
+	PathAliases  *PathAliases
+	DefaultTheme string
+	customFS     http.FileSystem
+	enableTheme  bool
 	*PathFixers
 	themeInfo       *ThemeInfo
 	themeMutex      sync.RWMutex
@@ -149,7 +152,7 @@ func (t *Template) Register(renderer driver.Driver, watchOtherDirs ...string) {
 	renderer.SetTmplPathFixer(func(c echo.Context, tmpl string) string {
 		var theme string
 		if t.enableTheme {
-			theme = c.Internal().String(`theme`, `default`)
+			theme = c.Internal().String(`theme`, t.DefaultTheme)
 		}
 		return t.Handle(c, theme, tmpl)
 	})
