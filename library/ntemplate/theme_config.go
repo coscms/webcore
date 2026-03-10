@@ -16,7 +16,6 @@ import (
 	"github.com/webx-top/echo/param"
 
 	_ "github.com/coscms/webcore/library/formbuilder"
-	//_ "github.com/coscms/forms/defaults"
 )
 
 var (
@@ -87,8 +86,8 @@ func RGB2Hex(rgb string) string {
 		return rgb
 	}
 	n := 3
-	if strings.HasPrefix(rgb, `rgba(`) {
-		rgb = strings.TrimPrefix(rgb, `rgba(`)
+	if after, found := strings.CutPrefix(rgb, `rgba(`); found {
+		rgb = after
 		n = 4
 	} else {
 		rgb = strings.TrimPrefix(rgb, `rgb(`)
@@ -119,7 +118,8 @@ func (t ThemeColor) HexColor() string {
 
 // ThemeInfo 模板主题信息
 type ThemeInfo struct {
-	Author       ThemeAuthor                  `json:"author,omitempty"`       // 模板作者
+	Project      string                       `json:"project,omitempty"`      // 项目标识
+	Author       ThemeAuthor                  `json:"author"`                 // 模板作者
 	Colors       ThemeColors                  `json:"colors,omitempty"`       // 多种颜色主题时，所有支持的颜色信息
 	Version      string                       `json:"version,omitempty"`      // 版本号(格式: 1.0.0)
 	Name         string                       `json:"name"`                   // 主题英文名
