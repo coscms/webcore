@@ -66,6 +66,22 @@ type Template struct {
 	themeInfoStorer Storer
 }
 
+func (t *Template) SetProject(project string, defaultTheme ...string) *Template {
+	t.Project = project
+	if len(defaultTheme) > 0 && len(defaultTheme[0]) > 0 {
+		t.SetDefaultTheme(defaultTheme[0])
+	}
+	return t
+}
+
+func (t *Template) SetDefaultTheme(defaultTheme string) *Template {
+	if t.themeInfo.Name == t.DefaultTheme {
+		t.themeInfo.Name = defaultTheme
+	}
+	t.DefaultTheme = defaultTheme
+	return t
+}
+
 func (t *Template) SetTmplDir(tmplDir string) *Template {
 	t.TmplDir = tmplDir
 	return t
