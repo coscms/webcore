@@ -372,6 +372,15 @@ var (
 	noneFloatCleanRegexp = regexp.MustCompile(`[^\d\.-]`)
 )
 
+func CanTranslateContent(contentType string) bool {
+	switch contentType {
+	case `html`, `string`, `text`, `json`, `markdown`:
+		return true
+	default:
+		return false
+	}
+}
+
 func ContentEncode(content string, contypes ...string) string {
 	if len(content) == 0 {
 		return content
