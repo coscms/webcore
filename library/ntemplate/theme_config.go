@@ -221,6 +221,34 @@ func (t *ThemeInfo) SaveForm(ctx echo.Context, templateName string, gets ...func
 	return cfg.GetValue(get)
 }
 
+func (t *ThemeInfo) HasFormInputOption(ctx echo.Context, templateName string, inputName string, inputOption string) bool {
+	elem := t.GetFormInputElement(ctx, templateName, inputName)
+	if elem == nil {
+		return false
+	}
+	for _, v := range elem.Choices {
+		if len(v.Option) > 0 && v.Option[0] == inputOption {
+			return true
+		}
+	}
+	return false
+}
+
+func (t *ThemeInfo) GetFormInputElement(ctx echo.Context, templateName string, inputName string) *formConfig.Element {
+	cfg, ok := t.FormConfig[templateName]
+	if !ok {
+		return nil
+	}
+	for _, elem := range cfg.Elements {
+		if elem.Type == `langset` || elem.Type == `fieldset` || elem.Name != inputName {
+			continue
+		}
+
+		return elem
+	}
+	return nil
+}
+
 func (t *ThemeInfo) CustomConfigContains(name string, value interface{}) bool {
 	switch values := t.CustomConfig.Get(name).(type) {
 	case []string:
