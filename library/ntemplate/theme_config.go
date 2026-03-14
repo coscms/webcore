@@ -1,10 +1,12 @@
 package ntemplate
 
 import (
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"os"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -13,6 +15,7 @@ import (
 	formCommon "github.com/coscms/forms/common"
 	formConfig "github.com/coscms/forms/config"
 	"github.com/webx-top/echo"
+	"github.com/webx-top/echo/engine"
 	"github.com/webx-top/echo/param"
 
 	_ "github.com/coscms/webcore/library/formbuilder"
@@ -208,11 +211,25 @@ func (t *ThemeInfo) SaveForm(ctx echo.Context, templateName string, gets ...func
 	}
 	if get == nil {
 		get = func(fieldName string, fieldValue string) error {
+			if before, found := strings.CutSuffix(fieldName, `[]`); found {
+				t.CustomConfig.Set(before, ctx.FormValues(fieldName))
+			}
 			t.CustomConfig.Set(fieldName, ctx.Form(fieldName))
 			return nil
 		}
 	}
 	return cfg.GetValue(get)
+}
+
+func (t *ThemeInfo) CustomConfigContains(name string, value interface{}) bool {
+	switch values := t.CustomConfig.Get(name).(type) {
+	case []string:
+		return slices.Contains(values, param.AsString(value))
+	case []interface{}:
+		return slices.Contains(values, value)
+	default:
+		return false
+	}
 }
 
 func (t *ThemeInfo) Render(templateName string) template.HTML {
@@ -222,13 +239,22 @@ func (t *ThemeInfo) Render(templateName string) template.HTML {
 	}
 	copied := cfg.Clone()
 	copied.SetValue(func(fieldName string) string {
+		if before, found := strings.CutSuffix(fieldName, `[]`); found {
+			switch values := t.CustomConfig.Get(before).(type) {
+			case []string:
+				b, _ := json.Marshal(values)
+				return engine.Bytes2str(b)
+			case []interface{}:
+				b, _ := json.Marshal(values)
+				return engine.Bytes2str(b)
+			}
+		}
 		return t.CustomConfig.String(fieldName)
 	})
 	f := forms.NewForms(forms.New())
 	if len(cfg.Theme) == 0 {
 		copied.Theme = formCommon.BOOTSTRAP
 	}
-	f.Theme = formCommon.BOOTSTRAP
 	f.Init(copied)
 	f.ParseFromConfig(true)
 	f.Config().Template = `allfields`
