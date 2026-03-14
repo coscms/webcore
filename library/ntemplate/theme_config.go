@@ -240,12 +240,28 @@ func (t *ThemeInfo) GetFormInputElement(ctx echo.Context, templateName string, i
 	if !ok {
 		return nil
 	}
+	hasSuffix := strings.HasSuffix(inputName, `[]`)
 	for _, elem := range cfg.Elements {
-		if elem.Type == `langset` || elem.Type == `fieldset` || elem.Name != inputName {
+		if elem.Type == `langset` || elem.Type == `fieldset` {
 			continue
 		}
-
-		return elem
+		if elem.Name == inputName {
+			return elem
+		}
+		elemHasSuffix := strings.HasSuffix(elem.Name, `[]`)
+		if hasSuffix == elemHasSuffix {
+			continue
+		}
+		if hasSuffix {
+			if inputName == elem.Name+`[]` {
+				return elem
+			}
+		} else {
+			if inputName+`[]` == elem.Name {
+				return elem
+			}
+		}
+		continue
 	}
 	return nil
 }
