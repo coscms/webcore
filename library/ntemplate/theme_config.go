@@ -213,6 +213,7 @@ func (t *ThemeInfo) SaveForm(ctx echo.Context, templateName string, gets ...func
 		get = func(fieldName string, fieldValue string) error {
 			if before, found := strings.CutSuffix(fieldName, `[]`); found {
 				t.CustomConfig.Set(before, ctx.FormValues(fieldName))
+				return nil
 			}
 			t.CustomConfig.Set(fieldName, ctx.Form(fieldName))
 			return nil
