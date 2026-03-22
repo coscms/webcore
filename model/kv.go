@@ -160,6 +160,11 @@ func (s *Kv) GetValue(key string, defaultValue ...string) (string, error) {
 	return s.Value, err
 }
 
+const (
+	HKeyDescription = `description`
+	HKeyHelp        = `help`
+)
+
 // GetTypeValues
 // typ: "type|typeName"
 // defaultValue: echo.NewKVData().Add(`key`, `value`, echo.KVOptHKV(`description`, `说明`), echo.KVOptHKV(`help`, `帮助`))
@@ -180,8 +185,8 @@ func (s *Kv) GetTypeValues(typ string, defaultValue ...*echo.KVData) (echo.KVLis
 				var description string
 				var help string
 				if item.H != nil {
-					description = item.H.String(`description`)
-					help = item.H.String(`help`)
+					description = item.H.String(HKeyDescription)
+					help = item.H.String(HKeyHelp)
 				}
 				if err = s.AutoCreateKey(typ, item.K, item.V, description, help); err != nil {
 					s.Context().Logger().Error(err)
@@ -193,7 +198,19 @@ func (s *Kv) GetTypeValues(typ string, defaultValue ...*echo.KVData) (echo.KVLis
 	}
 	values := make(echo.KVList, 0, len(rows))
 	for _, row := range rows {
-		values.Add(row.Key, row.Value)
+		var h echo.H
+		if len(defaultValue) > 0 {
+			item := defaultValue[0].GetItem(row.Key)
+			if item != nil && item.H != nil {
+				h = item.H.Clone()
+			}
+		}
+		if h == nil {
+			h = echo.H{}
+		}
+		h.Set(HKeyDescription, row.Description)
+		h.Set(HKeyHelp, row.Help)
+		values.Add(row.Key, row.Value, echo.KVOptH(h))
 	}
 	return values, err
 }
