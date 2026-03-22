@@ -163,39 +163,37 @@ func (s *Kv) GetValue(key string, defaultValue ...string) (string, error) {
 // GetTypeValues
 // typ: "type|typeName"
 // defaultValue: {"key":"Value|Description|Help"}
-func (s *Kv) GetTypeValues(typ string, defaultValue ...map[string]string) (map[string]string, error) {
+func (s *Kv) GetTypeValues(typ string, defaultValue ...*echo.KVData) (echo.KVList, error) {
 	_, err := s.NgingKv.ListByOffset(nil, func(r db.Result) db.Result {
-		return r.Select(`value`)
+		return r.Select(`value`).OrderBy(`sort`, `id`)
 	}, 0, -1, db.Cond{`type`: strings.SplitN(typ, `|`, 2)[0]})
 	if err != nil {
 		if len(defaultValue) > 0 {
-			result := make(map[string]string, len(defaultValue[0]))
-			for key, value := range defaultValue[0] {
-				values := strings.SplitN(value, `|`, 2)
-				result[key] = values[0]
-			}
-			return result, err
+			return defaultValue[0].Clone().Slice(), err
 		}
 		return nil, err
 	}
 	rows := s.Objects()
 	if len(rows) == 0 {
 		if len(defaultValue) > 0 {
-			result := make(map[string]string, len(defaultValue[0]))
-			for key, value := range defaultValue[0] {
-				values := strings.SplitN(value, `|`, 3)
-				if err = s.AutoCreateKey(typ, key, values...); err != nil {
+			for _, item := range defaultValue[0].Slice() {
+				var description string
+				var help string
+				if item.H != nil {
+					description = item.H.String(`description`)
+					help = item.H.String(`help`)
+				}
+				if err = s.AutoCreateKey(typ, item.K, item.V, description, help); err != nil {
 					s.Context().Logger().Error(err)
 				}
-				result[key] = values[0]
 			}
-			return result, err
+			return defaultValue[0].Clone().Slice(), err
 		}
 		return nil, err
 	}
-	values := make(map[string]string, len(rows))
+	values := make(echo.KVList, 0, len(rows))
 	for _, row := range rows {
-		values[row.Key] = row.Value
+		values.Add(row.Key, row.Value)
 	}
 	return values, err
 }
