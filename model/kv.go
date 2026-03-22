@@ -89,18 +89,23 @@ var sg singleflight.Group
 
 // AutoCreateKey 自动创建 key
 // value: 0. 值; 1. 说明; 2. 帮助说明
-func (s *Kv) AutoCreateKey(key string, value ...string) error {
-	_, err, _ := sg.Do(key, func() (interface{}, error) {
-		err := s.autoCreateKey(key, value...)
+func (s *Kv) AutoCreateKey(typ string, key string, value ...string) error {
+	if len(typ) == 0 {
+		typ = AutoCreatedType
+	}
+	_, err, _ := sg.Do(typ+`&`+key, func() (interface{}, error) {
+		err := s.autoCreateKey(typ, key, value...)
 		return nil, err
 	})
 	return err
 }
 
-func (s *Kv) autoCreateKey(key string, value ...string) error {
+func (s *Kv) autoCreateKey(typ string, key string, value ...string) error {
+	typParts := strings.SplitN(typ, `|`, 2)
+	typ = typParts[0]
 	m := dbschema.NewNgingKv(s.Context())
 	m.Key = key
-	m.Type = AutoCreatedType
+	m.Type = typ
 	m.ChildKeyType = KvDefaultDataType
 	com.SliceExtract(value, &m.Value, &m.Description, &m.Help)
 	m.Updated = uint(time.Now().Unix())
@@ -110,16 +115,21 @@ func (s *Kv) autoCreateKey(key string, value ...string) error {
 	}
 
 	var exists bool
-	exists, err = m.Exists(nil, `key`, AutoCreatedType)
+	exists, err = m.Exists(nil, `key`, typ)
 	if err != nil || exists {
 		return err
 	}
 
 	m.Reset()
-	m.Key = AutoCreatedType
+	m.Key = typ
 	m.Type = KvRootType
 	m.ChildKeyType = KvDefaultDataType
-	m.Value = `自动创建`
+	if len(typParts) >= 2 {
+		m.Value = typParts[1]
+	}
+	if len(m.Value) == 0 && m.Key == AutoCreatedType {
+		m.Value = `自动创建`
+	}
 	_, err = m.Insert()
 	return err
 }
@@ -135,7 +145,7 @@ func (s *Kv) GetValue(key string, defaultValue ...string) (string, error) {
 	))
 	if err != nil {
 		if err == db.ErrNoMoreRows {
-			if err = s.AutoCreateKey(key, defaultValue...); err != nil {
+			if err = s.AutoCreateKey(AutoCreatedType, key, defaultValue...); err != nil {
 				s.Context().Logger().Error(err)
 			}
 		}
@@ -150,20 +160,34 @@ func (s *Kv) GetValue(key string, defaultValue ...string) (string, error) {
 	return s.Value, err
 }
 
-func (s *Kv) GetTypeValues(typ string, defaultValue ...string) ([]string, error) {
+// GetTypeValues
+// typ: "type|typeName"
+// defaultValue: {"key":"Value|Description|Help"}
+func (s *Kv) GetTypeValues(typ string, defaultValue ...map[string]string) (map[string]string, error) {
 	_, err := s.NgingKv.ListByOffset(nil, func(r db.Result) db.Result {
 		return r.Select(`value`)
-	}, 0, -1, db.Cond{`type`: typ})
+	}, 0, -1, db.Cond{`type`: strings.SplitN(typ, `|`, 2)[0]})
 	if err != nil {
-		return defaultValue, err
+		if len(defaultValue) > 0 {
+			return defaultValue[0], err
+		}
+		return nil, err
 	}
 	rows := s.Objects()
 	if len(rows) == 0 {
-		return defaultValue, err
+		if len(defaultValue) > 0 {
+			for key, value := range defaultValue[0] {
+				if err = s.AutoCreateKey(typ, key, strings.SplitN(value, `|`, 3)...); err != nil {
+					s.Context().Logger().Error(err)
+				}
+			}
+			return defaultValue[0], err
+		}
+		return nil, err
 	}
-	values := make([]string, len(rows))
-	for index, row := range rows {
-		values[index] = row.Value
+	values := make(map[string]string, len(rows))
+	for _, row := range rows {
+		values[row.Key] = row.Value
 	}
 	return values, err
 }
