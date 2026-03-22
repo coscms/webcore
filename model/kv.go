@@ -162,7 +162,7 @@ func (s *Kv) GetValue(key string, defaultValue ...string) (string, error) {
 
 // GetTypeValues
 // typ: "type|typeName"
-// defaultValue: {"key":"Value|Description|Help"}
+// defaultValue: echo.NewKVData().Add(`key`, `value`, echo.KVOptHKV(`description`, `说明`), echo.KVOptHKV(`help`, `帮助`))
 func (s *Kv) GetTypeValues(typ string, defaultValue ...*echo.KVData) (echo.KVList, error) {
 	_, err := s.NgingKv.ListByOffset(nil, func(r db.Result) db.Result {
 		return r.Select(`value`).OrderBy(`sort`, `id`)
