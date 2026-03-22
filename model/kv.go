@@ -169,19 +169,27 @@ func (s *Kv) GetTypeValues(typ string, defaultValue ...map[string]string) (map[s
 	}, 0, -1, db.Cond{`type`: strings.SplitN(typ, `|`, 2)[0]})
 	if err != nil {
 		if len(defaultValue) > 0 {
-			return defaultValue[0], err
+			result := make(map[string]string, len(defaultValue[0]))
+			for key, value := range defaultValue[0] {
+				values := strings.SplitN(value, `|`, 2)
+				result[key] = values[0]
+			}
+			return result, err
 		}
 		return nil, err
 	}
 	rows := s.Objects()
 	if len(rows) == 0 {
 		if len(defaultValue) > 0 {
+			result := make(map[string]string, len(defaultValue[0]))
 			for key, value := range defaultValue[0] {
-				if err = s.AutoCreateKey(typ, key, strings.SplitN(value, `|`, 3)...); err != nil {
+				values := strings.SplitN(value, `|`, 3)
+				if err = s.AutoCreateKey(typ, key, values...); err != nil {
 					s.Context().Logger().Error(err)
 				}
+				result[key] = values[0]
 			}
-			return defaultValue[0], err
+			return result, err
 		}
 		return nil, err
 	}
