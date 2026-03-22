@@ -170,7 +170,7 @@ const (
 // defaultValue: echo.NewKVData().Add(`key`, `value`, echo.KVOptHKV(`description`, `说明`), echo.KVOptHKV(`help`, `帮助`))
 func (s *Kv) GetTypeValues(typ string, defaultValue ...*echo.KVData) (echo.KVList, error) {
 	_, err := s.NgingKv.ListByOffset(nil, func(r db.Result) db.Result {
-		return r.Select(`value`).OrderBy(`sort`, `id`)
+		return r.Select(`key`, `value`, `description`, `help`).OrderBy(`sort`, `id`)
 	}, 0, -1, db.Cond{`type`: strings.SplitN(typ, `|`, 2)[0]})
 	if err != nil {
 		if len(defaultValue) > 0 {
