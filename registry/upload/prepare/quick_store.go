@@ -67,7 +67,7 @@ func (qc *QuickConfig) Save(ctx echo.Context, r io.ReadSeeker, size int64) error
 		FileName: qc.Filename,
 		FileSize: size,
 	}
-	result.SavePath, result.FileURL, err = stor.Put(dstFile, r, size)
+	result.SavePath, result.FileURL, err = stor.Put(ctx, dstFile, r, size)
 	if err != nil {
 		return err
 	}

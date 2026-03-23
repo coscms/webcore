@@ -19,7 +19,7 @@ func Deqr(ctx echo.Context, storer driver.Storer, results uploadClient.Results, 
 	if len(results) == 0 {
 		return nil
 	}
-	reader, err := storer.Get(results[0].SavePath)
+	reader, err := storer.Get(ctx, results[0].SavePath)
 	if reader != nil {
 		defer reader.Close()
 	}

@@ -65,7 +65,7 @@ func (t *Thumb) Crop(opt *CropOptions) error {
 		b = thumb
 	}
 	byteReader := bytes.NewReader(b)
-	t.SavePath, t.ViewUrl, err = opt.Storer.Put(opt.DestFile, byteReader, byteReader.Size()) //r-4;w-2;x-1
+	t.SavePath, t.ViewUrl, err = opt.Storer.Put(t.Context(), opt.DestFile, byteReader, byteReader.Size()) //r-4;w-2;x-1
 	if err != nil {
 		return errors.WithMessage(err, `Thumb.Crop.Put`)
 	}

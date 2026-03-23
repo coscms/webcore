@@ -84,7 +84,7 @@ func (f *Filesystem) URLDir(subpath string) string {
 }
 
 // Exists 判断文件是否存在
-func (f *Filesystem) Exists(file string) (bool, error) {
+func (f *Filesystem) Exists(ctx context.Context, file string) (bool, error) {
 	_, err := os.Stat(file)
 	if err != nil && os.IsNotExist(err) {
 		return false, nil
@@ -93,7 +93,7 @@ func (f *Filesystem) Exists(file string) (bool, error) {
 }
 
 // FileInfo 获取文件信息
-func (f *Filesystem) FileInfo(file string) (os.FileInfo, error) {
+func (f *Filesystem) FileInfo(ctx context.Context, file string) (os.FileInfo, error) {
 	return os.Stat(file)
 }
 
@@ -103,7 +103,7 @@ func (f *Filesystem) SendFile(ctx echo.Context, file string) error {
 }
 
 // Put 上传文件
-func (f *Filesystem) Put(dstFile string, src io.Reader, size int64) (savePath string, viewURL string, err error) {
+func (f *Filesystem) Put(ctx context.Context, dstFile string, src io.Reader, size int64) (savePath string, viewURL string, err error) {
 	savePath = f.FileDir(dstFile)
 	saveDir := filepath.Dir(savePath)
 	err = com.MkdirAll(saveDir, os.ModePerm)
@@ -176,30 +176,30 @@ func (f *Filesystem) URLWithParams(rawURL string, values url.Values) string {
 }
 
 // Get 获取文件读取接口
-func (f *Filesystem) Get(dstFile string) (io.ReadCloser, error) {
-	return f.openFile(dstFile)
+func (f *Filesystem) Get(ctx context.Context, dstFile string) (io.ReadCloser, error) {
+	return f.openFile(ctx, dstFile)
 }
 
-func (f *Filesystem) openFile(dstFile string) (*os.File, error) {
+func (f *Filesystem) openFile(ctx context.Context, dstFile string) (*os.File, error) {
 	//file := f.filepath(dstFile)
 	file := filepath.Join(echo.Wd(), dstFile)
 	return os.Open(file)
 }
 
 // Delete 删除文件
-func (f *Filesystem) Delete(dstFile string) error {
+func (f *Filesystem) Delete(ctx context.Context, dstFile string) error {
 	file := filepath.Join(echo.Wd(), dstFile)
 	return os.Remove(file)
 }
 
 // DeleteDir 删除文件夹及其内部文件
-func (f *Filesystem) DeleteDir(dstDir string) error {
+func (f *Filesystem) DeleteDir(ctx context.Context, dstDir string) error {
 	dir := filepath.Join(echo.Wd(), dstDir)
 	return os.RemoveAll(dir)
 }
 
 // Move 移动文件
-func (f *Filesystem) Move(src, dst string) error {
+func (f *Filesystem) Move(ctx context.Context, src, dst string) error {
 	sdir := filepath.Dir(dst)
 	if err := com.MkdirAll(sdir, os.ModePerm); err != nil {
 		return err

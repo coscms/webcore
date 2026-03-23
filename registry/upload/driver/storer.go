@@ -32,28 +32,28 @@ type Storer interface {
 	URLDir(subpath string) string
 
 	// Put 保存文件
-	Put(dst string, src io.Reader, size int64) (savePath string, viewURL string, err error)
+	Put(ctx context.Context, dst string, src io.Reader, size int64) (savePath string, viewURL string, err error)
 
 	// Get 获取文件
-	Get(file string) (io.ReadCloser, error)
+	Get(ctx context.Context, file string) (io.ReadCloser, error)
 
 	// Exists 文件是否存在
-	Exists(file string) (bool, error)
+	Exists(ctx context.Context, file string) (bool, error)
 
 	// FileInfo 文件信息
-	FileInfo(file string) (os.FileInfo, error)
+	FileInfo(ctx context.Context, file string) (os.FileInfo, error)
 
 	// SendFile 输出文件到浏览器
 	SendFile(ctx echo.Context, file string) error
 
 	// Delete 删除文件
-	Delete(file string) error
+	Delete(ctx context.Context, file string) error
 
 	// DeleteDir 删除目录
-	DeleteDir(dir string) error
+	DeleteDir(ctx context.Context, dir string) error
 
 	// Move 移动文件
-	Move(src, dst string) error
+	Move(ctx context.Context, src, dst string) error
 
 	// PublicURL 文件物理路径转网址
 	PublicURL(dst string) string

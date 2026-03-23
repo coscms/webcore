@@ -92,11 +92,11 @@ func init() {
 		var errs errorslice.Errors
 		otherFormatExtensions := convert.Extensions()
 		for _, file := range files {
-			if err := storer.Delete(file); err != nil && !storer.ErrIsNotExist(err) {
+			if err := storer.Delete(ctx, file); err != nil && !storer.ErrIsNotExist(err) {
 				errs = append(errs, err)
 			}
 			for _, extension := range otherFormatExtensions {
-				if err := storer.Delete(file + extension); err != nil && !storer.ErrIsNotExist(err) {
+				if err := storer.Delete(ctx, file+extension); err != nil && !storer.ErrIsNotExist(err) {
 					errs = append(errs, err)
 				}
 			}

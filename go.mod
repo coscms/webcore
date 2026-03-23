@@ -87,7 +87,7 @@ require (
 	github.com/studio-b12/gowebdav v0.12.0
 	github.com/syndtr/goleveldb v1.0.0
 	github.com/webx-top/chardet v0.0.2
-	github.com/webx-top/client v0.9.6
+	github.com/webx-top/client v0.9.7
 	github.com/webx-top/codec v0.3.0
 	github.com/webx-top/com v1.4.1
 	github.com/webx-top/db v1.30.8
