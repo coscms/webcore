@@ -45,7 +45,7 @@ func (s *Info) Cloud(ctx echo.Context, forces ...bool) (*dbschema.NgingCloudStor
 	}
 	cloudM := dbschema.NewNgingCloudStorage(ctx)
 	s.cloud = cloudM
-	if len(s.ID) > 0 {
+	if len(s.ID) > 0 && s.Name == `s3` {
 		id, err := strconv.ParseUint(s.ID, 10, strconv.IntSize)
 		if err != nil {
 			return s.cloud, fmt.Errorf(`[storer.Info] failed to strconv.ParseUint(%q): %w`, s.ID, err)
