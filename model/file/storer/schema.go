@@ -29,13 +29,13 @@ func (s *Info) FromStore(v echo.H) *Info {
 	return s
 }
 
-func (s *Info) Cloud(ctx echo.Context, forces ...bool) *dbschema.NgingCloudStorage {
+func (s *Info) Cloud(ctx echo.Context, forces ...bool) (*dbschema.NgingCloudStorage, error) {
 	var force bool
 	if len(forces) > 0 {
 		force = forces[0]
 	}
 	if !force && s.cloud != nil {
-		return s.cloud
+		return s.cloud, nil
 	}
 	if ctx == nil {
 		ctx = defaults.NewMockContext()
@@ -43,7 +43,8 @@ func (s *Info) Cloud(ctx echo.Context, forces ...bool) *dbschema.NgingCloudStora
 	cloudM := dbschema.NewNgingCloudStorage(ctx)
 	s.cloud = cloudM
 	if len(s.ID) > 0 {
-		cloudM.Get(nil, `id`, s.ID)
+		err := cloudM.Get(nil, `id`, s.ID)
+		return s.cloud, err
 	}
-	return s.cloud
+	return s.cloud, nil
 }
