@@ -1,10 +1,12 @@
 package storer
 
 import (
+	"fmt"
+	"strconv"
+
 	"github.com/coscms/webcore/dbschema"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/defaults"
-	"github.com/webx-top/echo/param"
 )
 
 const (
@@ -44,8 +46,11 @@ func (s *Info) Cloud(ctx echo.Context, forces ...bool) (*dbschema.NgingCloudStor
 	cloudM := dbschema.NewNgingCloudStorage(ctx)
 	s.cloud = cloudM
 	if len(s.ID) > 0 {
-		id := param.AsUint(s.ID)
-		err := cloudM.Get(nil, `id`, id)
+		id, err := strconv.ParseUint(s.ID, 10, strconv.IntSize)
+		if err != nil {
+			return nil, fmt.Errorf(`[storer.Info] failed to strconv.ParseUint(%q)`, s.ID)
+		}
+		err = cloudM.Get(nil, `id`, id)
 		return s.cloud, err
 	}
 	return s.cloud, nil
