@@ -2,28 +2,37 @@ package model
 
 import (
 	"context"
+	"errors"
 
 	"github.com/coscms/webcore/model/file/storer"
 	"github.com/webx-top/echo/defaults"
-	"github.com/webx-top/echo/param"
 )
 
-const StorageAccountIDKey = `storerID`
+var (
+	ErrNoSetStorerID = errors.New(`no set storerID`)
+	ErrNoSetStorer   = errors.New(`no set storer`)
+)
 
-func GetCloudStorage(ctx context.Context) (*CloudStorage, error) {
-	var cloudAccountID string
+func GetCloudStorage(ctx context.Context, storerID string) (*CloudStorage, error) {
 	eCtx := defaults.MustGetContext(ctx)
-	cloudAccountID = eCtx.Internal().String(StorageAccountIDKey)
 	m := NewCloudStorage(eCtx)
-	if len(cloudAccountID) == 0 {
-		cloudAccountID = param.AsString(ctx.Value(StorageAccountIDKey))
+	cloudAccountID, err := storer.StorerIDToNumber(storerID)
+	if err != nil {
+		return nil, err
 	}
-	if len(cloudAccountID) == 0 || cloudAccountID == `0` {
+	if cloudAccountID <= 0 {
 		storerConfig, ok := storer.GetOk()
-		if ok {
-			cloudAccountID = storerConfig.ID
+		if !ok {
+			return nil, ErrNoSetStorer
+		}
+		cloudAccountID, err = storer.StorerIDToNumber(storerConfig.ID)
+		if err != nil {
+			return nil, err
+		}
+		if cloudAccountID <= 0 {
+			return nil, ErrNoSetStorerID
 		}
 	}
-	err := m.Get(nil, `id`, cloudAccountID)
+	err = m.Get(nil, `id`, cloudAccountID)
 	return m, err
 }

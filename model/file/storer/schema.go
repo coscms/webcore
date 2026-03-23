@@ -46,12 +46,23 @@ func (s *Info) Cloud(ctx echo.Context, forces ...bool) (*dbschema.NgingCloudStor
 	cloudM := dbschema.NewNgingCloudStorage(ctx)
 	s.cloud = cloudM
 	if len(s.ID) > 0 && s.Name == `s3` {
-		id, err := strconv.ParseUint(s.ID, 10, strconv.IntSize)
+		id, err := StorerIDToNumber(s.ID)
 		if err != nil {
-			return s.cloud, fmt.Errorf(`[storer.Info] failed to strconv.ParseUint(%q): %w`, s.ID, err)
+			return s.cloud, fmt.Errorf(`[storer.Info]%w`, err)
 		}
 		err = cloudM.Get(nil, `id`, id)
 		return s.cloud, err
 	}
 	return s.cloud, nil
+}
+
+func StorerIDToNumber(storerID string) (uint64, error) {
+	if len(storerID) == 0 {
+		return 0, nil
+	}
+	id, err := strconv.ParseUint(storerID, 10, strconv.IntSize)
+	if err != nil {
+		err = fmt.Errorf(`[storerID] failed to strconv.ParseUint(%q): %w`, storerID, err)
+	}
+	return id, err
 }

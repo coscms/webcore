@@ -53,7 +53,8 @@ func init() {
 }
 
 func NewFilesystem(ctx context.Context, subdir string, options ...driver.Option) (*Filesystem, error) {
-	m, err := model.GetCloudStorage(ctx)
+	base := local.NewFilesystem(ctx, subdir, options...)
+	m, err := model.GetCloudStorage(ctx, base.Config.StorerID)
 	if err != nil {
 		return nil, errors.WithMessage(err, Name)
 	}
@@ -61,11 +62,9 @@ func NewFilesystem(ctx context.Context, subdir string, options ...driver.Option)
 	if _, err := mgr.Connect(); err != nil {
 		return nil, errors.WithMessage(err, Name)
 	}
-	options = append(options, func(c *driver.Config) {
-		c.BaseURL = m.Baseurl
-	})
+	base.Config.BaseURL = m.Baseurl
 	return &Filesystem{
-		Filesystem: local.NewFilesystem(ctx, subdir, options...),
+		Filesystem: base,
 		model:      m,
 		mgr:        mgr,
 	}, nil
