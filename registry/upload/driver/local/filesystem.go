@@ -32,28 +32,36 @@ import (
 
 	uploadLibrary "github.com/coscms/webcore/library/upload"
 	"github.com/coscms/webcore/registry/upload"
+	"github.com/coscms/webcore/registry/upload/driver"
 )
 
 const Name = `local`
 
 var _ upload.Storer = &Filesystem{}
 
+var defaultConfig = driver.Config{
+	RootPath: uploadLibrary.UploadDir,
+	URLPath:  uploadLibrary.UploadURLPath,
+}
+
 func init() {
-	upload.StorerRegister(Name, func(ctx context.Context, subdir string) (upload.Storer, error) {
-		return NewFilesystem(ctx, subdir), nil
+	upload.StorerRegister(Name, func(ctx context.Context, subdir string, options ...driver.Option) (upload.Storer, error) {
+		return NewFilesystem(ctx, subdir, options...), nil
 	})
 }
 
-func NewFilesystem(ctx context.Context, subdir string, baseURLs ...string) *Filesystem {
-	var baseURL string
-	if len(baseURLs) > 0 {
-		baseURL = baseURLs[0]
-		baseURL = strings.TrimSuffix(baseURL, `/`)
+func NewFilesystem(ctx context.Context, subdir string, options ...driver.Option) *Filesystem {
+	cfg := defaultConfig
+	for _, o := range options {
+		o(&cfg)
+	}
+	if len(cfg.BaseURL) > 0 {
+		cfg.BaseURL = strings.TrimSuffix(cfg.BaseURL, `/`)
 	}
 	return &Filesystem{
 		Context: ctx,
 		Subdir:  subdir,
-		baseURL: baseURL,
+		Config:  cfg,
 	}
 }
 
@@ -61,7 +69,7 @@ func NewFilesystem(ctx context.Context, subdir string, baseURLs ...string) *File
 type Filesystem struct {
 	context.Context `json:"-" xml:"-"`
 	Subdir          string
-	baseURL         string
+	Config          driver.Config
 }
 
 // Name 引擎名
@@ -75,12 +83,12 @@ func (f *Filesystem) ErrIsNotExist(err error) bool {
 
 // FileDir 物理路径文件夹
 func (f *Filesystem) FileDir(subpath string) string {
-	return filepath.Join(uploadLibrary.UploadDir, f.Subdir, subpath)
+	return filepath.Join(f.Config.RootPath, f.Subdir, subpath)
 }
 
 // URLDir 网址路径文件夹
 func (f *Filesystem) URLDir(subpath string) string {
-	return path.Join(uploadLibrary.UploadURLPath, f.Subdir, subpath)
+	return path.Join(f.Config.URLPath, f.Subdir, subpath)
 }
 
 // Exists 判断文件是否存在
@@ -125,7 +133,7 @@ func (f *Filesystem) Put(ctx context.Context, dstFile string, src io.Reader, siz
 
 // PublicURL 文件物理路径转为文件网址
 func (f *Filesystem) PublicURL(dstFile string) string {
-	return f.baseURL + f.URLDir(dstFile)
+	return f.Config.BaseURL + f.URLDir(dstFile)
 }
 
 // URLToFile 文件网址转为文件物理路径
@@ -137,8 +145,8 @@ func (f *Filesystem) URLToFile(publicURL string) string {
 
 // URLToPath 文件网址转为文件路径
 func (f *Filesystem) URLToPath(publicURL string) string {
-	if len(f.baseURL) > 0 {
-		publicURL = strings.TrimPrefix(publicURL, f.baseURL+`/`)
+	if len(f.Config.BaseURL) > 0 {
+		publicURL = strings.TrimPrefix(publicURL, f.Config.BaseURL+`/`)
 		if !strings.HasPrefix(publicURL, `/`) {
 			publicURL = `/` + publicURL
 		}
@@ -149,12 +157,12 @@ func (f *Filesystem) URLToPath(publicURL string) string {
 // SetBaseURL 设置根网址
 func (f *Filesystem) SetBaseURL(baseURL string) {
 	baseURL = strings.TrimSuffix(baseURL, `/`)
-	f.baseURL = baseURL
+	f.Config.BaseURL = baseURL
 }
 
 // BaseURL 根网址
 func (f *Filesystem) BaseURL() string {
-	return f.baseURL
+	return f.Config.BaseURL
 }
 
 // FixURL 改写文件网址

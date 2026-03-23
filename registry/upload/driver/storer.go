@@ -76,7 +76,7 @@ type Storer interface {
 }
 
 // Constructor 存储引擎构造函数
-type Constructor func(ctx context.Context, typ string) (Storer, error)
+type Constructor func(ctx context.Context, typ string, options ...Option) (Storer, error)
 
 var storers = map[string]Constructor{}
 

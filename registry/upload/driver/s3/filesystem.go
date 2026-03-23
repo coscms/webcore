@@ -33,6 +33,7 @@ import (
 	uploadLibrary "github.com/coscms/webcore/library/upload"
 	"github.com/coscms/webcore/model"
 	"github.com/coscms/webcore/registry/upload"
+	"github.com/coscms/webcore/registry/upload/driver"
 	"github.com/coscms/webcore/registry/upload/driver/local"
 )
 
@@ -40,13 +41,18 @@ const Name = `s3`
 
 var _ upload.Storer = &Filesystem{}
 
+var defaultConfig = driver.Config{
+	RootPath: uploadLibrary.UploadURLPath,
+	URLPath:  uploadLibrary.UploadURLPath,
+}
+
 func init() {
-	upload.StorerRegister(Name, func(ctx context.Context, subdir string) (upload.Storer, error) {
-		return NewFilesystem(ctx, subdir)
+	upload.StorerRegister(Name, func(ctx context.Context, subdir string, options ...driver.Option) (upload.Storer, error) {
+		return NewFilesystem(ctx, subdir, options...)
 	})
 }
 
-func NewFilesystem(ctx context.Context, subdir string) (*Filesystem, error) {
+func NewFilesystem(ctx context.Context, subdir string, options ...driver.Option) (*Filesystem, error) {
 	m, err := model.GetCloudStorage(ctx)
 	if err != nil {
 		return nil, errors.WithMessage(err, Name)
@@ -55,8 +61,11 @@ func NewFilesystem(ctx context.Context, subdir string) (*Filesystem, error) {
 	if _, err := mgr.Connect(); err != nil {
 		return nil, errors.WithMessage(err, Name)
 	}
+	options = append(options, func(c *driver.Config) {
+		c.BaseURL = m.Baseurl
+	})
 	return &Filesystem{
-		Filesystem: local.NewFilesystem(ctx, subdir, m.Baseurl),
+		Filesystem: local.NewFilesystem(ctx, subdir, options...),
 		model:      m,
 		mgr:        mgr,
 	}, nil
