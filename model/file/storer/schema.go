@@ -29,7 +29,7 @@ func (s *Info) FromStore(v echo.H) *Info {
 	return s
 }
 
-func (s *Info) Cloud(forces ...bool) *dbschema.NgingCloudStorage {
+func (s *Info) Cloud(ctx echo.Context, forces ...bool) *dbschema.NgingCloudStorage {
 	var force bool
 	if len(forces) > 0 {
 		force = forces[0]
@@ -37,7 +37,9 @@ func (s *Info) Cloud(forces ...bool) *dbschema.NgingCloudStorage {
 	if !force && s.cloud != nil {
 		return s.cloud
 	}
-	ctx := defaults.NewMockContext()
+	if ctx == nil {
+		ctx = defaults.NewMockContext()
+	}
 	cloudM := dbschema.NewNgingCloudStorage(ctx)
 	s.cloud = cloudM
 	if len(s.ID) > 0 {
