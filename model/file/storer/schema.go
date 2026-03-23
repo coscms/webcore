@@ -4,6 +4,7 @@ import (
 	"github.com/coscms/webcore/dbschema"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/defaults"
+	"github.com/webx-top/echo/param"
 )
 
 const (
@@ -43,7 +44,8 @@ func (s *Info) Cloud(ctx echo.Context, forces ...bool) (*dbschema.NgingCloudStor
 	cloudM := dbschema.NewNgingCloudStorage(ctx)
 	s.cloud = cloudM
 	if len(s.ID) > 0 {
-		err := cloudM.Get(nil, `id`, s.ID)
+		id := param.AsUint(s.ID)
+		err := cloudM.Get(nil, `id`, id)
 		return s.cloud, err
 	}
 	return s.cloud, nil
