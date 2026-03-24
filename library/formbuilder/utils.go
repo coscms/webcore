@@ -72,9 +72,13 @@ func SetChoiceByKV(field fields.FieldInterface, kvData *echo.KVData, checkedKeys
 func FormData(ctx echo.Context) engine.URLValuer {
 	contentType := ctx.Request().Header().Get(echo.HeaderContentType)
 	var formData engine.URLValuer
-	if strings.HasPrefix(contentType, echo.MIMEApplicationForm) {
+	switch strings.SplitN(contentType, `;`, 2)[0] {
+	case echo.MIMEMultipartForm:
+		ctx.Request().MultipartForm()
+		formData = ctx.Request().Form()
+	case echo.MIMEApplicationForm:
 		formData = ctx.Request().PostForm()
-	} else {
+	default:
 		formData = ctx.Request().Form()
 	}
 	return formData
