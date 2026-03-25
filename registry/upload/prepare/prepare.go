@@ -34,16 +34,16 @@ type PrepareData struct {
 	multiple   bool // 是否为多文件上传
 }
 
-func (p *PrepareData) Storer() (driver.Storer, error) {
+func (p *PrepareData) Storer(options ...driver.Option) (driver.Storer, error) {
 	var err error
 	if p.storer == nil {
-		p.storer, err = p.newStorer(p.ctx, p.Subdir)
+		p.storer, err = p.newStorer(p.ctx, p.Subdir, options...)
 	}
 	return p.storer, err
 }
 
-func (p *PrepareData) NewStorer(subdir string) (driver.Storer, error) {
-	return p.newStorer(p.ctx, subdir)
+func (p *PrepareData) NewStorer(subdir string, options ...driver.Option) (driver.Storer, error) {
+	return p.newStorer(p.ctx, subdir, options...)
 }
 
 func (p *PrepareData) Close() error {
