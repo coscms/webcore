@@ -21,4 +21,9 @@ func TestOne(t *testing.T) {
 	expectedPath := `/public/upload/test/user/1/2020/1/2/a.jpg`
 	assert.Equal(t, expectedPath, f.URLToPath(viewURL))
 	assert.Equal(t, `user/1/2020/1/2/a.jpg`, f.URLToFile(expectedPath))
+
+	for i := 0; i < 3; i++ {
+		cfg := defaultConfig
+		t.Logf(`pointer: %p`, &cfg)
+	}
 }

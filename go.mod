@@ -56,8 +56,8 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.41.4
 	github.com/aws/aws-sdk-go-v2/config v1.32.12
 	github.com/aws/aws-sdk-go-v2/credentials v1.19.12
-	github.com/aws/aws-sdk-go-v2/feature/s3/transfermanager v0.1.10
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.97.1
+	github.com/aws/aws-sdk-go-v2/feature/s3/transfermanager v0.1.11
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.97.2
 	github.com/caddyserver/certmagic v0.25.2
 	github.com/coscms/captcha v0.2.3
 	github.com/coscms/forms v1.16.12
@@ -127,7 +127,7 @@ require (
 	github.com/admpub/websocket v1.0.4 // indirect
 	github.com/admpub/xencoding v0.0.3 // indirect
 	github.com/andybalholm/brotli v1.2.0 // indirect
-	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.7 // indirect
+	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.8 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.18.20 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.4.20 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.7.20 // indirect
@@ -190,7 +190,7 @@ require (
 	github.com/kr/fs v0.1.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/libdns/libdns v1.1.1 // indirect
-	github.com/lufia/plan9stats v0.0.0-20260216142805-b3301c5f2a88 // indirect
+	github.com/lufia/plan9stats v0.0.0-20260324052639-156f7da3f749 // indirect
 	github.com/maruel/rs v1.1.0 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
@@ -248,7 +248,7 @@ require (
 	go.yaml.in/yaml/v2 v2.4.4 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/exp v0.0.0-20260312153236-7ab1446f8b90 // indirect
-	golang.org/x/image v0.37.0 // indirect
+	golang.org/x/image v0.38.0 // indirect
 	golang.org/x/mod v0.34.0 // indirect
 	golang.org/x/sys v0.42.0 // indirect
 	golang.org/x/tools v0.43.0 // indirect
