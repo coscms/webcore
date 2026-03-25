@@ -41,11 +41,6 @@ const Name = `s3`
 
 var _ upload.Storer = &Filesystem{}
 
-var defaultConfig = driver.Config{
-	RootPath: uploadLibrary.UploadURLPath,
-	URLPath:  uploadLibrary.UploadURLPath,
-}
-
 func init() {
 	upload.StorerRegister(Name, func(ctx context.Context, subdir string, options ...driver.Option) (upload.Storer, error) {
 		return NewFilesystem(ctx, subdir, options...)
