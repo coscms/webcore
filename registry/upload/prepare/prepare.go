@@ -42,6 +42,12 @@ func (p *PrepareData) Storer(options ...driver.Option) (driver.Storer, error) {
 	return p.storer, err
 }
 
+func (p *PrepareData) StorerForceNew(options ...driver.Option) (driver.Storer, error) {
+	var err error
+	p.storer, err = p.newStorer(p.ctx, p.Subdir, options...)
+	return p.storer, err
+}
+
 func (p *PrepareData) NewStorer(subdir string, options ...driver.Option) (driver.Storer, error) {
 	return p.newStorer(p.ctx, subdir, options...)
 }
