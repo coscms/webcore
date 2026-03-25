@@ -2,6 +2,7 @@ package local
 
 import (
 	"context"
+	"reflect"
 	"testing"
 
 	"github.com/coscms/webcore/registry/upload/driver"
@@ -22,8 +23,14 @@ func TestOne(t *testing.T) {
 	assert.Equal(t, expectedPath, f.URLToPath(viewURL))
 	assert.Equal(t, `user/1/2020/1/2/a.jpg`, f.URLToFile(expectedPath))
 
+	var lastptr uintptr
 	for i := 0; i < 3; i++ {
 		cfg := defaultConfig
+		ptr := reflect.ValueOf(&cfg).Pointer()
+		if lastptr != 0 {
+			assert.False(t, ptr == lastptr)
+		}
 		t.Logf(`pointer: %p`, &cfg)
+		lastptr = ptr
 	}
 }
