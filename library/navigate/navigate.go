@@ -41,6 +41,7 @@ type Item struct {
 	Feature    string      `json:",omitempty" xml:",omitempty"` //功能
 	Group      string      `json:",omitempty" xml:",omitempty"` //组标识(仅部分地方有用到)
 	Attributes echo.KVList `json:",omitempty" xml:",omitempty"` //HTML标签a属性
+	PermTitle  string      `json:",omitempty" xml:",omitempty"` //权限标题
 	Children   *List       `json:",omitempty" xml:",omitempty"` //子菜单
 }
 
