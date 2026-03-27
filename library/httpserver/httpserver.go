@@ -38,6 +38,7 @@ func New(kind string) *HTTPServer {
 		DefaultTemplateDir:   `./template/` + kind,
 		DefaultAssetsDir:     `./public/assets/` + kind,
 		DefaultAssetsURLPath: `/public/assets/` + kind,
+		handlerMiddlewares:   map[string][]interface{}{},
 	}
 	s.TemplateDir = s.DefaultTemplateDir
 	s.AssetsDir = s.DefaultAssetsDir
@@ -81,6 +82,7 @@ type HTTPServer struct {
 	RenderOptions         []func(*render.Config)
 	renderConfig          *render.Config
 	language              *language.Language
+	handlerMiddlewares    map[string][]interface{}
 }
 
 func (h *HTTPServer) Clear() {
@@ -135,6 +137,20 @@ func (h *HTTPServer) I18n() *language.Language {
 func (h *HTTPServer) SetRenderDataWrapper(dataWrapper echo.DataWrapper) *HTTPServer {
 	h.Router.Echo().SetRenderDataWrapper(dataWrapper)
 	return h
+}
+
+func (h *HTTPServer) RegisterHandlerMiddleware(handlerName string, middlewares ...echo.Middleware) *HTTPServer {
+	if _, ok := h.handlerMiddlewares[handlerName]; !ok {
+		h.handlerMiddlewares[handlerName] = []interface{}{}
+	}
+	for _, mw := range middlewares {
+		h.handlerMiddlewares[handlerName] = append(h.handlerMiddlewares[handlerName], mw)
+	}
+	return h
+}
+
+func (h *HTTPServer) GetHandlerMiddlewares(handlerName string) []interface{} {
+	return h.handlerMiddlewares[handlerName]
 }
 
 func (h *HTTPServer) GetStaticMW() echo.MiddlewareFunc {
