@@ -275,7 +275,7 @@ var styleListRegex = regexp.MustCompile(`^[\s]*(?:[a-z]+(?:-[a-z]+)*[\s]*:[\s]*(
 
 func allowAttrs(p *bluemonday.Policy) {
 	p.AllowAttrs("style").Matching(styleListRegex).OnElements("img")
-	p.AllowAttrs("class").Matching(bluemonday.SpaceSeparatedTokens).OnElements("pre")
+	p.AllowAttrs("class").Matching(bluemonday.SpaceSeparatedTokens).OnElements("pre", "hr", "h1", "h2", "h3", "h4", "h5", "h6", "div", "span", "i", "img")
 	p.AllowAttrs("start").Matching(bluemonday.Integer).OnElements("ol")
 }
 
