@@ -160,7 +160,7 @@ func (c *captchaGo) MakeData(ctx echo.Context, hostAlias string, name string) ec
 	data.Set("cssURLs", cssURLs)
 	jsInit := c.render(ctx, `partial_jsinit`, `captchaName`, name)
 	data.Set("jsInit", jsInit)
-	htmlCode := c.Render(ctx, `partial_main`, `captchaName`, name)
+	htmlCode := c.render(ctx, `partial_main`, `captchaName`, name, `loadResource`, false)
 	data.Set("html", htmlCode)
 	data.Set("captchaName", name)
 	return data
