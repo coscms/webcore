@@ -32,6 +32,12 @@ type PrepareData struct {
 	Subdir     string
 	FileType   string
 	multiple   bool // 是否为多文件上传
+	autoClean  bool // 是否自动清理上传文件产生的临时文件
+}
+
+func (p *PrepareData) SetAutoClean(autoClean bool) *PrepareData {
+	p.autoClean = autoClean
+	return p
 }
 
 func (p *PrepareData) AddChecker(checker uploadClient.Checker) *PrepareData {
@@ -217,6 +223,7 @@ func (p *PrepareData) Save(fileM *modelFile.File, clientName string, clients ...
 		uploadClient.OptStorer(storer),
 		uploadClient.OptWatermarkOptions(storerUtils.GetWatermarkOptions()),
 		uploadClient.OptChecker(p.Checker),
+		uploadClient.OptAutoClean(p.autoClean),
 		uploadClient.OptCallback(callback),
 	}
 	if p.multiple {
