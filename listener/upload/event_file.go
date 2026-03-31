@@ -20,13 +20,13 @@
 package upload
 
 import (
-	"fmt"
-
 	"github.com/admpub/events"
 	"github.com/coscms/webcore/dbschema"
 	"github.com/coscms/webcore/library/errorslice"
+	"github.com/coscms/webcore/model"
 	"github.com/coscms/webcore/registry/upload"
 	"github.com/coscms/webcore/registry/upload/convert"
+	"github.com/coscms/webcore/registry/upload/driver"
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
 )
@@ -35,23 +35,9 @@ func init() {
 	// 当用户文件被删除
 	echo.OnCallback(`user-file-deleted`, func(v events.Event) error {
 		data := v.Context.Get(`data`).(*dbschema.NgingFile)
-		ownerID := v.Context.Uint64(`ownerID`)
-		userM := dbschema.NewNgingUser(data.Context())
-		err := userM.Get(nil, db.Cond{`id`: ownerID})
-		if err != nil {
-			if err == db.ErrNoMoreRows {
-				return nil
-			}
-			return err
-		}
-		err = userM.UpdateFields(nil, map[string]interface{}{
-			`file_size`: db.Raw(`file_size-` + fmt.Sprintf(`%d`, data.Size)),
-			`file_num`:  db.Raw(`file_num-1`),
-		}, db.And(
-			db.Cond{`id`: ownerID},
-			db.Cond{`file_size`: db.Gte(data.Size)},
-			db.Cond{`file_num`: db.Gt(0)},
-		))
+		ownerID := v.Context.Uint(`ownerID`)
+		userM := model.NewUser(data.Context())
+		err := userM.SafeDecrFileSizeAndNum(ownerID, data.Size, 1)
 		if err != nil {
 			fileM := dbschema.NewNgingFile(data.Context())
 			recv := echo.H{}
@@ -82,9 +68,9 @@ func init() {
 		if newStore == nil {
 			return ctx.E(`存储引擎“%s”未被登记`, data.StorerName)
 		}
-		key := `storerID`
-		ctx.Internal().Set(key, data.StorerId)
-		storer, err := newStore(ctx, ``)
+		storer, err := newStore(ctx, ``, func(cfg *driver.Config) {
+			cfg.StorerID = data.StorerId
+		})
 		if err != nil {
 			return err
 		}

@@ -1,6 +1,6 @@
 module github.com/coscms/webcore
 
-go 1.25.3
+go 1.26.1
 
 // replace github.com/coscms/forms => ../forms
 
@@ -61,7 +61,7 @@ require (
 	github.com/caddyserver/certmagic v0.25.2
 	github.com/coscms/captcha v0.2.3
 	github.com/coscms/forms v1.16.12
-	github.com/coscms/go-imgparse v0.0.1
+	github.com/coscms/go-imgparse v0.0.3
 	github.com/coscms/oauth2s v0.5.0
 	github.com/coscms/session-boltstore v0.0.0-20260203210304-79c433bb1621
 	github.com/coscms/session-mysqlstore v0.0.0-20260127080438-1856d3685966

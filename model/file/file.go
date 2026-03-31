@@ -19,6 +19,7 @@
 package file
 
 import (
+	"errors"
 	"io"
 	"mime"
 	"path/filepath"
@@ -43,6 +44,12 @@ func NewFile(ctx echo.Context) *File {
 
 type File struct {
 	*dbschema.NgingFile
+	onCreating func(echo.Context, *dbschema.NgingFile) error
+}
+
+func (f *File) OnCreating(fn func(echo.Context, *dbschema.NgingFile) error) *File {
+	f.onCreating = fn
+	return f
 }
 
 func (f *File) NewFile(m *dbschema.NgingFile) *File {
@@ -83,13 +90,21 @@ func (f *File) FillData(reader io.Reader, forceReset bool, schemas ...*dbschema.
 		if typ == `jpg` {
 			typ = `jpeg`
 		}
-		width, height, err := imgparse.ParseRes(reader, typ)
+		width, height, err := imgparse.Parse(reader, typ)
 		if err != nil {
 			return err
 		}
 		m.Width = uint(width)
 		m.Height = uint(height)
 		m.Dpi = 0
+	}
+	if f.onCreating != nil {
+		if err := f.onCreating(f.Context(), f.NgingFile); err != nil {
+			if dErr := f.fireFileDeleted([]string{f.SavePath}); dErr != nil {
+				err = errors.Join(err, dErr)
+			}
+			return err
+		}
 	}
 	return nil
 }
@@ -127,12 +142,15 @@ func (f *File) fireDelete() error {
 	if err != nil {
 		return err
 	}
-	err = f.Context().FireByNameWithMap(`file-deleted`, map[string]interface{}{
+	return f.fireFileDeleted(files)
+}
+
+func (f *File) fireFileDeleted(files []string) error {
+	return f.Context().FireByNameWithMap(`file-deleted`, map[string]interface{}{
 		`ctx`:   f.Context(),
 		`data`:  f.NgingFile,
 		`files`: files,
 	})
-	return err
 }
 
 func (f *File) DeleteByID(id uint64, ownerType string, ownerID uint64) (err error) {
