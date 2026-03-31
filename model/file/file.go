@@ -21,12 +21,9 @@ package file
 import (
 	"errors"
 	"io"
-	"mime"
 	"path/filepath"
-	"strings"
 	"time"
 
-	"github.com/coscms/go-imgparse/imgparse"
 	uploadClient "github.com/webx-top/client/upload"
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
@@ -72,35 +69,16 @@ func (f *File) SetByUploadResult(result *uploadClient.Result) *File {
 	return f
 }
 
-func (f *File) FillData(reader io.Reader, forceReset bool, schemas ...*dbschema.NgingFile) error {
-	var m *dbschema.NgingFile
-	if len(schemas) > 0 {
-		m = schemas[0]
-	} else {
-		m = f.NgingFile
-	}
-	if forceReset || len(m.Mime) == 0 {
-		m.Mime = mime.TypeByExtension(m.Ext)
-		if len(f.Mime) == 0 {
-			f.Mime = echo.MIMEOctetStream
-		}
-	}
-	if m.Type == `image` {
-		typ := strings.TrimPrefix(m.Ext, `.`)
-		if typ == `jpg` {
-			typ = `jpeg`
-		}
-		width, height, err := imgparse.Parse(reader, typ)
-		if err != nil {
-			return err
-		}
-		m.Width = uint(width)
-		m.Height = uint(height)
-		m.Dpi = 0
+func (f *File) FillData(reader io.Reader, forceReset bool) error {
+	m := f.NgingFile
+	ParseMime(m, forceReset)
+	err := ParseImage(m, reader, forceReset)
+	if err != nil {
+		return err
 	}
 	if f.onCreating != nil {
-		if err := f.onCreating(f.Context(), f.NgingFile); err != nil {
-			if dErr := f.fireFileDeleted([]string{f.SavePath}); dErr != nil {
+		if err = f.onCreating(f.Context(), m); err != nil {
+			if dErr := f.fireFileDeleted([]string{m.SavePath}); dErr != nil {
 				err = errors.Join(err, dErr)
 			}
 			return err
