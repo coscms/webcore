@@ -49,6 +49,13 @@ func (f *File) OnCreating(fn func(echo.Context, *dbschema.NgingFile) error) *Fil
 	return f
 }
 
+func (f *File) FireCreating(ctx echo.Context, nf *dbschema.NgingFile) error {
+	if f.onCreating != nil {
+		return f.onCreating(ctx, nf)
+	}
+	return nil
+}
+
 func (f *File) NewFile(m *dbschema.NgingFile) *File {
 	r := &File{
 		NgingFile: m,
@@ -76,13 +83,12 @@ func (f *File) FillData(reader io.Reader, forceReset bool) error {
 	if err != nil {
 		return err
 	}
-	if f.onCreating != nil {
-		if err = f.onCreating(f.Context(), m); err != nil {
-			if dErr := f.fireFileDeleted([]string{m.SavePath}); dErr != nil {
-				err = errors.Join(err, dErr)
-			}
-			return err
+	err = f.FireCreating(f.Context(), m)
+	if err != nil {
+		if dErr := f.fireFileDeleted([]string{m.SavePath}); dErr != nil {
+			err = errors.Join(err, dErr)
 		}
+		return err
 	}
 	return nil
 }
