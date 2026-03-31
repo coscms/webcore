@@ -34,6 +34,25 @@ type PrepareData struct {
 	multiple   bool // 是否为多文件上传
 }
 
+func (p *PrepareData) AddChecker(checker uploadClient.Checker) *PrepareData {
+	if p.Checker == nil {
+		p.Checker = checker
+		return p
+	}
+	last := p.Checker
+	p.Checker = func(rs *uploadClient.Result, rd io.Reader) error {
+		err := last(rs, rd)
+		if err != nil {
+			return err
+		}
+		if sk, ok := rd.(io.Seeker); ok {
+			sk.Seek(0, io.SeekStart)
+		}
+		return checker(rs, rd)
+	}
+	return p
+}
+
 func (p *PrepareData) Storer(options ...driver.Option) (driver.Storer, error) {
 	var err error
 	if p.storer == nil {
