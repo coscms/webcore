@@ -77,7 +77,7 @@ func LogFilename(category string, logOutputFile string) (string, error) {
 	} else {
 		logFile = filename
 	}
-	logFile = strings.Replace(logFile, `{category}`, category, -1)
+	logFile = strings.ReplaceAll(logFile, `{category}`, category)
 	if com.FileExists(logFile) {
 		return logFile, nil
 	}
@@ -89,7 +89,7 @@ func LogFilename(category string, logOutputFile string) (string, error) {
 		} else {
 			serviceAppLogFile = filename
 		}
-		serviceAppLogFile = strings.Replace(serviceAppLogFile, `{category}`, category, -1)
+		serviceAppLogFile = strings.ReplaceAll(serviceAppLogFile, `{category}`, category)
 		if com.FileExists(serviceAppLogFile) {
 			logFile = serviceAppLogFile
 		}
