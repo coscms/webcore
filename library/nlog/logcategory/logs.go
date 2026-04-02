@@ -51,16 +51,13 @@ func LogList(ctx echo.Context, hasCategory bool, logOutputFile string) LogCatego
 	}
 	logs.WithCategory = hasCategory
 	for _, v := range Categories.Slice() {
-		if v.K == log.DefaultLog.Category {
-			logs.addCategory(v.K, ctx.T(v.V))
-			if !logs.WithCategory {
-				break
-			}
-		}
 		if len(v.V) == 0 {
 			logs.addCategory(v.K, ctx.T(`%s日志`, com.Title(v.K)))
 		} else {
 			logs.addCategory(v.K, ctx.T(v.V))
+		}
+		if v.K == log.DefaultLog.Category && !logs.WithCategory {
+			break
 		}
 	}
 	return logs
