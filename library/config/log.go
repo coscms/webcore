@@ -22,56 +22,24 @@ import (
 	"fmt"
 	"path/filepath"
 	"strings"
-	"time"
 
-	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 
 	"github.com/admpub/log"
 	"github.com/coscms/webcore/library/nlog"
-	"github.com/coscms/webcore/library/service"
+	"github.com/coscms/webcore/library/nlog/logcategory"
 )
 
-var DefaultLogCategories = []string{`db`, `echo,mock`}
-
 type Log struct {
-	Debug        bool     `json:"debug"`
-	Colorable    bool     `json:"colorable"`    // for console
-	SaveFile     string   `json:"saveFile"`     // for file
-	FileMaxBytes int64    `json:"fileMaxBytes"` // for file
-	Targets      string   `json:"targets" form_delimiter:","`
-	Categories   []string `json:"cagegories"`
+	Debug        bool   `json:"debug"`
+	Colorable    bool   `json:"colorable"`    // for console
+	SaveFile     string `json:"saveFile"`     // for file
+	FileMaxBytes int64  `json:"fileMaxBytes"` // for file
+	Targets      string `json:"targets" form_delimiter:","`
 }
 
-func (c *Log) LogFilename(category string) (string, error) {
-	_, _, timeformat, filename, err := log.DateFormatFilename(c.LogFile())
-	if err != nil {
-		return ``, err
-	}
-	var logFile string
-	if len(timeformat) > 0 {
-		logFile = fmt.Sprintf(filename, time.Now().Format(timeformat))
-	} else {
-		logFile = filename
-	}
-	logFile = strings.Replace(logFile, `{category}`, category, -1)
-	if com.FileExists(logFile) {
-		return logFile, nil
-	}
-	serviceAppLogFile := service.ServiceLogDir() + echo.FilePathSeparator + service.ServiceAppLogFile
-	_, _, timeformat, filename, err = log.DateFormatFilename(serviceAppLogFile)
-	if err == nil {
-		if len(timeformat) > 0 {
-			serviceAppLogFile = fmt.Sprintf(filename, time.Now().Format(timeformat))
-		} else {
-			serviceAppLogFile = filename
-		}
-		serviceAppLogFile = strings.Replace(serviceAppLogFile, `{category}`, category, -1)
-		if com.FileExists(serviceAppLogFile) {
-			logFile = serviceAppLogFile
-		}
-	}
-	return logFile, nil
+func LogHasCategory() bool {
+	return strings.Contains(FromFile().Settings().Log.LogFile(), `{category}`)
 }
 
 func (c *Log) Show(ctx echo.Context) error {
@@ -82,7 +50,7 @@ func (c *Log) Show(ctx echo.Context) error {
 	if category != log.DefaultLog.Category && !log.HasCategory(category) {
 		return ctx.JSON(ctx.Data().SetInfo(ctx.T(`不存在日志分类: %s`, category), 0).SetZone(`category`))
 	}
-	logFile, err := c.LogFilename(category)
+	logFile, err := logcategory.LogFilename(category, c.LogFile())
 	if err != nil {
 		return ctx.JSON(ctx.Data().SetError(err))
 	}
@@ -120,13 +88,6 @@ func (c *Log) LogFile() string {
 	return filepath.Join(echo.Wd(), `data/logs/{category}_{date:20060102}_info.log`)
 }
 
-func (c *Log) LogCategories() []string {
-	if len(c.Categories) == 0 {
-		return DefaultLogCategories
-	}
-	return c.Categories
-}
-
 func (c *Log) Init() {
 	//======================================================
 	// 配置日志
@@ -146,26 +107,13 @@ func (c *Log) Init() {
 		switch targetName {
 		case "file":
 			//输出到文件
-			fileTarget := log.NewFileTarget()
-			fileTarget.Filter = &log.Filter{
-				MaxLevel: log.DefaultLog.MaxLevel,
-			}
-			if c.FileMaxBytes > 0 {
-				fileTarget.MaxBytes = c.FileMaxBytes
-			}
 			logFileName := c.LogFile()
-			fileTarget.FileName = logFileName
 			if strings.Contains(logFileName, `{category}`) {
-				fileTarget.FileName = strings.Replace(logFileName, `{category}`, log.DefaultLog.Category, -1)
-				fileTarget.Filter.Categories = []string{log.DefaultLog.Category, `websocket`, `watcher`}
-				targets = append(targets, fileTarget)
-
-				// subcategory
-				for _, category := range c.LogCategories() {
+				for _, category := range logcategory.Categories.Slice() {
 					fileTarget := log.NewFileTarget()
 					fileTarget.Filter = &log.Filter{
 						MaxLevel:   log.DefaultLog.MaxLevel,
-						Categories: strings.Split(category, `,`),
+						Categories: append([]string{category.K}, category.X...),
 					}
 					fileTarget.FileName = logFileName
 					if c.FileMaxBytes > 0 {
@@ -175,6 +123,14 @@ func (c *Log) Init() {
 					targets = append(targets, fileTarget)
 				}
 			} else {
+				fileTarget := log.NewFileTarget()
+				fileTarget.Filter = &log.Filter{
+					MaxLevel: log.DefaultLog.MaxLevel,
+				}
+				if c.FileMaxBytes > 0 {
+					fileTarget.MaxBytes = c.FileMaxBytes
+				}
+				fileTarget.FileName = logFileName
 				targets = append(targets, fileTarget)
 			}
 

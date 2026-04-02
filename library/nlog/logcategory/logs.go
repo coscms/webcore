@@ -19,49 +19,80 @@
 package logcategory
 
 import (
+	"fmt"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/admpub/log"
-	"github.com/coscms/webcore/library/config"
+	"github.com/coscms/webcore/library/service"
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 )
 
-func addLogCategory(logCategories *echo.KVList, k, v string) {
-	logFilename, _ := config.FromFile().Settings().Log.LogFilename(k)
-	if len(logFilename) > 0 {
-		logFilename = filepath.Base(logFilename)
-	}
-	logCategories.Add(k, v, echo.KVOptHKV(`logFilename`, logFilename))
-}
-
 type LogCategories struct {
 	WithCategory bool        `json:"withCategory"`
 	Categories   echo.KVList `json:"categories"`
+	OutputFile   string      `json:"outputFile"`
 }
 
-func LogList(ctx echo.Context) LogCategories {
-	logs := LogCategories{}
-	logCategories := &echo.KVList{}
-	addLogCategory(logCategories, log.DefaultLog.Category, ctx.T(`Nging日志`))
-	if strings.Contains(config.FromFile().Settings().Log.LogFile(), `{category}`) {
-		logs.WithCategory = true
-		categories := config.FromFile().Settings().Log.LogCategories()
-		for _, k := range categories {
-			k = strings.SplitN(k, `,`, 2)[0]
-			v := k
-			switch k {
-			case `db`:
-				v = ctx.T(`SQL日志`)
-			case `echo`:
-				v = ctx.T(`Web框架日志`)
-			default:
-				v = ctx.T(`%s日志`, com.Title(k))
+func (a *LogCategories) addCategory(k, v string) {
+	logFilename, _ := LogFilename(k, a.OutputFile)
+	if len(logFilename) > 0 {
+		logFilename = filepath.Base(logFilename)
+	}
+	a.Categories.Add(k, v, echo.KVOptHKV(`logFilename`, logFilename))
+}
+
+func LogList(ctx echo.Context, hasCategory bool, logOutputFile string) LogCategories {
+	logs := LogCategories{
+		Categories: echo.KVList{},
+		OutputFile: logOutputFile,
+	}
+	logs.WithCategory = hasCategory
+	for _, v := range Categories.Slice() {
+		if v.K == log.DefaultLog.Category {
+			logs.addCategory(v.K, ctx.T(v.V))
+			if !logs.WithCategory {
+				break
 			}
-			addLogCategory(logCategories, k, v)
+		}
+		if len(v.V) == 0 {
+			logs.addCategory(v.K, ctx.T(`%s日志`, com.Title(v.K)))
+		} else {
+			logs.addCategory(v.K, ctx.T(v.V))
 		}
 	}
-	logs.Categories = *logCategories
 	return logs
+}
+
+func LogFilename(category string, logOutputFile string) (string, error) {
+	_, _, timeformat, filename, err := log.DateFormatFilename(logOutputFile)
+	if err != nil {
+		return ``, err
+	}
+	var logFile string
+	if len(timeformat) > 0 {
+		logFile = fmt.Sprintf(filename, time.Now().Format(timeformat))
+	} else {
+		logFile = filename
+	}
+	logFile = strings.Replace(logFile, `{category}`, category, -1)
+	if com.FileExists(logFile) {
+		return logFile, nil
+	}
+	serviceAppLogFile := service.ServiceLogDir() + echo.FilePathSeparator + service.ServiceAppLogFile
+	_, _, timeformat, filename, err = log.DateFormatFilename(serviceAppLogFile)
+	if err == nil {
+		if len(timeformat) > 0 {
+			serviceAppLogFile = fmt.Sprintf(filename, time.Now().Format(timeformat))
+		} else {
+			serviceAppLogFile = filename
+		}
+		serviceAppLogFile = strings.Replace(serviceAppLogFile, `{category}`, category, -1)
+		if com.FileExists(serviceAppLogFile) {
+			logFile = serviceAppLogFile
+		}
+	}
+	return logFile, nil
 }
