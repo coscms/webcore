@@ -126,13 +126,13 @@ func BackendFuncMap() echo.MiddlewareFunc {
 			})
 			c.SetFunc(`LogCategories`, func() logcategory.LogCategories {
 				if user != nil && role.IsFounder(user) {
-					return logcategory.LogList(c, config.LogHasCategory(), config.FromFile().Settings().Log.LogFile())
+					return LogList(c)
 				}
 				permission := UserPermission(c)
 				if !permission.Check(c, `manager/log/:category`) {
 					return emptyLogCategories
 				}
-				return logcategory.LogList(c, config.LogHasCategory(), config.FromFile().Settings().Log.LogFile())
+				return LogList(c)
 			})
 			c.SetFunc(`HasPermission`, func(key string, typ ...string) bool {
 				if user != nil && role.IsFounder(user) {
@@ -147,6 +147,10 @@ func BackendFuncMap() echo.MiddlewareFunc {
 			return h.Handle(c)
 		})
 	}
+}
+
+func LogList(c echo.Context) logcategory.LogCategories {
+	return logcategory.LogList(c, config.LogHasCategory(), config.FromFile().Settings().Log.LogFile())
 }
 
 func UserPermission(c echo.Context) *role.RolePermission {
