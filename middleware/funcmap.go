@@ -25,6 +25,7 @@ import (
 	"github.com/webx-top/echo"
 
 	"github.com/coscms/webcore/library/backend"
+	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webcore/library/dashboard"
 	"github.com/coscms/webcore/library/httpserver"
 	"github.com/coscms/webcore/library/modal"
@@ -125,13 +126,13 @@ func BackendFuncMap() echo.MiddlewareFunc {
 			})
 			c.SetFunc(`LogCategories`, func() logcategory.LogCategories {
 				if user != nil && role.IsFounder(user) {
-					return logcategory.LogList(c)
+					return logcategory.LogList(c, config.LogHasCategory(), config.FromFile().Settings().Log.LogFile())
 				}
 				permission := UserPermission(c)
 				if !permission.Check(c, `manager/log/:category`) {
 					return emptyLogCategories
 				}
-				return logcategory.LogList(c)
+				return logcategory.LogList(c, config.LogHasCategory(), config.FromFile().Settings().Log.LogFile())
 			})
 			c.SetFunc(`HasPermission`, func(key string, typ ...string) bool {
 				if user != nil && role.IsFounder(user) {
