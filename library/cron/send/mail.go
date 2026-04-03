@@ -139,3 +139,23 @@ func MailWithIDAndNoticer(id uint64, noticer notice.Noticer, toEmail string, toU
 	}
 	return email.SendMail(conf)
 }
+
+func MailWithConfig(conf *email.Config) error {
+	if len(conf.ToAddress) < 1 { //收信人邮箱地址不正确
+		return ErrIncorrectRecipient
+	}
+	emailCfg := config.FromFile().Settings().Email
+	if conf.Engine == `` {
+		conf.Engine = emailCfg.Engine
+	}
+	if conf.SMTP == nil {
+		conf.SMTP = emailCfg.SMTPConfig
+	}
+	if conf.From == `` {
+		conf.From = emailCfg.From
+	}
+	if conf.Timeout <= 0 {
+		conf.Timeout = emailCfg.Timeout
+	}
+	return email.SendMail(conf)
+}

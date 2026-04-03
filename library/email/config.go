@@ -38,8 +38,20 @@ type Config struct {
 	Auth       smtp.Auth
 	Timeout    int64
 	Noticer    notice.Noticer
+	Callback   []func(*Config, error)
 }
 
 func (c *Config) Send() error {
 	return SendMail(c)
+}
+
+func (c *Config) AddCallback(f ...func(*Config, error)) *Config {
+	c.Callback = append(c.Callback, f...)
+	return c
+}
+
+func (c *Config) FireCallback(cfg *Config, err error) {
+	for _, f := range c.Callback {
+		f(cfg, err)
+	}
 }

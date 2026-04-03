@@ -95,6 +95,7 @@ func initial(parent context.Context, queueSizes ...int) chan *queueItem {
 				for _, callback := range Callbacks {
 					callback(&m.Config, err)
 				}
+				m.Config.FireCallback(&m.Config, err)
 			case <-ctxGlobal.Done():
 				log.Debugf(`<SendMail> %v`, context.Canceled)
 			}
