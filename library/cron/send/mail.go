@@ -144,6 +144,11 @@ func MailWithConfig(conf *email.Config) error {
 	if len(conf.ToAddress) < 1 { //收信人邮箱地址不正确
 		return ErrIncorrectRecipient
 	}
+	SetDefaults(conf)
+	return email.SendMail(conf)
+}
+
+func SetDefaults(conf *email.Config) {
 	emailCfg := config.FromFile().Settings().Email
 	if conf.Engine == `` {
 		conf.Engine = emailCfg.Engine
@@ -157,5 +162,4 @@ func MailWithConfig(conf *email.Config) error {
 	if conf.Timeout <= 0 {
 		conf.Timeout = emailCfg.Timeout
 	}
-	return email.SendMail(conf)
 }
