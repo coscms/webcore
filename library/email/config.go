@@ -28,30 +28,31 @@ import (
 type Config struct {
 	ID         uint64 //RequestID
 	Engine     string
-	SMTP       *mail.SMTPConfig
+	SMTP       *mail.SMTPConfig `json:"-" xml:"-"`
 	From       string
 	ToAddress  string
 	ToUsername string
 	Subject    string
 	Content    []byte
 	CcAddress  []string
-	Auth       smtp.Auth
+	Auth       smtp.Auth `json:"-" xml:"-"`
 	Timeout    int64
-	Noticer    notice.Noticer
-	Callback   []func(*Config, error)
+	Noticer    notice.Noticer       `json:"-" xml:"-"`
+	Callback   func(*Config, error) `json:"-" xml:"-"`
 }
 
 func (c *Config) Send() error {
 	return SendMail(c)
 }
 
-func (c *Config) AddCallback(f ...func(*Config, error)) *Config {
-	c.Callback = append(c.Callback, f...)
+func (c *Config) SetCallback(f func(*Config, error)) *Config {
+	c.Callback = f
 	return c
 }
 
 func (c *Config) FireCallback(cfg *Config, err error) {
-	for _, f := range c.Callback {
-		f(cfg, err)
+	if c.Callback == nil {
+		return
 	}
+	c.Callback(cfg, err)
 }
