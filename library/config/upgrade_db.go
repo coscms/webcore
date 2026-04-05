@@ -114,17 +114,13 @@ func executePreupgrade() {
 		if installedProjectSchemaVersion == -1 {
 			installedProjectSchemaVersion = installedSchemaVer
 		}
-		for versionStr, sqlContents := range sqlVersionContents {
-			versionNum, err := strconv.ParseFloat(versionStr, 64)
-			if err != nil {
-				stdLog.Panicln(versionStr + `: ` + err.Error())
-			}
+		for versionNum, sqlContents := range sqlVersionContents {
 			if versionNum <= installedProjectSchemaVersion {
 				continue
 			}
 			for _, sqlContent := range sqlContents {
 				log.Info(color.GreenString(`[preupgrade]`), `Execute SQL: `, sqlContent)
-				err = nsql.ParseSQL(sqlContent, false, installer)
+				err := nsql.ParseSQL(sqlContent, false, installer)
 				if err != nil {
 					stdLog.Panicln(err.Error())
 				}

@@ -4,14 +4,14 @@ func NewSQLCollection() *SQLCollection {
 	return &SQLCollection{
 		Install:    map[string][]string{},
 		Insert:     map[string][]string{},
-		Preupgrade: map[string]map[string][]string{},
+		Preupgrade: map[string]map[float64][]string{},
 	}
 }
 
 type SQLCollection struct {
-	Install    map[string][]string            //{ project:[sql-content] }
-	Insert     map[string][]string            //{ project:[sql-content] }
-	Preupgrade map[string]map[string][]string //{ project:{ version:[sql-content] } }
+	Install    map[string][]string             //{ project:[sql-content] }
+	Insert     map[string][]string             //{ project:[sql-content] }
+	Preupgrade map[string]map[float64][]string //{ project:{ version:[sql-content] } }
 }
 
 func (s *SQLCollection) RegisterInstall(project, installSQL string) *SQLCollection {
@@ -32,9 +32,9 @@ func (s *SQLCollection) RegisterInsert(project string, insertSQL string) *SQLCol
 	return s
 }
 
-func (s *SQLCollection) RegisterPreupgrade(project string, version, preupgradeSQL string) *SQLCollection {
+func (s *SQLCollection) RegisterPreupgrade(project string, version float64, preupgradeSQL string) *SQLCollection {
 	if _, ok := s.Preupgrade[project]; !ok {
-		s.Preupgrade[project] = map[string][]string{
+		s.Preupgrade[project] = map[float64][]string{
 			version: {preupgradeSQL},
 		}
 		return s

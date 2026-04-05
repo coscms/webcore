@@ -75,7 +75,7 @@ func RegisterInsertSQL(project string, insertSQL string) {
 // If the project already exists, the pre-upgrade SQL string will be appended to the existing pre-upgrade SQLs of the project.
 // The RegisterPreupgradeSQL function is used by the system to register the pre-upgrade SQLs of the system.
 // The RegisterPreupgradeSQL function is also used by the plugins to register the pre-upgrade SQLs of the plugins.
-func RegisterPreupgradeSQL(project string, version, preupgradeSQL string) {
+func RegisterPreupgradeSQL(project string, version float64, preupgradeSQL string) {
 	sqlCollection.RegisterPreupgrade(project, version, preupgradeSQL)
 }
 
@@ -102,11 +102,11 @@ func GetInstallSQLs() map[string][]string {
 //
 //	For example, if the returned map is map[string]map[string][]string{
 //		"nging": {
-//			"1.0.0": []string{"sql1", "sql2"},
-//			"2.0.0": []string{"sql3", "sql4"},
+//			1.0: []string{"sql1", "sql2"},
+//			2.0: []string{"sql3", "sql4"},
 //		},
-//	}, it means that when upgrading the "nging" project from version "1.0.0" to "2.0.0", the system will execute the pre-upgrade SQL "sql3" and "sql4".
-func GetPreupgradeSQLs() map[string]map[string][]string {
+//	}, it means that when upgrading the "nging" project from version "1.0" to "2.0", the system will execute the pre-upgrade SQL "sql3" and "sql4".
+func GetPreupgradeSQLs() map[string]map[float64][]string {
 	return sqlCollection.Preupgrade
 }
 
