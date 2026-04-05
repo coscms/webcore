@@ -84,12 +84,23 @@ func executePreupgrade() {
 		//sqlFile = /your/path/preupgrade.3_0.nging.sql //preupgrade.{versionStr}.{project}.sql
 		versionStr := strings.TrimPrefix(filepath.Base(sqlFile), `preupgrade.`)
 		versionStr = strings.TrimSuffix(versionStr, `.sql`) // {versionStr}.{project}
-		versionStr = strings.ReplaceAll(strings.SplitN(versionStr, `.`, 2)[0], `_`, `.`)
+		versionAndProject := strings.SplitN(versionStr, `.`, 2)
+		versionStr = strings.ReplaceAll(versionAndProject[0], `_`, `.`)
 		versionNum, err := strconv.ParseFloat(versionStr, 64)
 		if err != nil {
 			stdLog.Panicln(versionStr + `: ` + err.Error())
 		}
-		if versionNum <= installedSchemaVer {
+		var installedProjectSchemaVersion float64
+		if len(versionAndProject) == 2 {
+			project := versionAndProject[1]
+			installedProjectSchemaVersion = GetInstalledPkgSchemaVer(project)
+			if installedProjectSchemaVersion == -1 {
+				installedProjectSchemaVersion = installedSchemaVer
+			}
+		} else {
+			installedProjectSchemaVersion = installedSchemaVer
+		}
+		if versionNum <= installedProjectSchemaVersion {
 			continue
 		}
 		log.Info(color.GreenString(`[preupgrade]`), `Execute SQL file: `, sqlFile)
@@ -98,13 +109,17 @@ func executePreupgrade() {
 			stdLog.Panicln(err.Error())
 		}
 	}
-	for _, sqlVersionContents := range GetPreupgradeSQLs() {
+	for project, sqlVersionContents := range GetPreupgradeSQLs() { // {"project":{"version":["sql1","sql2"]}
+		installedProjectSchemaVersion := GetInstalledPkgSchemaVer(project)
+		if installedProjectSchemaVersion == -1 {
+			installedProjectSchemaVersion = installedSchemaVer
+		}
 		for versionStr, sqlContents := range sqlVersionContents {
 			versionNum, err := strconv.ParseFloat(versionStr, 64)
 			if err != nil {
 				stdLog.Panicln(versionStr + `: ` + err.Error())
 			}
-			if versionNum <= installedSchemaVer {
+			if versionNum <= installedProjectSchemaVersion {
 				continue
 			}
 			for _, sqlContent := range sqlContents {
