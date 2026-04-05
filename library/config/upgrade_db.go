@@ -70,6 +70,16 @@ func UpgradeDB() {
 	log.Info(`Database table upgrade completed`)
 }
 
+func getInstalledProjectSchemaVersion(project string) float64 {
+	var installedProjectSchemaVersion float64
+	if len(project) == 0 || project == `nging` {
+		installedProjectSchemaVersion = installedSchemaVer
+	} else {
+		installedProjectSchemaVersion = GetInstalledPkgSchemaVer(project)
+	}
+	return installedProjectSchemaVersion
+}
+
 // 处理自动升级前要执行的sql
 func executePreupgrade() {
 	preupgradeSQLFiles := GetPreupgradeSQLFiles()
@@ -80,6 +90,7 @@ func executePreupgrade() {
 	if !ok {
 		stdLog.Panicf(`Does not support installation to database: %s`, FromFile().DB.Type)
 	}
+
 	for _, sqlFile := range preupgradeSQLFiles {
 		//sqlFile = /your/path/preupgrade.3_0.nging.sql //preupgrade.{versionStr}.{project}.sql
 		versionStr := strings.TrimPrefix(filepath.Base(sqlFile), `preupgrade.`)
@@ -93,10 +104,7 @@ func executePreupgrade() {
 		var installedProjectSchemaVersion float64
 		if len(versionAndProject) == 2 {
 			project := versionAndProject[1]
-			installedProjectSchemaVersion = GetInstalledPkgSchemaVer(project)
-			if installedProjectSchemaVersion == -1 {
-				installedProjectSchemaVersion = installedSchemaVer
-			}
+			installedProjectSchemaVersion = getInstalledProjectSchemaVersion(project)
 		} else {
 			installedProjectSchemaVersion = installedSchemaVer
 		}
@@ -110,10 +118,7 @@ func executePreupgrade() {
 		}
 	}
 	for project, sqlVersionContents := range GetPreupgradeSQLs() { // {"project":{"version":["sql1","sql2"]}
-		installedProjectSchemaVersion := GetInstalledPkgSchemaVer(project)
-		if installedProjectSchemaVersion == -1 {
-			installedProjectSchemaVersion = installedSchemaVer
-		}
+		installedProjectSchemaVersion := getInstalledProjectSchemaVersion(project)
 		for versionNum, sqlContents := range sqlVersionContents {
 			if versionNum <= installedProjectSchemaVersion {
 				continue
