@@ -89,9 +89,9 @@ require (
 	github.com/webx-top/chardet v0.0.2
 	github.com/webx-top/client v0.9.10
 	github.com/webx-top/codec v0.3.0
-	github.com/webx-top/com v1.5.0
+	github.com/webx-top/com v1.5.1
 	github.com/webx-top/db v1.30.8
-	github.com/webx-top/echo v1.23.9
+	github.com/webx-top/echo v1.24.0
 	github.com/webx-top/image v0.1.2
 	github.com/webx-top/restyclient v0.0.6
 	github.com/webx-top/validation v0.0.3
@@ -194,7 +194,7 @@ require (
 	github.com/maruel/rs v1.1.0 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
-	github.com/mattn/go-sqlite3 v1.14.40 // indirect
+	github.com/mattn/go-sqlite3 v1.14.41 // indirect
 	github.com/mholt/acmez/v3 v3.1.6 // indirect
 	github.com/miekg/dns v1.1.72 // indirect
 	github.com/minio/crc64nvme v1.1.1 // indirect
