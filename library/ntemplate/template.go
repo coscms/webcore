@@ -85,6 +85,9 @@ func (t *Template) SetDefaultTheme(defaultTheme string) *Template {
 		t.themeInfo.Name = defaultTheme
 	}
 	t.DefaultTheme = defaultTheme
+	if len(DefaultTheme) > 0 && DefaultTheme != defaultTheme && len(t.themeInfo.Fallback) == 0 {
+		t.themeInfo.Fallback = append(t.themeInfo.Fallback, DefaultTheme)
+	}
 	return t
 }
 
