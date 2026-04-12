@@ -2,6 +2,7 @@ package license
 
 import (
 	"os"
+	"os/exec"
 	"path/filepath"
 	"runtime"
 	"testing"
@@ -55,7 +56,8 @@ func TestParseVersionInfo(t *testing.T) {
 [ERROR]88202|2025-05-06 14:47:23|bindata_none.go:55|Error|app|*****
 Nging v5.3.3-dev licensed(free)
 Schema: v7.7001
-Build: 20250424162337`
+Build: 20250424162337
+`
 	ver, err := parseVersionInfo(output)
 	assert.NoError(t, err)
 	assert.Equal(t, &config.VersionInfo{
@@ -66,6 +68,16 @@ Build: 20250424162337`
 		DBSchema:  7.7001,
 		BuildTime: `20250424162337`,
 	}, ver)
+}
+
+func TestParseVersionInfo2(t *testing.T) {
+	t.Skip()
+	b, err := exec.Command(`./nging`, `version`).CombinedOutput()
+	assert.NoError(t, err)
+	s := string(b)
+	ver, err := parseVersionInfo(s)
+	assert.NoError(t, err)
+	ppnocolor.Println(ver)
 }
 
 func TestLicenseDownload(t *testing.T) {

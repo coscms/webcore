@@ -206,7 +206,11 @@ func parseVersionInfo(s string) (*config.VersionInfo, error) {
 		err = fmt.Errorf(`failed to query version information from command line output: %s`, "\n"+s)
 		return nil, err
 	}
-	rows = rows[len(rows)-3:]
+	if strings.HasPrefix(rows[len(rows)-1], `Feature:`) && len(rows) >= 4 {
+		rows = rows[len(rows)-4:]
+	} else {
+		rows = rows[len(rows)-3:]
+	}
 	ngingVer := strings.TrimSpace(rows[0])
 	parts := strings.Split(ngingVer, ` `)
 	if len(parts) != 3 {
