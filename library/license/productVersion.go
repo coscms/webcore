@@ -206,22 +206,26 @@ func parseVersionInfo(s string) (*config.VersionInfo, error) {
 		err = fmt.Errorf(`failed to query version information from command line output: %s`, "\n"+s)
 		return nil, err
 	}
-	if strings.HasPrefix(rows[len(rows)-1], `Feature:`) && len(rows) >= 4 {
-		rows = rows[len(rows)-4:]
-	} else {
-		rows = rows[len(rows)-3:]
+	var ver *config.VersionInfo
+	ver, err = _parseVersionInfo_1(rows)
+	if err != nil {
+		ver, err = _parseVersionInfo_2(rows)
 	}
-	ngingVer := strings.TrimSpace(rows[0])
-	parts := strings.Split(ngingVer, ` `)
+	return ver, err
+}
+
+func _parseApplicationVersion(ngingVer string) (*config.VersionInfo, error) {
+	ngingVer = strings.TrimSpace(ngingVer)
+	parts := strings.Split(ngingVer, ` `) // Nging v5.3.3 licensed(vanguard)
 	if len(parts) != 3 {
-		err = fmt.Errorf(`failed to query version information from command line output: %s`, "\n"+ngingVer)
+		err := fmt.Errorf(`failed to query version information from command line output: %s`, "\n"+ngingVer)
 		return nil, err
 	}
 	ver := &config.VersionInfo{
 		Name: parts[0],
 	}
 	if !strings.HasPrefix(parts[1], `v`) {
-		err = fmt.Errorf(`failed to query version information from command line output: %s`, "\n"+ngingVer)
+		err := fmt.Errorf(`failed to query version information from command line output: %s`, "\n"+ngingVer)
 		return ver, err
 	}
 	ver.Number = strings.TrimPrefix(parts[1], `v`)
@@ -235,13 +239,51 @@ func parseVersionInfo(s string) (*config.VersionInfo, error) {
 		packageName = strings.TrimSuffix(parts2[1], `)`)
 		ver.Package = packageName
 	}
+	return ver, nil
+}
 
-	parts = strings.SplitN(rows[1], ` `, 2)
+func _parseVersionInfo_1(rows []string) (*config.VersionInfo, error) {
+	if strings.HasPrefix(rows[len(rows)-1], `Feature:`) && len(rows) >= 4 {
+		rows = rows[len(rows)-4:]
+	} else {
+		rows = rows[len(rows)-3:]
+	}
+	ver, err := _parseApplicationVersion(rows[0])
+	if err != nil {
+		return ver, err
+	}
+	parts := strings.SplitN(rows[1], ` `, 2) // Schema: v7.7001
 	if len(parts) == 2 && parts[0] == `Schema:` {
 		ver.DBSchema = com.Float64(strings.TrimPrefix(parts[1], `v`))
 	}
+	parts = strings.SplitN(rows[2], ` `, 2) // Build: 20250424162337
+	if len(parts) == 2 && parts[0] == `Build:` {
+		ver.BuildTime = parts[1]
+	}
+	return ver, err
+}
 
-	parts = strings.SplitN(rows[2], ` `, 2)
+func _parseVersionInfo_2(rows []string) (*config.VersionInfo, error) {
+	var j int
+	for i := len(rows) - 1; i >= 0; i-- {
+		if strings.HasPrefix(rows[i], `Schema: `) {
+			j = i
+			break
+		}
+	}
+	if j == 0 {
+		err := fmt.Errorf(`failed to query version information from command line output: %s`, "\n"+strings.Join(rows, "\n"))
+		return nil, err
+	}
+	ver, err := _parseApplicationVersion(rows[j-1])
+	if err != nil {
+		return ver, err
+	}
+	parts := strings.SplitN(rows[j], ` `, 2) // Schema: v7.7001
+	if len(parts) == 2 && parts[0] == `Schema:` {
+		ver.DBSchema = com.Float64(strings.TrimPrefix(parts[1], `v`))
+	}
+	parts = strings.SplitN(rows[j+1], ` `, 2) // Build: 20250424162337
 	if len(parts) == 2 && parts[0] == `Build:` {
 		ver.BuildTime = parts[1]
 	}
