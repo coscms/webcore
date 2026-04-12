@@ -210,14 +210,13 @@ func (t *Template) ThemeInfo(c echo.Context) *ThemeInfo {
 func (t *Template) loadThemeInfo(c echo.Context) {
 	themeInfo, err := t.themeInfoStorer.Get(c, ``)
 	if err != nil {
-		if os.IsNotExist(err) {
-			return
-		}
 		if t.themeInfoInitor != nil {
 			themeInfo, err = t.themeInfoInitor(c)
 		}
 		if err != nil {
-			log.Error(err)
+			if !os.IsNotExist(err) {
+				log.Error(err)
+			}
 			return
 		}
 	}
