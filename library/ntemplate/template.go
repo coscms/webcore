@@ -1,146 +1,255 @@
-// 模板文件系统、模板文件路径修正器、模板主题配置
 package ntemplate
 
 import (
+	"database/sql"
+	"net/http"
+	"os"
+	"path"
 	"path/filepath"
-	"sort"
-	"strings"
+	"sync"
 
 	"github.com/admpub/log"
-	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
+	"github.com/webx-top/echo/middleware/render/driver"
 )
 
-type PathFixer func(subdir, tmpl string) string
-type PathHandle func(c echo.Context, theme string, tmpl string) string
+var groups = map[string]*Template{}
+var DefaultTheme = `default`
 
-func NewPathFixers(debug ...bool) *PathFixers {
-	pfs := PathFixers{
-		pf: map[string][]PathFixer{},
+func New(kind string, pa *PathAliases, registerToGroup ...bool) *Template {
+	if pa == nil {
+		pa = NewPathAliases()
 	}
-	if len(debug) > 0 {
-		pfs.debug = debug[0]
-	} else {
-		pfs.debug = com.GetenvBool(`NGING_TEMPLATE_DEBUG`, false)
+	t := &Template{
+		Kind:            kind,
+		PathFixers:      NewPathFixers(),
+		PathAliases:     pa,
+		DefaultTheme:    DefaultTheme,
+		themeInfo:       &ThemeInfo{Name: DefaultTheme},
+		themeMutex:      sync.RWMutex{},
+		themeOnce:       sync.Once{},
+		cachedPathData:  newCachedPathData(),
+		themeInfoStorer: NewFileStore(kind),
 	}
-	return &pfs
-}
-
-type PathFixers struct {
-	pf    map[string][]PathFixer //模版路径 {subdir:func}
-	debug bool
-}
-
-func (p *PathFixers) SetDebug(debug bool) *PathFixers {
-	p.debug = debug
-	return p
-}
-
-func (p *PathFixers) DebugLogf(format string, args ...interface{}) {
-	if !p.debug {
-		return
+	if len(registerToGroup) > 0 && registerToGroup[0] {
+		groups[t.Kind] = t
 	}
-	log.Warnf(`[Template]`+format, args...)
+	return t
 }
 
-func (p *PathFixers) OkayLogf(format string, args ...interface{}) {
-	if !p.debug {
-		return
+func newCachedPathData() *cachedPathData {
+	return &cachedPathData{
+		mapping: map[string]sql.NullString{},
+		mutex:   sync.RWMutex{},
 	}
-	log.Okayf(`[Template]`+format, args...)
 }
 
-func (p *PathFixers) Add(dirName string, fixer PathFixer) *PathFixers {
-	if _, ok := p.pf[dirName]; !ok {
-		p.pf[dirName] = []PathFixer{}
+type cachedPathData struct {
+	mapping map[string]sql.NullString
+	mutex   sync.RWMutex
+}
+
+type Template struct {
+	handler      PathHandle
+	Project      string
+	TmplDir      string
+	Kind         string
+	PathAliases  *PathAliases
+	DefaultTheme string
+	customFS     http.FileSystem
+	enableTheme  bool
+	*PathFixers
+	themeInfo       *ThemeInfo
+	themeInfoInitor func(echo.Context) (*ThemeInfo, error)
+	themeMutex      sync.RWMutex
+	themeOnce       sync.Once
+	cachedPathData  *cachedPathData
+	themeInfoStorer Storer
+}
+
+func (t *Template) SetThemeInfoInitor(initor func(echo.Context) (*ThemeInfo, error)) *Template {
+	t.themeInfoInitor = initor
+	return t
+}
+
+func (t *Template) SetProject(project string, defaultTheme ...string) *Template {
+	t.Project = project
+	if len(defaultTheme) > 0 && len(defaultTheme[0]) > 0 {
+		t.SetDefaultTheme(defaultTheme[0])
 	}
-	p.pf[dirName] = append(p.pf[dirName], fixer)
-	return p
+	return t
 }
 
-func (p *PathFixers) AddDir(dirName string, parentPath string) *PathFixers {
-	p.Add(dirName, p.MakeFixer(parentPath))
-	return p
+func (t *Template) SetDefaultTheme(defaultTheme string) *Template {
+	if t.themeInfo.Name == t.DefaultTheme {
+		t.themeInfo.Name = defaultTheme
+	}
+	t.DefaultTheme = defaultTheme
+	return t
 }
 
-func (p *PathFixers) MakeFixer(parentPath string) PathFixer {
-	if !filepath.IsAbs(parentPath) {
-		var err error
-		parentPath, err = filepath.Abs(parentPath)
-		if err != nil {
-			panic(err)
+func (t *Template) SetTmplDir(tmplDir string) *Template {
+	t.TmplDir = tmplDir
+	return t
+}
+
+func (t *Template) SetStorer(storer Storer) *Template {
+	t.themeInfoStorer = storer
+	return t
+}
+
+func (t *Template) SetCustomFS(fs http.FileSystem) *Template {
+	t.customFS = fs
+	return t
+}
+
+func (t *Template) SetEnableTheme(enable bool) *Template {
+	t.enableTheme = enable
+	return t
+}
+
+func (t *Template) Storer() Storer {
+	return t.themeInfoStorer
+}
+
+func (t *Template) SetHandler(h PathHandle) *Template {
+	t.handler = h
+	return t
+}
+
+func (t *Template) Handle(ctx echo.Context, theme string, tmpl string) string {
+	return t.handler(ctx, theme, tmpl)
+}
+
+func (t *Template) SetPathFixers(h *PathFixers) *Template {
+	t.PathFixers = h
+	return t
+}
+
+func (t *Template) ApplyAliases() *Template {
+	t.PathAliases.Range(func(prefix, templateDir string) error {
+		log.Debug(`[`+t.Kind+`] `, `Template subfolder "`+prefix+`" is relocated to: `, templateDir)
+		t.AddDir(prefix, templateDir)
+		return nil
+	})
+	return t
+}
+
+func (t *Template) AddAlias(alias, tmplDir string) *Template {
+	t.PathAliases.Add(alias, tmplDir)
+	return t
+}
+
+func (t *Template) AddAliasFromAllSubdir(tmplDir string) *Template {
+	t.PathAliases.AddAllSubdir(tmplDir)
+	return t
+}
+
+func (t *Template) TmplDirs() []string {
+	return t.PathAliases.TmplDirs()
+}
+
+func (t *Template) Aliases() []string {
+	return t.PathAliases.Aliases()
+}
+
+func (t *Template) Register(renderer driver.Driver, watchOtherDirs ...string) {
+	hasCustomFS := t.customFS != nil
+	// 设置后台模板路径修正器的修正处理函数
+	t.SetTmplDir(renderer.TmplDir()).SetHandler(func(c echo.Context, theme string, tmpl string) string {
+		var found bool
+		tmpl, found = t.Fix(c, t.customFS, theme, tmpl)
+		if found {
+			return tmpl
 		}
-	}
-	return func(subdir, tmpl string) string {
-		return filepath.Join(parentPath, subdir, tmpl)
-	}
-}
+		if t.enableTheme && len(theme) > 0 {
+			tmpl = theme + `/` + tmpl
+		}
+		if hasCustomFS {
+			return path.Join(t.Kind, tmpl)
+		}
+		return filepath.Join(renderer.TmplDir(), tmpl)
+	})
 
-func (p *PathFixers) Delete(names ...string) *PathFixers {
-	for _, name := range names {
-		delete(p.pf, name)
-	}
-	return p
-}
+	// 将后台模板路径修正器与模板渲染引擎关联
+	renderer.SetTmplPathFixer(func(c echo.Context, tmpl string) string {
+		var theme string
+		if t.enableTheme {
+			theme = c.Internal().String(`theme`, t.DefaultTheme)
+		}
+		return t.Handle(c, theme, tmpl)
+	})
 
-func (p *PathFixers) Keys() []string {
-	names := make([]string, len(p.pf))
-	var i int
-	for name := range p.pf {
-		names[i] = name
-		i++
-	}
-	sort.Strings(names)
-	return names
-}
-
-func (p *PathFixers) splitPath(tmpl string) (subdir string, newTmpl string) {
-	newTmpl = tmpl
-	pos := strings.Index(tmpl, `/`)
-	if pos < 0 {
-		return
-	}
-	subdir = tmpl[:pos]
-	if len(tmpl) > pos+1 {
-		newTmpl = tmpl[pos+1:]
-	} else {
-		newTmpl = ``
-	}
-	return
-}
-
-func (p *PathFixers) parsePath(theme string, tmpl string) (subdir string, newTmpl string, group string) {
-	if len(tmpl) > 3 && strings.HasPrefix(tmpl, startChar) { // #theme#index
-		subdir = tmpl[1:]
-		splited := strings.SplitN(subdir, endChar, 2)
-		subdir = splited[0]
-		if len(splited) > 1 {
-			tmpl = strings.TrimLeft(splited[1], whitespace)
-			subdirAndGroup := strings.SplitN(subdir, groupAtChar, 2) // #theme@group#
-			if len(subdirAndGroup) == 2 {
-				subdir = strings.TrimRight(subdirAndGroup[0], whitespace)
-				group = strings.TrimLeft(subdirAndGroup[1], whitespace)
-				newTmpl = splited[1]
-				return
+	// 关注后台模板路径内的文件改动
+	if !hasCustomFS {
+		for _, watchOtherDir := range watchOtherDirs {
+			if len(watchOtherDir) > 0 {
+				renderer.Manager().AddWatchDir(watchOtherDir)
 			}
 		}
-		if len(theme) == 0 { // 未启用主题
-			subdir, newTmpl = p.splitPath(tmpl)
-		} else {
-			newTmpl = tmpl
+		for _, templateDir := range t.PathAliases.TmplDirs() {
+			log.Debug(`[`+t.Kind+`] `, `Watch folder: `, templateDir)
+			renderer.Manager().AddWatchDir(templateDir)
 		}
-	} else if len(theme) > 0 {
-		subdir = theme
-		newTmpl = tmpl
-	} else {
-		subdir, newTmpl = p.splitPath(tmpl)
 	}
-	return
 }
 
-const (
-	startChar   = `#`
-	endChar     = `#`
-	groupAtChar = `@`
-	whitespace  = ` `
-)
+func (t *Template) ThemeInfo(c echo.Context) *ThemeInfo {
+	t.themeMutex.RLock()
+	t.themeOnce.Do(func() {
+		t.loadThemeInfo(c)
+	})
+	v := t.themeInfo
+	t.themeMutex.RUnlock()
+	return v
+}
+
+func (t *Template) loadThemeInfo(c echo.Context) {
+	themeInfo, err := t.themeInfoStorer.Get(c, ``)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return
+		}
+		if t.themeInfoInitor != nil {
+			themeInfo, err = t.themeInfoInitor(c)
+		}
+		if err != nil {
+			log.Error(err)
+			return
+		}
+	}
+	if len(t.Project) == 0 || t.Project == themeInfo.Project {
+		t.themeInfo = themeInfo
+	}
+}
+
+func (t *Template) SetThemeInfo(c echo.Context, v *ThemeInfo) {
+	t.themeMutex.Lock()
+	t.themeInfo = v
+	t.themeInfoStorer.Put(c, ``, v)
+	t.cachedPathData.clear()
+	t.themeMutex.Unlock()
+}
+
+func (t *Template) ClearCache() {
+	t.cachedPathData.clear()
+}
+
+func (t *cachedPathData) get(path string) (sql.NullString, bool) {
+	t.mutex.RLock()
+	mp, ok := t.mapping[path]
+	t.mutex.RUnlock()
+	return mp, ok
+}
+
+func (t *cachedPathData) clear() {
+	t.mutex.Lock()
+	t.mapping = map[string]sql.NullString{}
+	t.mutex.Unlock()
+}
+
+func (t *cachedPathData) set(path string, mp sql.NullString) {
+	t.mutex.Lock()
+	t.mapping[path] = mp
+	t.mutex.Unlock()
+}
