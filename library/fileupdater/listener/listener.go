@@ -24,6 +24,7 @@ import (
 	"github.com/webx-top/com"
 	"github.com/webx-top/db/lib/factory"
 
+	"github.com/coscms/webcore/cmd/bootconfig"
 	"github.com/coscms/webcore/dbschema"
 	"github.com/coscms/webcore/library/fileupdater"
 	modelFile "github.com/coscms/webcore/model/file"
@@ -229,14 +230,18 @@ func (f *FileRelation) Listen(events ...string) *FileRelation {
 
 func (f *FileRelation) On(event string, h factory.EventHandler) *FileRelation {
 	f.DBI().On(event, h, f.TableName)
-	log.Debug(color.MagentaString(`listener.`+event+`:`), f.TableName+`.`+f.FieldName)
+	if !bootconfig.IsVersionQuery() {
+		log.Debug(color.MagentaString(`listener.`+event+`:`), f.TableName+`.`+f.FieldName)
+	}
 	RecordUpdaterInfo(``, f.TableName, f.FieldName, f.Seperator, f.Embedded, f.SameFields...)
 	return f
 }
 
 func (f *FileRelation) OnRead(event string, h factory.EventReadHandler) *FileRelation {
 	f.DBI().OnRead(event, h, f.TableName)
-	log.Debug(color.MagentaString(`listener.`+event+`:`), f.TableName+`.`+f.FieldName)
+	if !bootconfig.IsVersionQuery() {
+		log.Debug(color.MagentaString(`listener.`+event+`:`), f.TableName+`.`+f.FieldName)
+	}
 	RecordUpdaterInfo(``, f.TableName, f.FieldName, f.Seperator, f.Embedded, f.SameFields...)
 	return f
 }

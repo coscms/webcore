@@ -20,6 +20,7 @@ package bootconfig
 
 import (
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/webx-top/com"
@@ -51,7 +52,17 @@ var (
 	// Welcome 欢迎语
 	Welcome             = "Thank you for choosing nging %s, I hope you enjoy using it.\nToday is %s."
 	AutoUpgradeDBStruct = true
+	versionQuery        = isVersionQuery()
 )
+
+func isVersionQuery() bool {
+	length := len(os.Args)
+	return length > 1 && os.Args[length-1] == `version`
+}
+
+func IsVersionQuery() bool {
+	return versionQuery
+}
 
 func IsWeb() bool {
 	return IsServerType(`web`)
