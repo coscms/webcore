@@ -22,7 +22,7 @@ func New(kind string, pa *PathAliases, registerToGroup ...bool) *Template {
 	}
 	t := &Template{
 		Kind:            kind,
-		PathFixers:      &PathFixers{},
+		PathFixers:      NewPathFixers(),
 		PathAliases:     pa,
 		DefaultTheme:    DefaultTheme,
 		themeInfo:       &ThemeInfo{Name: DefaultTheme},
@@ -156,11 +156,11 @@ func (t *Template) Register(renderer driver.Driver, watchOtherDirs ...string) {
 		if found {
 			return tmpl
 		}
-		if hasCustomFS {
-			return path.Join(t.Kind, tmpl)
-		}
 		if t.enableTheme && len(theme) > 0 {
 			tmpl = theme + `/` + tmpl
+		}
+		if hasCustomFS {
+			return path.Join(t.Kind, tmpl)
 		}
 		return filepath.Join(renderer.TmplDir(), tmpl)
 	})

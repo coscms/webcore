@@ -23,16 +23,18 @@ func (p *PathFixers) Fix(ctx echo.Context, t *Template, theme string, tmpl strin
 		return mp.String, mp.Valid
 	}
 	subdir, newTmpl, group := p.parsePath(theme, tmpl)
+	p.DebugLogf(`parsePath(theme: %s tmpl: %s) => subdir: %s, tplfile: %s, group: %s`, theme, tmpl, subdir, newTmpl, group)
 	if len(group) > 0 {
 		if t, ok := groups[group]; ok {
 			r := t.Handle(ctx, subdir, newTmpl)
+			p.OkayLogf(`found group: %s`, group)
 			t.cachedPathData.set(cacheKey, sql.NullString{String: r, Valid: true})
 			return r, true
 		}
 	}
-	pathFixers, ok := (*p)[subdir]
+	pathFixers, ok := p.pf[subdir]
 	if ok {
-		if _tmpl, ok := findPath(pathFixers, subdir, newTmpl); ok {
+		if _tmpl, ok := p.findPath(pathFixers, subdir, newTmpl); ok {
 			t.cachedPathData.set(cacheKey, sql.NullString{String: _tmpl, Valid: true})
 			return _tmpl, ok
 		}
@@ -48,10 +50,10 @@ func (p *PathFixers) Fix(ctx echo.Context, t *Template, theme string, tmpl strin
 			if len(fb) == 0 {
 				continue
 			}
-			pathFixers, ok := (*p)[fb]
+			pathFixers, ok := p.pf[fb]
 			if ok {
 				subdir = fb
-				if _tmpl, ok := findPath(pathFixers, subdir, newTmpl); ok {
+				if _tmpl, ok := p.findPath(pathFixers, subdir, newTmpl); ok {
 					t.cachedPathData.set(cacheKey, sql.NullString{String: _tmpl, Valid: true})
 					return _tmpl, ok
 				}
@@ -68,13 +70,15 @@ func (p *PathFixers) Fix(ctx echo.Context, t *Template, theme string, tmpl strin
 	return tmpl, false
 }
 
-func findPath(pathFixers []PathFixer, subdir string, newTmpl string) (string, bool) {
+func (p *PathFixers) findPath(pathFixers []PathFixer, subdir string, newTmpl string) (string, bool) {
 	for _, pathFixer := range pathFixers {
 		_tmpl := pathFixer(subdir, newTmpl)
 		fi, err := os.Stat(_tmpl)
 		if err == nil && !fi.IsDir() {
+			p.OkayLogf(`found template: %s`, _tmpl)
 			return _tmpl, true
 		}
+		p.DebugLogf(`not found template: %s`, _tmpl)
 	}
 	return ``, false
 }

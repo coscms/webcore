@@ -6,18 +6,55 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/admpub/log"
+	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
 )
 
 type PathFixer func(subdir, tmpl string) string
 type PathHandle func(c echo.Context, theme string, tmpl string) string
-type PathFixers map[string][]PathFixer //模版路径 {subdir:func}
+
+func NewPathFixers(debug ...bool) *PathFixers {
+	pfs := PathFixers{
+		pf: map[string][]PathFixer{},
+	}
+	if len(debug) > 0 {
+		pfs.debug = debug[0]
+	} else {
+		pfs.debug = com.GetenvBool(`NGING_TEMPLATE_DEBUG`, false)
+	}
+	return &pfs
+}
+
+type PathFixers struct {
+	pf    map[string][]PathFixer //模版路径 {subdir:func}
+	debug bool
+}
+
+func (p *PathFixers) SetDebug(debug bool) *PathFixers {
+	p.debug = debug
+	return p
+}
+
+func (p *PathFixers) DebugLogf(format string, args ...interface{}) {
+	if !p.debug {
+		return
+	}
+	log.Warnf(`[Template]`+format, args...)
+}
+
+func (p *PathFixers) OkayLogf(format string, args ...interface{}) {
+	if !p.debug {
+		return
+	}
+	log.Okayf(`[Template]`+format, args...)
+}
 
 func (p *PathFixers) Add(dirName string, fixer PathFixer) *PathFixers {
-	if _, ok := (*p)[dirName]; !ok {
-		(*p)[dirName] = []PathFixer{}
+	if _, ok := p.pf[dirName]; !ok {
+		p.pf[dirName] = []PathFixer{}
 	}
-	(*p)[dirName] = append((*p)[dirName], fixer)
+	p.pf[dirName] = append(p.pf[dirName], fixer)
 	return p
 }
 
@@ -41,15 +78,15 @@ func (p *PathFixers) MakeFixer(parentPath string) PathFixer {
 
 func (p *PathFixers) Delete(names ...string) *PathFixers {
 	for _, name := range names {
-		delete(*p, name)
+		delete(p.pf, name)
 	}
 	return p
 }
 
 func (p *PathFixers) Keys() []string {
-	names := make([]string, len(*p))
+	names := make([]string, len(p.pf))
 	var i int
-	for name := range *p {
+	for name := range p.pf {
 		names[i] = name
 		i++
 	}

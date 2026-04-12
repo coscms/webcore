@@ -24,9 +24,11 @@ func (p *PathFixers) Fix(ctx echo.Context, fs http.FileSystem, t *Template, them
 		return mp.String, mp.Valid
 	}
 	subdir, tplfile, group := p.parsePath(theme, tmpl)
+	p.DebugLogf(`parsePath(theme: %s tmpl: %s) => subdir: %s, tplfile: %s, group: %s`, theme, tmpl, subdir, tplfile, group)
 	if len(group) > 0 {
 		if t, ok := groups[group]; ok {
 			r := t.Handle(ctx, subdir, tplfile)
+			p.OkayLogf(`found group: %s`, group)
 			t.cachedPathData.set(cacheKey, sql.NullString{String: r, Valid: true})
 			return r, true
 		}
@@ -34,7 +36,7 @@ func (p *PathFixers) Fix(ctx echo.Context, fs http.FileSystem, t *Template, them
 
 	dirName := filepath.Base(t.TmplDir)
 
-	if _tmpl, exists := fsFileExists(fs, t.TmplDir, dirName, subdir, tplfile); exists {
+	if _tmpl, exists := p.fsFileExists(fs, t.TmplDir, dirName, subdir, tplfile); exists {
 		t.cachedPathData.set(cacheKey, sql.NullString{String: _tmpl, Valid: true})
 		return _tmpl, exists
 	}
@@ -46,7 +48,7 @@ func (p *PathFixers) Fix(ctx echo.Context, fs http.FileSystem, t *Template, them
 				continue
 			}
 
-			if _tmpl, exists := fsFileExists(fs, t.TmplDir, dirName, fb, rawTmpl); exists {
+			if _tmpl, exists := p.fsFileExists(fs, t.TmplDir, dirName, fb, rawTmpl); exists {
 				t.cachedPathData.set(cacheKey, sql.NullString{String: _tmpl, Valid: true})
 				return _tmpl, exists
 			}
@@ -56,14 +58,16 @@ func (p *PathFixers) Fix(ctx echo.Context, fs http.FileSystem, t *Template, them
 	return tmpl, false
 }
 
-func fsFileExists(fs http.FileSystem, tmplDir, dirName, subDir, tmpl string) (string, bool) {
+func (p *PathFixers) fsFileExists(fs http.FileSystem, tmplDir, dirName, subDir, tmpl string) (string, bool) {
 	// step 1. 检查磁盘上是否存在模板文件，有则优先采用
 	_tmpl := filepath.Join(tmplDir, subDir, tmpl)
 	fi, err := os.Stat(_tmpl)
 	if err == nil && !fi.IsDir() {
+		p.OkayLogf(`found template(from disk): %s`, _tmpl)
 		_tmpl = path.Join(dirName, subDir, tmpl)
 		return _tmpl, true
 	}
+	p.DebugLogf(`not found template(from disk): %s`, _tmpl)
 	// step 2. 使用 http.FileSystem 内的文件
 	_tmpl = path.Join(dirName, subDir, tmpl)
 	file, err := fs.Open(_tmpl)
@@ -72,8 +76,10 @@ func fsFileExists(fs http.FileSystem, tmplDir, dirName, subDir, tmpl string) (st
 		fi, err = file.Stat()
 		file.Close()
 		if err == nil && !fi.IsDir() {
+			p.OkayLogf(`found template(from http.FileSystem): %s`, _tmpl)
 			return _tmpl, true
 		}
 	}
+	p.DebugLogf(`not found template(from http.FileSystem): %s`, _tmpl)
 	return ``, false
 }
