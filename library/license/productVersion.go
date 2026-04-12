@@ -266,7 +266,7 @@ func _parseVersionInfo_1(rows []string) (*config.VersionInfo, error) {
 func _parseVersionInfo_2(rows []string) (*config.VersionInfo, error) {
 	var j int
 	for i := len(rows) - 1; i >= 0; i-- {
-		if strings.HasPrefix(rows[i], `Schema: `) {
+		if strings.HasPrefix(rows[i], `Schema: v`) {
 			j = i
 			break
 		}
