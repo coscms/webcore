@@ -30,8 +30,6 @@ func Open(name string) *Message {
 
 func Unregister(names ...string) {
 	for _, name := range names {
-		if _, ok := messagers[name]; ok {
-			delete(messagers, name)
-		}
+		delete(messagers, name)
 	}
 }
