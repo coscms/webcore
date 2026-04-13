@@ -50,18 +50,29 @@ var (
 	// Long 长述
 	Long string
 	// Welcome 欢迎语
-	Welcome             = "Thank you for choosing nging %s, I hope you enjoy using it.\nToday is %s."
-	AutoUpgradeDBStruct = true
-	versionQuery        = isVersionQuery()
+	Welcome                = "Thank you for choosing nging %s, I hope you enjoy using it.\nToday is %s."
+	AutoUpgradeDBStruct    = true
+	currentAloneSubCommand = getCurrentAloneCommand()
+	aloneSubCommands       = []string{`version`, `shutdown`, `feature`, `backup`, `exportsc`, `fetchfont`, `tail`} // 不依赖数据库的独立子命令
 )
 
-func isVersionQuery() bool {
-	length := len(os.Args)
-	return length > 1 && os.Args[length-1] == `version`
+func AddAloneSubCommand(subCommand string) {
+	if com.InSlice(subCommand, aloneSubCommands) {
+		return
+	}
+	aloneSubCommands = append(aloneSubCommands, subCommand)
 }
 
-func IsVersionQuery() bool {
-	return versionQuery
+func getCurrentAloneCommand() string {
+	length := len(os.Args)
+	if length > 1 {
+		return os.Args[length-1]
+	}
+	return ``
+}
+
+func IsAloneQuery() bool {
+	return com.InSlice(currentAloneSubCommand, aloneSubCommands)
 }
 
 func IsWeb() bool {
