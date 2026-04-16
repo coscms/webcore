@@ -178,7 +178,7 @@ func (t *Template) Register(renderer driver.Driver, watchOtherDirs ...string) {
 	renderer.SetTmplPathFixer(func(c echo.Context, tmpl string) string {
 		var theme string
 		if t.enableTheme {
-			theme = c.Internal().String(`theme`, t.DefaultTheme)
+			theme = c.Internal().String(InternalKeyTheme, t.DefaultTheme)
 		}
 		return t.Handle(c, theme, tmpl)
 	})

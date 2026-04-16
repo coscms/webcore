@@ -344,15 +344,21 @@ func (t *ThemeInfo) DecodeFile(file string) error {
 	return err
 }
 
+const (
+	InternalKeyThemeConfig = `theme.config`
+	InternalKeyTheme       = `theme`
+	CookieKeyThemeColor    = `ThemeColor`
+)
+
 func GetThemeInfoFromContext(ctx echo.Context) *ThemeInfo {
-	v, _ := ctx.Internal().Get(`theme.config`).(*ThemeInfo)
+	v, _ := ctx.Internal().Get(InternalKeyThemeConfig).(*ThemeInfo)
 	return v
 }
 
 func IsDarkMode(ctx echo.Context) bool {
 	themeInfo := GetThemeInfoFromContext(ctx)
 	if themeInfo == nil {
-		return ctx.Cookie().Get(`ThemeColor`) == Dark
+		return ctx.Cookie().Get(CookieKeyThemeColor) == Dark
 	}
 	return themeInfo.IsDarkMode()
 }
