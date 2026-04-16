@@ -20,7 +20,11 @@ func ListSystemJobs() echo.KVList {
 	sort.Strings(names)
 	for _, name := range names {
 		sj := systemJobs[name]
-		kvList = append(kvList, echo.NewKV(name, sj.Description).SetHKV(`example`, sj.Example))
+		kv := echo.NewKV(name, sj.Description).SetHKV(`example`, sj.Example)
+		if len(kv.V) == 0 {
+			kv.V = kv.K
+		}
+		kvList = append(kvList, kv)
 	}
 	return kvList
 }
