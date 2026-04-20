@@ -60,12 +60,12 @@ func (e *Group) Exists(cacheKey string) bool {
 }
 
 // Map 任务列表
-func (e *Group) Map() map[string]Background {
-	r := map[string]Background{}
+func (e *Group) Map() map[string]*Background {
+	r := map[string]*Background{}
 	e.mu.RLock()
 	for k, v := range (*e).m {
 		if v != nil {
-			r[k] = *v
+			r[k] = v
 		}
 	}
 	e.mu.RUnlock()
