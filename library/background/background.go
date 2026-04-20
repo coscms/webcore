@@ -23,6 +23,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/coscms/webcore/library/notice"
 	"github.com/webx-top/echo"
 )
 
@@ -119,4 +120,40 @@ func (b *Background) Clone() Background {
 		Started:  b.Started,
 		Progress: &prog,
 	}
+}
+
+func (b *Background) NewNP(ctx echo.Context, username string, opts ...func(*notice.Config)) notice.NProgressor {
+	noticer := notice.NewP(ctx, b.op, username, b.ctx, opts...).AutoComplete(true)
+	return &NP{
+		b:           b,
+		NProgressor: noticer,
+	}
+}
+
+type NP struct {
+	b *Background
+	notice.NProgressor
+}
+
+func (np *NP) Done(i int64) notice.NProgressor {
+	np.NProgressor.Done(i)
+	np.b.Done(i)
+	return np
+}
+
+func (np *NP) Reset() {
+	np.NProgressor.Reset()
+	np.b.Reset()
+}
+
+func (np *NP) Add(i int64) notice.NProgressor {
+	np.NProgressor.Add(i)
+	np.b.AddTotal(i)
+	return np
+}
+
+func (np *NP) OnlyAdd(i int64) notice.NProgressor {
+	np.NProgressor.OnlyAdd(i)
+	np.b.AddTotal(i)
+	return np
 }
