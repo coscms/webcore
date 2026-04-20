@@ -20,6 +20,7 @@ package background
 
 import (
 	"context"
+	"sync/atomic"
 	"time"
 
 	"github.com/webx-top/echo"
@@ -43,6 +44,35 @@ func New(c context.Context, opt echo.H) *Background {
 	}
 }
 
+type Progress struct {
+	finish atomic.Int64
+	total  atomic.Int64
+}
+
+func (b *Progress) Done(i int64) {
+	b.finish.Add(i)
+}
+
+func (b *Progress) SetFinish(i int64) {
+	b.finish.Store(i)
+}
+
+func (b *Progress) SetTotal(i int64) {
+	b.total.Store(i)
+}
+
+func (b *Progress) AddTotal(i int64) {
+	b.total.Add(i)
+}
+
+func (b *Progress) Total() int64 {
+	return b.total.Load()
+}
+
+func (b *Progress) Finish() int64 {
+	return b.finish.Load()
+}
+
 // Background 后台执行信息
 type Background struct {
 	alone    bool
@@ -52,6 +82,7 @@ type Background struct {
 	cancel   context.CancelFunc
 	Options  echo.H
 	Started  time.Time
+	Progress
 }
 
 // Context 暂存上下文信息
