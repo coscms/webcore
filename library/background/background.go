@@ -36,11 +36,12 @@ func New(c context.Context, opt echo.H) *Background {
 	}
 	ctx, cancel := context.WithCancel(c)
 	return &Background{
-		alone:   true,
-		ctx:     ctx,
-		cancel:  cancel,
-		Options: opt,
-		Started: time.Now(),
+		alone:    true,
+		ctx:      ctx,
+		cancel:   cancel,
+		Options:  opt,
+		Started:  time.Now(),
+		Progress: &Progress{},
 	}
 }
 
@@ -82,7 +83,7 @@ type Background struct {
 	cancel   context.CancelFunc
 	Options  echo.H
 	Started  time.Time
-	Progress
+	*Progress
 }
 
 // Context 暂存上下文信息
@@ -97,4 +98,20 @@ func (b *Background) Cancel() {
 		return
 	}
 	Cancel(b.op, b.cacheKey)
+}
+
+func (b *Background) Clone() Background {
+	prog := Progress{}
+	prog.SetFinish(b.Progress.Finish())
+	prog.SetTotal(b.Progress.Total())
+	return Background{
+		alone:    b.alone,
+		op:       b.op,
+		cacheKey: b.cacheKey,
+		ctx:      b.ctx,
+		cancel:   b.cancel,
+		Options:  b.Options,
+		Started:  b.Started,
+		Progress: &prog,
+	}
 }
