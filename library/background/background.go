@@ -54,6 +54,11 @@ func (b *Progress) Done(i int64) {
 	b.finish.Add(i)
 }
 
+func (b *Progress) Reset() {
+	b.finish.Store(0)
+	b.total.Store(0)
+}
+
 func (b *Progress) SetFinish(i int64) {
 	b.finish.Store(i)
 }
