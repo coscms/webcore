@@ -71,6 +71,7 @@ type HTTPServer struct {
 	AssetsURLPath         string                                   //素材网址路径
 	DefaultAvatarURL      string                                   //默认头像网址
 	RendererDo            func(driver.Driver)                      //模板引擎配置函数
+	TmplForceParser       func(tmpl string, content []byte) []byte //模板强制解析函数
 	TmplCustomParser      func(tmpl string, content []byte) []byte //模板自定义解析函数
 	ParseStrings          map[string]string                        //模板内容替换
 	ParseStringFuncs      map[string]func() string                 //模板内容替换函数
@@ -115,6 +116,11 @@ func (h *HTTPServer) SetNavigate(nav *navigate.ProjectNavigates) *HTTPServer {
 
 func (h *HTTPServer) SetTmplCustomParser(parser func(tmpl string, content []byte) []byte) *HTTPServer {
 	h.TmplCustomParser = parser
+	return h
+}
+
+func (h *HTTPServer) SetTmplForceParser(parser func(tmpl string, content []byte) []byte) *HTTPServer {
+	h.TmplForceParser = parser
 	return h
 }
 
@@ -258,6 +264,21 @@ func (h *HTTPServer) Apply() {
 		ErrorProcessors:      ErrorProcessors,
 		FuncMapGlobal:        h.GlobalFuncMap,
 		CustomParser:         h.TmplCustomParser,
+	}
+	if h.renderConfig.CustomParser == nil {
+		if h.TmplForceParser != nil {
+			h.renderConfig.CustomParser = h.TmplForceParser
+		}
+	} else {
+		if h.TmplForceParser != nil {
+			tmplForceParser := h.TmplForceParser
+			tmplCustomParser := h.TmplCustomParser
+			h.renderConfig.CustomParser = func(tmpl string, content []byte) []byte {
+				content = tmplForceParser(tmpl, content)
+				content = tmplCustomParser(tmpl, content)
+				return content
+			}
+		}
 	}
 	for key, val := range h.ParseStrings {
 		h.renderConfig.ParseStrings[key] = val
