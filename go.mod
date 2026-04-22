@@ -26,7 +26,7 @@ require (
 	github.com/admpub/go-figure v0.1.0
 	github.com/admpub/go-isatty v0.0.11
 	github.com/admpub/go-password v0.1.3
-	github.com/admpub/go-pretty/v6 v6.0.4
+	github.com/admpub/go-pretty/v6 v6.0.5
 	github.com/admpub/go-ps v0.0.1
 	github.com/admpub/godotenv v1.4.4
 	github.com/admpub/goth v0.0.4
@@ -169,7 +169,6 @@ require (
 	github.com/golang/snappy v1.0.0 // indirect
 	github.com/gomodule/redigo v1.9.3 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
-	github.com/google/pprof v0.0.0-20250607225305-033d6d78b36a // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20210202160940-bed99a852dfe // indirect
 	github.com/gorilla/css v1.0.1 // indirect
