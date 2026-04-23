@@ -90,7 +90,7 @@ func LogShow(ctx echo.Context, logFile string, extensions ...echo.H) error {
 				obj.Stop()
 				return ctx.JSON(data.SetError(err))
 			}
-			if row, err := parser(line); err != nil {
+			if row, err := parser(ctx, line); err != nil {
 				obj.Stop()
 				return ctx.JSON(data.SetError(err))
 			} else if row == nil {

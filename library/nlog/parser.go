@@ -18,9 +18,12 @@
 
 package nlog
 
-import "github.com/admpub/tail"
+import (
+	"github.com/admpub/tail"
+	"github.com/webx-top/echo"
+)
 
 // LogParsers 日志格式解析器
 var LogParsers = map[string]LogParser{}
 
-type LogParser func(line *tail.Line) (interface{}, error)
+type LogParser func(ctx echo.Context, line *tail.Line) (interface{}, error)
