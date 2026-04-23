@@ -75,7 +75,7 @@ func GetIP2RegionConfig(c echo.Context) (cfg *IP2RegionConfig, ok bool) {
 
 func getIP2RegionConfig() (cfg *IP2RegionConfig, ok bool) {
 	cfg, ok = config.FromDB(`thirdparty`).Get(`ip2region`).(*IP2RegionConfig)
-	if ok {
+	if ok && cfg.Mode != `` {
 		return
 	}
 	cfg, ok = config.FromFile().Extend.Get(`ip2region`).(*IP2RegionConfig)
