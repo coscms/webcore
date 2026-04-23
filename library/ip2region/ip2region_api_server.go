@@ -21,13 +21,13 @@ func IP2RegionHandler(c echo.Context) error {
 	}
 	cfg, _ := GetIP2RegionConfig(c)
 	if cfg != nil {
-		if len(cfg.APIKey) > 0 {
+		if len(cfg.ApiKey) > 0 {
 			val := c.Header(echo.HeaderAuthorization)
-			if strings.TrimPrefix(val, `Bearer `) != cfg.APIKey {
+			if strings.TrimPrefix(val, `Bearer `) != cfg.ApiKey {
 				return echo.ErrUnauthorized
 			}
-		} else if cfg.APIBasicAuth != nil && cfg.APIBasicAuth.Username != `` && cfg.APIBasicAuth.Password != `` {
-			if username, password, ok := c.Request().BasicAuth(); !ok || username != cfg.APIBasicAuth.Username || password != cfg.APIBasicAuth.Password {
+		} else if cfg.ApiBasicAuth != nil && cfg.ApiBasicAuth.Username != `` && cfg.ApiBasicAuth.Password != `` {
+			if username, password, ok := c.Request().BasicAuth(); !ok || username != cfg.ApiBasicAuth.Username || password != cfg.ApiBasicAuth.Password {
 				c.Response().Header().Set(echo.HeaderWWWAuthenticate, "Basic realm=Restricted")
 				return echo.ErrUnauthorized
 			}

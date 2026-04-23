@@ -15,16 +15,16 @@ import (
 // It handles API authentication (token or basic auth), custom headers, and response parsing.
 // Returns IpInfo on success or error if the request fails or API returns non-success status.
 func requestAPI(cfg *IP2RegionConfig, ip string) (ip2region.IpInfo, error) {
-	api := strings.Replace(cfg.APIURL, `{ip}`, ip, -1)
+	api := strings.Replace(cfg.ApiURL, `{ip}`, ip, -1)
 	cli := restyclient.Classic()
-	if len(cfg.APIKey) > 0 {
-		cli.SetAuthToken(cfg.APIKey)
+	if len(cfg.ApiKey) > 0 {
+		cli.SetAuthToken(cfg.ApiKey)
 	}
-	if cfg.APIBasicAuth != nil && cfg.APIBasicAuth.Username != `` && cfg.APIBasicAuth.Password != `` {
-		cli.SetBasicAuth(cfg.APIBasicAuth.Username, cfg.APIBasicAuth.Password)
+	if cfg.ApiBasicAuth != nil && cfg.ApiBasicAuth.Username != `` && cfg.ApiBasicAuth.Password != `` {
+		cli.SetBasicAuth(cfg.ApiBasicAuth.Username, cfg.ApiBasicAuth.Password)
 	}
-	if len(cfg.APIHeaders) > 0 {
-		cli.SetHeaders(cfg.APIHeaders)
+	if len(cfg.ApiHeaders) > 0 {
+		cli.SetHeaders(cfg.ApiHeaders)
 	}
 	resp, err := cli.Get(api)
 	if err != nil {
