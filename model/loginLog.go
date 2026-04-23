@@ -80,7 +80,7 @@ func (s *LoginLog) InitLocation() (ipInfo ip2regionparser.IpInfo, err error) {
 	if len(s.IpAddress) == 0 {
 		s.IpAddress = s.Context().RealIP()
 	}
-	ipInfo, err = ip2region.IPInfo(s.IpAddress)
+	ipInfo, err = ip2region.IPInfo(s.Context(), s.IpAddress)
 	if err != nil {
 		return
 	}

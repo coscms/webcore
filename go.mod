@@ -56,8 +56,8 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.41.6
 	github.com/aws/aws-sdk-go-v2/config v1.32.16
 	github.com/aws/aws-sdk-go-v2/credentials v1.19.15
-	github.com/aws/aws-sdk-go-v2/feature/s3/transfermanager v0.1.17
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.99.1
+	github.com/aws/aws-sdk-go-v2/feature/s3/transfermanager v0.1.18
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.100.0
 	github.com/caddyserver/certmagic v0.25.2
 	github.com/coscms/captcha v0.2.3
 	github.com/coscms/forms v1.16.12
@@ -90,7 +90,7 @@ require (
 	github.com/webx-top/client v0.9.10
 	github.com/webx-top/codec v0.3.0
 	github.com/webx-top/com v1.5.1
-	github.com/webx-top/db v1.30.13
+	github.com/webx-top/db v1.30.14
 	github.com/webx-top/echo v1.24.4
 	github.com/webx-top/image v0.1.2
 	github.com/webx-top/restyclient v0.0.6

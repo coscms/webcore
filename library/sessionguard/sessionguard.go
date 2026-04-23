@@ -100,7 +100,7 @@ func (c *SessionGuardConfig) validateEnv(ctx echo.Context, ownerType string, own
 		return true
 	}
 	log.Debugf(`[%s:%d]ip mismatched: %q != %q`, ownerType, ownerId, lastIP, currentIP)
-	ipInfo, err := ip2region.IPInfo(currentIP)
+	ipInfo, err := ip2region.IPInfo(ctx, currentIP)
 	if err != nil {
 		if ip2region.ErrIsInvalidIP(err) || ip2region.ErrIsNotFoundXDB(err) { // 忽略不支持 IPv6 的情况
 			return true
