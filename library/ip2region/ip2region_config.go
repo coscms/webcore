@@ -34,7 +34,7 @@ type IP2RegionConfig struct {
 	Mode string `json:"mode"` // api / local / local-memory(or set env IP2REGION_MEMORY_MODE=true)
 
 	// API 模式
-	ApiURL       string            `json:"apiUrl"` // 需要带{ip}占位符
+	ApiURL       string            `json:"apiURL"` // 需要带{ip}占位符
 	ApiKey       string            `json:"apiKey,omitempty"`
 	ApiBasicAuth *APIBasicAuth     `json:"apiBasicAuth,omitempty"`
 	ApiHeaders   map[string]string `json:"apiHeaders,omitempty"`
