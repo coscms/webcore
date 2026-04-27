@@ -62,36 +62,36 @@ func Logger() logger.Logger {
 	return IRegister().Logger()
 }
 
-func PreUse(middlewares ...interface{}) {
-	IRegister().PreUse(middlewares...)
+func PreUse(middlewares ...interface{}) route.IRegister {
+	return IRegister().PreUse(middlewares...)
 }
 
-func PreToGroup(groupName string, middlewares ...interface{}) {
-	IRegister().PreToGroup(groupName, middlewares...)
+func PreToGroup(groupName string, middlewares ...interface{}) route.IRegister {
+	return IRegister().PreToGroup(groupName, middlewares...)
 }
 
-func Use(middlewares ...interface{}) {
-	IRegister().Use(middlewares...)
+func Use(middlewares ...interface{}) route.IRegister {
+	return IRegister().Use(middlewares...)
 }
 
 // UseToGroup “@”符号代表后台网址前缀
-func UseToGroup(groupName string, middlewares ...interface{}) {
+func UseToGroup(groupName string, middlewares ...interface{}) route.IRegister {
 	if groupName != `*` {
 		groupName = `@` + groupName
 	}
-	IRegister().UseToGroup(groupName, middlewares...)
+	return IRegister().UseToGroup(groupName, middlewares...)
 }
 
-func AddGroupNamer(namers ...func(string) string) {
-	IRegister().AddGroupNamer(namers...)
+func AddGroupNamer(namers ...func(string) string) route.IRegister {
+	return IRegister().AddGroupNamer(namers...)
 }
 
-func Register(fn func(echo.RouteRegister)) {
-	RegisterToGroup(``, fn)
+func Register(fn func(echo.RouteRegister)) route.MetaSetter {
+	return RegisterToGroup(``, fn)
 }
 
-func SetRootGroup(groupName string) {
-	IRegister().SetRootGroup(groupName)
+func SetRootGroup(groupName string) route.IRegister {
+	return IRegister().SetRootGroup(groupName)
 }
 
 func Host(hostName string, middlewares ...interface{}) route.Hoster {
