@@ -50,7 +50,7 @@ type CropOptionsDefault struct {
 var DefaultCropOptions = CropOptionsDefault{
 	Quality:   75,
 	ScaleUp:   true,
-	SmartCrop: false,
+	SmartCrop: false, // 禁用智能裁剪，显著降低内存消耗
 }
 
 func ImageOptions(width, height float64, cropOptionsSetters ...func(*imageproxy.Options)) *imageproxy.Options {
