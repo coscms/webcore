@@ -50,7 +50,7 @@ type CropOptionsDefault struct {
 var DefaultCropOptions = CropOptionsDefault{
 	Quality:   75,
 	ScaleUp:   true,
-	SmartCrop: true,
+	SmartCrop: false,
 }
 
 func ImageOptions(width, height float64, cropOptionsSetters ...func(*imageproxy.Options)) *imageproxy.Options {
