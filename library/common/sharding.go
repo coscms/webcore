@@ -19,7 +19,6 @@
 package common
 
 import (
-	"math"
 	"time"
 
 	"github.com/webx-top/com"
@@ -28,8 +27,8 @@ import (
 )
 
 // IDSharding 按照ID进行分片
-func IDSharding(id uint64, shardingNum float64) uint64 {
-	return uint64(math.Ceil(float64(id) / shardingNum))
+func IDSharding(id uint64, shardingNum uint64) uint64 {
+	return id % shardingNum
 }
 
 // MD5Sharding 按照MD5进行分片
@@ -65,7 +64,7 @@ func GetNowTime(ctx echo.Context) time.Time {
 }
 
 // DirShardingNum 文件夹分组基数
-const DirShardingNum = float64(50000)
+const DirShardingNum = 50000
 
 // DirSharding 文件夹分组(暂不使用)
 func DirSharding(id uint64) uint64 {
