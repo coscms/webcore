@@ -95,7 +95,7 @@ require (
 	github.com/webx-top/image v0.1.2
 	github.com/webx-top/restyclient v0.0.6
 	github.com/webx-top/validation v0.0.3
-	github.com/webx-top/validator v0.3.1
+	github.com/webx-top/validator v0.3.2
 	golang.org/x/crypto v0.51.0
 	golang.org/x/net v0.54.0
 	golang.org/x/oauth2 v0.36.0
