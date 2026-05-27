@@ -76,8 +76,8 @@ func profileHandler(w http.ResponseWriter, r *http.Request) {
 			userM.Avatar = siteURL + `/` + strings.TrimPrefix(userM.Avatar, `/`)
 		}
 	}
-	data := map[string]interface{}{
-		"expires_in":  int64(token.GetAccessCreateAt().Add(token.GetAccessExpiresIn()).Sub(time.Now()).Seconds()),
+	data := map[string]any{
+		"expires_in":  int64(time.Until(token.GetAccessCreateAt().Add(token.GetAccessExpiresIn())).Seconds()),
 		"client_id":   clientID,
 		"id":          userID,
 		"name":        userM.Username,

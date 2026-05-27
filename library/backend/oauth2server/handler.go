@@ -7,7 +7,6 @@ import (
 
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/defaults"
-	"github.com/webx-top/echo/formfilter"
 
 	"github.com/coscms/webcore/dbschema"
 	"github.com/coscms/webcore/library/backend"
@@ -23,8 +22,6 @@ var (
 	// Debug 调试模式
 	Debug bool
 )
-
-var authCodeFormFilter = formfilter.Build(formfilter.SplitValues(`scope`, ` `))
 
 // 获取授权码(response_type=code)或token(response_type=token) (首先进入执行)
 func authorizeHandler(w http.ResponseWriter, r *http.Request) {
