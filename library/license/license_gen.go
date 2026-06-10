@@ -23,7 +23,7 @@ func Generate(privBytes []byte, pemSaveDirs ...string) error {
 		if err != nil {
 			return err
 		}
-		publicKey = string(pubBytes)
+		SetPublicKey(string(pubBytes))
 		var pemSaveDir string
 		if len(pemSaveDirs) > 0 {
 			pemSaveDir = pemSaveDirs[0]

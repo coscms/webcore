@@ -21,34 +21,39 @@ package license
 import (
 	"os"
 	"path/filepath"
+	"sync/atomic"
 
 	"github.com/admpub/log"
 	"github.com/webx-top/echo"
 )
 
-var publicKey string
+var publicKey atomic.Value
 
 func PublicKey() string {
-	return publicKey
+	s, _ := publicKey.Load().(string)
+	return s
 }
 
 func GetOrLoadPublicKey() string {
-	if len(publicKey) == 0 {
-		LoadPublicKey()
+	pubKey := PublicKey()
+	if len(pubKey) == 0 {
+		pubKey = LoadPublicKey()
 	}
-	return publicKey
+	return pubKey
 }
 
-func LoadPublicKey() {
+func LoadPublicKey() string {
 	pubKeyFile := filepath.Join(echo.Wd(), `data`, `nging.pem.pub`)
 	b, err := os.ReadFile(pubKeyFile)
 	if err != nil {
 		log.Error(`Failed to reading public key file [ ` + pubKeyFile + ` ]: ` + err.Error())
-		return
+		return ``
 	}
-	publicKey = string(b)
+	pubKey := string(b)
+	publicKey.Store(pubKey)
+	return pubKey
 }
 
-func SetPublicKey(pubkey string) {
-	publicKey = pubkey
+func SetPublicKey(pubKey string) {
+	publicKey.Store(pubKey)
 }

@@ -29,6 +29,7 @@ func Check(ctx echo.Context) error {
 		if err == ErrConnectionFailed {
 			err = nil
 		} else {
+			SetError(err)
 			err = fmt.Errorf(`[R] %w`, err)
 		}
 	}
@@ -77,7 +78,6 @@ func Ok(ctx echo.Context) bool {
 
 	default:
 		err := Check(ctx)
-		SetError(err)
 		if err == nil {
 			return true
 		}
@@ -143,11 +143,11 @@ func Validate(content ...[]byte) (err error) {
 	var pubKey string
 	b, pubKey = LicenseDecode(b)
 	if len(pubKey) > 0 {
-		if publicKey != pubKey {
+		if PublicKey() != pubKey {
 			SetPublicKey(pubKey)
 		}
 	} else {
-		pubKey = publicKey
+		pubKey = PublicKey()
 	}
 	var data *lib.LicenseData
 	data, err = lib.CheckLicenseStringAndReturning(com.Bytes2str(b), pubKey, validator)
