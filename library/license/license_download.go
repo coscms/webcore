@@ -53,7 +53,7 @@ func Download(ctx echo.Context) error {
 		}
 	}
 	b := com.Str2bytes(officialResponse.Data.License)
-	err = os.WriteFile(licenseFile, b, os.ModePerm)
+	err = os.WriteFile(licenseFile, b, 0644)
 	if err != nil {
 		return fmt.Errorf(`保存授权证书失败：%v`, err)
 	}

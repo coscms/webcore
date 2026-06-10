@@ -53,36 +53,34 @@ func Ok(ctx echo.Context) bool {
 	if SkipLicenseCheck {
 		return true
 	}
-	switch Error() {
-	case nil:
-		data := License()
-		if len(data.Key) == 0 {
-			SetError(lib.ErrUnlicensedVersion)
-			return false
-		}
-		if !data.Info.Expiration.IsZero() && time.Now().After(data.Info.Expiration) {
-			fi, err := os.Stat(FilePath())
-			if err == nil {
-				if fi.ModTime().After(licenseModTime) {
-					licenseModTime = fi.ModTime()
-					goto CHECK
-				}
-			}
-			SetError(lib.ErrExpiredLicense)
+	if Error() != nil {
+		err := Check(ctx)
+		if err != nil {
+			log.Warn(err)
 			return false
 		}
 		return true
-
-	CHECK:
-		fallthrough
-
-	default:
-		err := Check(ctx)
-		if err == nil {
-			return true
-		}
-		log.Warn(err)
 	}
+	data := License()
+	if len(data.Key) == 0 {
+		SetError(lib.ErrUnlicensedVersion)
+		return false
+	}
+	if data.Info.Expiration.IsZero() || time.Now().Before(data.Info.Expiration) {
+		return true
+	}
+	// expired — re-check if file was modified since last validation
+	fi, fiErr := os.Stat(FilePath())
+	if fiErr == nil && fi.ModTime().After(licenseModTime) {
+		licenseModTime = fi.ModTime()
+		err := Check(ctx)
+		if err != nil {
+			log.Warn(err)
+			return false
+		}
+		return true
+	}
+	SetError(lib.ErrExpiredLicense)
 	return false
 }
 

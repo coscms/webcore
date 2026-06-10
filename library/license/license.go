@@ -30,6 +30,7 @@ import (
 
 	"github.com/admpub/license_gen/lib"
 	"github.com/admpub/log"
+
 	"github.com/admpub/once"
 	"github.com/shirou/gopsutil/v4/cpu"
 	"github.com/webx-top/com"
@@ -77,6 +78,7 @@ var (
 	machineID   string
 	domain      string
 	licenseOnce once.Once
+	reloadMu    sync.Mutex
 )
 
 func Version() string {
@@ -174,6 +176,8 @@ func initLicense() {
 }
 
 func ReloadLicense() {
+	reloadMu.Lock()
+	defer reloadMu.Unlock()
 	licenseOnce.Reset()
 	licenseOnce.Do(initLicense)
 }

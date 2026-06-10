@@ -276,7 +276,7 @@ func SplitBySpace(s string, n int) []string {
 }
 
 func Sha256file(file string) (string, error) {
-	f, err := os.OpenFile(file, os.O_RDONLY, 0666)
+	f, err := os.Open(file)
 	if err != nil {
 		return ``, err
 	}

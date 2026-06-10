@@ -11,7 +11,7 @@ import (
 
 // Save 保存授权文件
 func Save(b []byte) error {
-	return os.WriteFile(licenseFile, b, os.ModePerm)
+	return os.WriteFile(licenseFile, b, 0644)
 }
 
 // Generate 生成演示版证书
@@ -31,11 +31,11 @@ func Generate(privBytes []byte, pemSaveDirs ...string) error {
 			pemSaveDir = filepath.Join(echo.Wd(), `data`)
 		}
 		if len(pemSaveDir) > 0 {
-			err = os.WriteFile(filepath.Join(pemSaveDir, `nging.pem.pub`), pubBytes, os.ModePerm)
+			err = os.WriteFile(filepath.Join(pemSaveDir, `nging.pem.pub`), pubBytes, 0644)
 			if err != nil {
 				return err
 			}
-			err = os.WriteFile(filepath.Join(pemSaveDir, `nging.pem`), privBytes, os.ModePerm)
+			err = os.WriteFile(filepath.Join(pemSaveDir, `nging.pem`), privBytes, 0600)
 			if err != nil {
 				return err
 			}
