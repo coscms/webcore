@@ -92,7 +92,7 @@ require (
 	github.com/webx-top/com v1.5.2
 	github.com/webx-top/db v1.30.16
 	github.com/webx-top/echo v1.24.6
-	github.com/webx-top/image v0.1.2
+	github.com/webx-top/image v0.1.4
 	github.com/webx-top/restyclient v0.0.6
 	github.com/webx-top/validation v0.0.3
 	github.com/webx-top/validator v0.3.3
