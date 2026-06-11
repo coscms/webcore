@@ -89,7 +89,7 @@ require (
 	github.com/webx-top/chardet v0.0.2
 	github.com/webx-top/client v0.9.10
 	github.com/webx-top/codec v0.3.0
-	github.com/webx-top/com v1.5.2
+	github.com/webx-top/com v1.5.3
 	github.com/webx-top/db v1.30.16
 	github.com/webx-top/echo v1.24.6
 	github.com/webx-top/image v0.1.4
