@@ -90,14 +90,14 @@ require (
 	github.com/webx-top/client v0.9.10
 	github.com/webx-top/codec v0.3.0
 	github.com/webx-top/com v1.5.3
-	github.com/webx-top/db v1.30.16
+	github.com/webx-top/db v1.30.17
 	github.com/webx-top/echo v1.24.6
 	github.com/webx-top/image v0.1.4
 	github.com/webx-top/restyclient v0.0.6
 	github.com/webx-top/validation v0.0.3
 	github.com/webx-top/validator v0.3.3
 	golang.org/x/crypto v0.53.0
-	golang.org/x/net v0.55.0
+	golang.org/x/net v0.56.0
 	golang.org/x/oauth2 v0.36.0
 	golang.org/x/sync v0.21.0
 	golang.org/x/text v0.38.0
