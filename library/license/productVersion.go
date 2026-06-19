@@ -385,7 +385,7 @@ func (v *ProductVersion) Upgrade(ctx echo.Context, ngingDir string, restartMode 
 			restore()
 		}, targetExecutable, restartMode...)
 		if err == nil {
-			v.prog.Send(`successfully upgrade `+bootconfig.SoftwareName+` to version `+v.Version, notice.StateSuccess)
+			v.prog.Send(`successfully upgraded `+bootconfig.SoftwareName+` to version `+v.Version, notice.StateSuccess)
 		}
 	}
 	v.prog.Complete()

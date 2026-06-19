@@ -49,17 +49,18 @@ func restartByBash(exiter func(error), executable string) error {
 	cmd.Stderr = os.Stderr
 	cmd.SysProcAttr = NewSysProcAttr()
 	log.Debugf(`restartByBash: %s`, cmd.String())
-	err := cmd.Run()
-	if err != nil && err.Error() == `signal: killed` {
-		log.Warnf(`restartByBash: %s`, err.Error())
-		err = nil
+	err := cmd.Start()
+	if err != nil {
+		if exiter != nil {
+			exiter(err)
+		}
+		return err
 	}
 	if exiter != nil {
-		exiter(err)
-	} else if err == nil {
-		os.Exit(0)
+		exiter(nil)
 	}
-	return err
+	os.Exit(0)
+	return nil
 }
 
 func generateArgs(executable string) []string {
