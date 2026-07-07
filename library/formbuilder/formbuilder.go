@@ -113,6 +113,7 @@ type FormBuilder struct {
 	translateLabelCols  int
 	renames             map[string]string
 	multilingualFields  []string
+	_formData           engine.URLValuer
 }
 
 // Exited 是否需要退出后续处理。此时一般有err值，用于记录错误原因
@@ -226,5 +227,8 @@ func (f *FormBuilder) setSnippetConfig(cfg *formsconfig.Config) *FormBuilder {
 // FormData retrieves form data from the request based on the content type.
 // Returns engine.URLValuer containing either POST form data or URL query parameters.
 func (f *FormBuilder) FormData() engine.URLValuer {
-	return FormData(f.ctx)
+	if f._formData == nil {
+		f._formData = FormData(f.ctx)
+	}
+	return f._formData
 }

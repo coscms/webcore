@@ -23,6 +23,12 @@ func (f *FormBuilder) SetLangInput(lang string, field string, value string, post
 	return f
 }
 
+// GetLangInput get the form input value for a specific language and field.
+func (f *FormBuilder) GetLangInput(lang, field string) string {
+	inputName := f.langInputNamePrefix(lang) + `[` + field + `]`
+	return f.FormData().Get(inputName)
+}
+
 // AnyLangInputCallback processes form input values for all languages, applying the given callback function to each language-specific input.
 // The callback receives the current value and language code, and returns the modified value.
 // If postFormOnly is true, only processes POST form data; otherwise processes both POST and GET data.
