@@ -230,8 +230,8 @@ github.com/clipperhouse/uax29/v2 v2.7.0/go.mod h1:EFJ2TJMRUaplDxHKj1qAEhCtQPW2tJ
 github.com/coreos/go-systemd v0.0.0-20181012123002-c6f51f82210d/go.mod h1:F5haX7vjVVG0kc13fIWeqUViNPyEJxv/OmvnBo0Yme4=
 github.com/coscms/captcha v0.2.3 h1:r9GA1x8zvaC43gr+lRm79/EAqXx4+8WXCP+vC47vC8c=
 github.com/coscms/captcha v0.2.3/go.mod h1:IAdMnt5ExsjQPA7+SVzQa9qV/xNJmV7NMEXqrFJiSME=
-github.com/coscms/forms v1.16.12 h1:XFZOEQWqLaS83n39RoQx/OUZaV9VDhIRUvjmRUDwbAM=
-github.com/coscms/forms v1.16.12/go.mod h1:AmbLU/IzWdMROhfMDRMCh3RuaJkiMZbZM8HDX2fCi8A=
+github.com/coscms/forms v1.16.13 h1:DmEbOhoOKatg/BEnW5LUBZdPuVfESRkRdneiF/zMac4=
+github.com/coscms/forms v1.16.13/go.mod h1:AmbLU/IzWdMROhfMDRMCh3RuaJkiMZbZM8HDX2fCi8A=
 github.com/coscms/go-imgparse v0.0.3 h1:5+8ADm0MqVjddVuDTuUt4UkQpbLbzs09owcHTfnX6OY=
 github.com/coscms/go-imgparse v0.0.3/go.mod h1:QjSITYRj5HlhVt2dt9tcdEsc8jMb62TT3l+iV4O08GQ=
 github.com/coscms/oauth2s v0.5.0 h1:hx40Ss3xTeIpkX0mVQST+XjNMnOeVa/eN2VuxEIscY0=
