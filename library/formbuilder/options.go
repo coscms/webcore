@@ -135,3 +135,10 @@ func Snippet(snippet bool) Option {
 		f.snippet = snippet
 	}
 }
+
+// MultilingualFields sets the struct fields that should be treated as multilingual in the form builder.
+func MultilingualFields(fields ...string) Option {
+	return func(f *FormBuilder) {
+		f.multilingualFields = fields
+	}
+}

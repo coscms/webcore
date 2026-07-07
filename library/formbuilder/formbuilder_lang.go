@@ -116,16 +116,20 @@ func (f *FormBuilder) toLangset(cfg *formsconfig.Config) {
 	if len(langCodes) <= 1 {
 		return
 	}
-	m, ok := f.Model.(factory.Short)
-	if !ok {
-		log.Warnf(`[formbuilder.toLangset] model %T does not implement factory.Short`, f.Model)
-		return
-	}
 	var multilingualFields []string
-	for _, info := range f.dbi.Fields[m.Short_()] {
-		if info.Multilingual {
-			multilingualFields = append(multilingualFields, info.GoName)
+	if f.multilingualFields == nil {
+		m, ok := f.Model.(factory.Short)
+		if !ok {
+			log.Warnf(`[formbuilder.toLangset] model %T does not implement factory.Short`, f.Model)
+			return
 		}
+		for _, info := range f.dbi.Fields[m.Short_()] {
+			if info.Multilingual {
+				multilingualFields = append(multilingualFields, info.GoName)
+			}
+		}
+	} else {
+		multilingualFields = f.multilingualFields
 	}
 	if len(multilingualFields) == 0 {
 		return

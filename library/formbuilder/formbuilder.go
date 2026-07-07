@@ -112,6 +112,7 @@ type FormBuilder struct {
 	ctxStoreKey         string
 	translateLabelCols  int
 	renames             map[string]string
+	multilingualFields  []string
 }
 
 // Exited 是否需要退出后续处理。此时一般有err值，用于记录错误原因
