@@ -218,7 +218,7 @@ func (h FileManagerHandler) Handle(ctx echo.Context) error {
 			data.SetError(ctx.NewError(code.Unsupported, `不支持浏览此类型文件`))
 			return ctx.JSON(data)
 		}
-		return nlog.LogShow(ctx, filePath, echo.H{`title`: com.BaseFileName(filePath)})
+		return nlog.LogShow(ctx, mgr.RealPath(filePath), echo.H{`title`: com.BaseFileName(filePath)})
 	default:
 		var dirs []os.FileInfo
 		var exit bool
