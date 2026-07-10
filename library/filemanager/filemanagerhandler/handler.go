@@ -8,6 +8,7 @@ import (
 
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
+	"github.com/webx-top/echo/code"
 
 	uploadClient "github.com/webx-top/client/upload"
 	uploadDropzone "github.com/webx-top/client/upload/driver/dropzone"
@@ -16,6 +17,7 @@ import (
 	"github.com/coscms/webcore/library/common"
 	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webcore/library/filemanager"
+	"github.com/coscms/webcore/library/nlog"
 	"github.com/coscms/webcore/library/notice"
 	"github.com/coscms/webcore/library/respond"
 	"github.com/coscms/webcore/registry/upload/chunk"
@@ -27,6 +29,7 @@ func New(root, urlPrefix string) *FileManagerHandler {
 		canUpload: true,
 		canEdit:   true,
 		canDelete: true,
+		canTail:   true,
 		urlPrefix: urlPrefix,
 	}
 }
@@ -35,6 +38,7 @@ type FileManagerHandler struct {
 	root      string
 	canUpload bool
 	canEdit   bool
+	canTail   bool
 	canDelete bool
 	canChmod  bool
 	canChown  bool
@@ -46,6 +50,9 @@ func (h *FileManagerHandler) SetCanUpload(can bool) {
 }
 func (h *FileManagerHandler) SetCanEdit(can bool) {
 	h.canEdit = can
+}
+func (h *FileManagerHandler) SetCanTail(can bool) {
+	h.canTail = can
 }
 func (h *FileManagerHandler) SetCanDelete(can bool) {
 	h.canDelete = can
@@ -202,6 +209,16 @@ func (h FileManagerHandler) Handle(ctx echo.Context) error {
 			}
 		}
 		return respond.Dropzone(ctx, err, nil)
+	case `tail`:
+		if !h.canTail {
+			return echo.ErrNotFound
+		}
+		if _, ok := Tailable(filePath); !ok {
+			data := ctx.Data()
+			data.SetError(ctx.NewError(code.Unsupported, `不支持浏览此类型文件`))
+			return ctx.JSON(data)
+		}
+		return nlog.LogShow(ctx, filePath, echo.H{`title`: com.BaseFileName(filePath)})
 	default:
 		var dirs []os.FileInfo
 		var exit bool
@@ -247,6 +264,10 @@ func (h FileManagerHandler) Handle(ctx echo.Context) error {
 	ctx.SetFunc(`Playable`, func(fileName string) string {
 		mime, _ := Playable(fileName)
 		return mime
+	})
+	ctx.SetFunc(`Tailable`, func(fileName string) bool {
+		_, ok := Tailable(fileName)
+		return ok
 	})
 	return err
 }

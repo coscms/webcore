@@ -9,3 +9,7 @@ func Editable(fileName string) (string, bool) {
 func Playable(fileName string) (string, bool) {
 	return config.FromFile().Sys.Playable(fileName)
 }
+
+func Tailable(fileName string) (string, bool) {
+	return config.FromFile().Sys.Tailable(fileName)
+}

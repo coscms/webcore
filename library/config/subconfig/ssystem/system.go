@@ -46,6 +46,7 @@ type System struct {
 	EditableFileMaxSize    string            `json:"editableFileMaxSize"`
 	editableFileMaxBytes   int
 	PlayableFileExtensions map[string]string `json:"playableFileExtensions"`
+	TailableFileExtensions map[string]string `json:"tailableFileExtensions"`
 	ErrorPages             map[int]string    `json:"errorPages"`
 	CmdTimeout             string            `json:"cmdTimeout"`
 	CmdTimeoutDuration     time.Duration     `json:"-"`
@@ -148,16 +149,34 @@ func (sys *System) IsEnv(name string) bool {
 }
 
 func (sys *System) Playable(fileName string) (string, bool) {
+	var extensions map[string]string
 	if sys.PlayableFileExtensions == nil {
-		sys.PlayableFileExtensions = map[string]string{
+		extensions = map[string]string{
 			`mp4`:  `video/mp4`,
 			`m3u8`: `application/x-mpegURL`,
 			//`ts`:   `video/MP2T`,
 		}
+	} else {
+		extensions = sys.PlayableFileExtensions
 	}
 	ext := strings.TrimPrefix(filepath.Ext(fileName), `.`)
 	ext = strings.ToLower(ext)
-	typ, ok := sys.PlayableFileExtensions[ext]
+	typ, ok := extensions[ext]
+	return typ, ok
+}
+
+func (sys *System) Tailable(fileName string) (string, bool) {
+	var extensions map[string]string
+	if sys.TailableFileExtensions == nil {
+		extensions = map[string]string{
+			`log`: `log`,
+		}
+	} else {
+		extensions = sys.TailableFileExtensions
+	}
+	ext := strings.TrimPrefix(filepath.Ext(fileName), `.`)
+	ext = strings.ToLower(ext)
+	typ, ok := extensions[ext]
 	return typ, ok
 }
 
