@@ -79,11 +79,8 @@ func LogShow(ctx echo.Context, logFile string, extensions ...echo.H) error {
 		if !ok {
 			return ctx.JSON(data.SetInfo(ctx.T(`Invalid pipe: %s`, pipe), 0))
 		}
-		maxRows := 1000
-		if config.LastLines < maxRows {
-			maxRows = config.LastLines
-		}
-		rows := make([]interface{}, 0, maxRows)
+		maxRows := min(1000, config.LastLines)
+		rows := make([]any, 0, maxRows)
 		for line := range obj.Lines {
 			line.Text, err = transform(line.Text)
 			if err != nil {

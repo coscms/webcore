@@ -37,7 +37,7 @@ var ServiceOptions = &service.Options{
 	Name:          ``,
 	DisplayName:   ``,
 	Description:   ``,
-	Options:       map[string]interface{}{},
+	Options:       map[string]any{},
 	MaxRetries:    10,
 	RetryInterval: 60,
 }
