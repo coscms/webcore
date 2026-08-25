@@ -80,8 +80,8 @@ github.com/admpub/go-zbar-wasm v0.0.0-20251219053451-e85456633a16 h1:gywBpCi3phu
 github.com/admpub/go-zbar-wasm v0.0.0-20251219053451-e85456633a16/go.mod h1:9k8ALd/ZUaSTgPbskNsaW8yPgSRZwt+GoT3EBilgmms=
 github.com/admpub/godotenv v1.4.4 h1:xi/+0B0k/F3ZfuoYICccvn3KGLOWRomJHZLB5PZ7iQY=
 github.com/admpub/godotenv v1.4.4/go.mod h1:W8zOql4lSgnK6zfI6Le+GXlAaz5ZCj4kZI2wgcjar18=
-github.com/admpub/goth v0.0.4 h1:eOSvkOwrj6Z/Q25OdUHWwn9mF5/6Y0oWQkdApnwD8uM=
-github.com/admpub/goth v0.0.4/go.mod h1:xx12SdWA3k6CpCY0KrfnS0DHPckui0Zz0/FtGi09y4U=
+github.com/admpub/goth v0.0.5 h1:YioxUhvVlZYl8ETn//9ATeF+/5J+jd5gTVigx4rp17s=
+github.com/admpub/goth v0.0.5/go.mod h1:O0e+CAzSk/TdWImlFfh3DODJcc0FtcSSyiNajRVQBPo=
 github.com/admpub/httpscerts v0.0.0-20180907121630-a2990e2af45c h1:tmqtGUQDycCYRZedeZyn+097k4x3MHkVTIqJAvHGStM=
 github.com/admpub/httpscerts v0.0.0-20180907121630-a2990e2af45c/go.mod h1:ntjmNJTEY4r6P9iKkN08oWLxjJSy85dSsJv6S0mjB3M=
 github.com/admpub/humanize v0.0.0-20190501023926-5f826e92c8ca h1:9mfauR3d9p41BFnAoXmHc2z8yHcgg+3+jT1hbnQrtXo=

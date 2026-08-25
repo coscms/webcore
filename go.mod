@@ -29,7 +29,7 @@ require (
 	github.com/admpub/go-pretty/v6 v6.0.5
 	github.com/admpub/go-ps v0.0.1
 	github.com/admpub/godotenv v1.4.4
-	github.com/admpub/goth v0.0.4
+	github.com/admpub/goth v0.0.5
 	github.com/admpub/httpscerts v0.0.0-20180907121630-a2990e2af45c
 	github.com/admpub/imageproxy v0.10.1
 	github.com/admpub/ip2region/v3 v3.0.5
