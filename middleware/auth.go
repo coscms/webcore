@@ -88,9 +88,9 @@ func AuthCheck(h echo.Handler) echo.HandlerFunc {
 				return nil
 			}
 			if !permission.Check(c, route) {
-				return nerrors.ErrUserNoPerm
+				return role.AuthDependency(c, user, permission, route)
 			}
-			return role.AuthDependency(c, user, permission, route)
+			return nil
 		})
 		if handlerPermission == httpserver.PermissionPublic {
 			return h.Handle(c)
