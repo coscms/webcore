@@ -91,5 +91,6 @@ func TestParse(t *testing.T) {
 	assert.True(t, m.Check(`manager/upload/*`))
 	assert.True(t, m.Check(`manager/user`))
 	assert.True(t, m.Check(`manager/settings`))
+	assert.True(t, m.Check(`/manager/settings`))
 	assert.False(t, m.Check(`manager/verification/delete/settings`))
 }

@@ -147,8 +147,9 @@ func (m *Map) checkByNav(perm string) bool {
 }
 
 // Check 检测权限
-// perm: /a/b/c
+// perm: /a/b/c or a/b/c
 func (m *Map) Check(perm string) bool {
+	perm = strings.TrimPrefix(perm, `/`)
 	if m.cached == nil || m == m.cached {
 		return m.checkByNav(perm)
 	}
